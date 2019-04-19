@@ -6,8 +6,8 @@ class Splash extends StatelessWidget {
   /// Returns a centered application logo.
   ///
   Widget getLogoWidget() {
-    return new Align(
-        alignment: new Alignment(0, -1000),
+    return new Padding(
+        padding: EdgeInsets.only(top: 50),
         child: new ConstrainedBox(
             constraints: BoxConstraints(
               minWidth: 300,
@@ -30,24 +30,37 @@ class Splash extends StatelessWidget {
   }
 
   Widget getAuthButton() {
-    return new Align(
+    return new Expanded(
+      child: new Align(
           alignment: Alignment.bottomCenter,
-          child: RaisedButton(
-            color: Color.fromRGBO(100, 78, 0, 1),
-            onPressed: () =>
-            {
-            debugPrint("Im tapped")
-            },
-            child: const Text('Log In / Register'),
-          ),
-        );
+          child: SizedBox(
+            height: 100,
+            width: double.infinity,
+              child: RaisedButton(
+                color: Color.fromRGBO(254, 199, 0, 1),
+                onPressed: () => {
+                debugPrint("Im tapped")
+                },
+                child: Text(
+                  'Log In / Register',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold
+                  ),
+                ),
+              ))
+      ),
+    );
   }
 
   @override
   Widget build (BuildContext context) => new Scaffold(
       backgroundColor: Colors.white,
       body: new Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
         children: <Widget>[
           getLogoWidget(),
           getAuthButton()
