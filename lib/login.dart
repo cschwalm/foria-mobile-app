@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:foria/utils.dart';
 
-class Splash extends StatelessWidget {
+class Login extends StatelessWidget {
 
   ///
   /// Returns a centered application logo.
@@ -29,7 +30,7 @@ class Splash extends StatelessWidget {
     );
   }
 
-  Widget getAuthButton() {
+  Widget getAuthButton(BuildContext context) {
     return new Expanded(
       child: new Align(
           alignment: Alignment.bottomCenter,
@@ -39,7 +40,7 @@ class Splash extends StatelessWidget {
               child: RaisedButton(
                 color: Color.fromRGBO(254, 199, 0, 1),
                 onPressed: () => {
-                debugPrint("Im tapped")
+                webLogin(context)
                 },
                 child: Text(
                   'Log In / Register',
@@ -63,7 +64,7 @@ class Splash extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
           getLogoWidget(),
-          getAuthButton()
+          getAuthButton(context)
         ],
       )
   );

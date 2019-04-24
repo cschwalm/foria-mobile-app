@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-class Home extends StatelessWidget {
+class Tickets extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) => new Container(
       child: new Column(
@@ -12,7 +13,7 @@ class Home extends StatelessWidget {
               size: 150.0,
               color: Colors.black12
           ),
-          new Text('Home tab content')
+          new Text('Tickets tab content')
         ],
       )
   );

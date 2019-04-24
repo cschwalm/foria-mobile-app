@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:foria/utils.dart';
 
 class Settings extends StatelessWidget {
   @override
@@ -7,12 +8,21 @@ class Settings extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
-        new Icon(
-            Icons.settings,
-            size: 150.0,
-            color: Colors.black12
+        new Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            RaisedButton(
+              onPressed: () {
+                logout(context);
+              },
+              child: Text(
+                'Logout',
+                textAlign: TextAlign.center,
+              ),
+            )
+          ],
         ),
-        new Text('Settings tab content')
       ],
     ),
   );

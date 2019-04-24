@@ -24,6 +24,8 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
   otp: 1.0.1
+  flutter_secure_storage: 3.2.1
+  jose: ^0.1.2
   flutter_auth0:
     git:
       url: https://github.com/devdennysegura/flutter-auth0
@@ -46,6 +48,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/jwks.json
     - assets/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see

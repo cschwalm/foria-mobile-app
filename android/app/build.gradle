@@ -33,7 +33,7 @@ android {
 
     defaultConfig {
         applicationId "com.foriatickets.foria"
-        minSdkVersion 20
+        minSdkVersion 23
         targetSdkVersion 28
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

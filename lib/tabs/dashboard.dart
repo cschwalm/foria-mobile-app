@@ -2,12 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_auth0/flutter_auth0.dart';
+import 'package:foria/constants.dart';
 
-final String clientId = 'V1jhyoo97eyJCswxErzMb-DWD98DVgZi';
-final String domain = 'foriatickets.auth0.com';
-
-final Auth0 auth = new Auth0(clientId: clientId, domain: domain);
-final WebAuth web = new WebAuth(clientId: clientId, domain: domain);
+final Auth0 auth = new Auth0(clientId: auth0ClientKey, domain: auth0Domain);
+final WebAuth web = new WebAuth(clientId: auth0ClientKey, domain: auth0Domain);
 
 class Dashboard extends StatefulWidget {
   Dashboard({Key key}) : super(key: key);
@@ -92,7 +90,7 @@ class _MyDashboardState extends State<Dashboard> {
   void webLogin() {
     web
         .authorize(
-      audience: 'https://$domain/userinfo',
+      audience: 'https://$auth0Domain/userinfo',
       scope: 'openid email offline_access',
     )
         .then((value) {
