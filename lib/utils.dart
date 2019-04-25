@@ -11,6 +11,8 @@ import 'package:jose/jose.dart';
 final Auth0 _auth = new Auth0(clientId: auth0ClientKey, domain: auth0Domain);
 final WebAuth _web = new WebAuth(clientId: auth0ClientKey, domain: auth0Domain);
 
+final _storage = new FlutterSecureStorage();
+
 /// Shows the user a generic error message.
 void showErrorAlert(BuildContext context, String error) {
 
@@ -62,10 +64,9 @@ Future<void> _storeAuthInfo(dynamic authInfo) async {
 
   } else {
 
-    final storage = new FlutterSecureStorage();
-    storage.write(key: accessTokenKey, value: authToken);
-    storage.write(key: idTokenKey, value: idToken);
-    storage.write(key: refreshTokenKey, value: refreshToken);
+    _storage.write(key: accessTokenKey, value: authToken);
+    _storage.write(key: idTokenKey, value: idToken);
+    _storage.write(key: refreshTokenKey, value: refreshToken);
 
     debugPrint("Tokens stored in secure storage.");
   }
@@ -122,8 +123,9 @@ Future<bool> _validateJwt(String encodedJwt, String audience) async {
 ///
 void logout(BuildContext context) {
 
-  final storage = new FlutterSecureStorage();
-  storage.deleteAll();
+  refreshTokens();
+  
+  //_storage.deleteAll();
 
   debugPrint("Logout called. Secrets deleted.");
   Navigator.pushReplacementNamed(context, '/login');
@@ -156,4 +158,34 @@ void webLogin(BuildContext context) {
     showErrorAlert(context, loginError);
     return;
   });
+}
+
+///
+/// Fetches a new access token for when the current one is expired.
+/// This also validates the new access token, and if valid, replaces the previous token.
+///
+/// On exception, the user should be logged out.
+///
+Future<void> refreshTokens() async {
+
+  String refreshToken = await _storage.read(key: refreshTokenKey);
+  if (refreshToken == null) {
+
+    debugPrint("Refresh token is null when attempting refresh!");
+    throw new Exception("Refresh token is null when attempting refresh!");
+  }
+  
+  var auth0Result = await _auth.refreshToken(refreshToken: refreshToken);
+  debugPrint("Refresh Response received: $auth0Result");
+
+  String authToken = auth0Result['access_token'];
+
+  bool isAuthTokenValid = await _validateJwt(authToken, auth0Audience);
+  if (!isAuthTokenValid) {
+    debugPrint("Returned auth token is not valid!");
+    throw new Exception("Returned auth token is not valid!");
+  }
+
+  _storage.write(key: accessTokenKey, value: authToken);
+  debugPrint("Token refresh complete.");
 }
