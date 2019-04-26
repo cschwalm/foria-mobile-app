@@ -123,9 +123,7 @@ Future<bool> _validateJwt(String encodedJwt, String audience) async {
 ///
 void logout(BuildContext context) {
 
-  refreshTokens();
-  
-  //_storage.deleteAll();
+  _storage.deleteAll();
 
   debugPrint("Logout called. Secrets deleted.");
   Navigator.pushReplacementNamed(context, '/login');
@@ -161,12 +159,53 @@ void webLogin(BuildContext context) {
 }
 
 ///
+/// Checks if the user has a valid access token. If not, the app attempts to
+/// refresh tokens.
+///
+/// On failure this method will return false.
+///
+Future<bool> isUserLoggedIn() async {
+
+    String accessTokenStr = await _storage.read(key: accessTokenKey);
+
+    if (accessTokenStr == null) {
+      debugPrint("User is not logged in. No access token found.");
+      return false;
+    }
+
+    JsonWebToken jwt;
+    try {
+      jwt = new JsonWebToken.unverified(accessTokenStr);
+    } catch (e) {
+      debugPrint("Failed to parse JWT on login! - Error: $e");
+      return false;
+    }
+
+
+    bool isExpired = DateTime.now().compareTo(jwt.claims.expiry) >= 0;
+    if (isExpired) { //Expiration check should be skipped if there is no internet to allow offline access.
+
+      try {
+        String newTokenStr = await _refreshToken();
+        jwt = new JsonWebToken.unverified(newTokenStr);
+      } catch (ex) {
+        debugPrint("Exception caught refreshing token. Msg: $ex");
+        return false;
+      }
+    }
+
+    debugPrint("User is logged in with a valid token.");
+    return true;
+}
+
+///
 /// Fetches a new access token for when the current one is expired.
 /// This also validates the new access token, and if valid, replaces the previous token.
 ///
 /// On exception, the user should be logged out.
+/// Returns the new valid access token.
 ///
-Future<void> refreshTokens() async {
+Future<String> _refreshToken() async {
 
   String refreshToken = await _storage.read(key: refreshTokenKey);
   if (refreshToken == null) {
@@ -188,4 +227,5 @@ Future<void> refreshTokens() async {
 
   _storage.write(key: accessTokenKey, value: authToken);
   debugPrint("Token refresh complete.");
+  return authToken;
 }
