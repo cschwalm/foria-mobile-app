@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+
 import io.flutter.plugins.flutterauth0.FlutterAuth0Plugin;
-import com.example.flutterauth0.MainActivity;
 
 public class RedirectUriReceiver extends Activity {
 
