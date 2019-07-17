@@ -5,10 +5,10 @@ const auth0ClientKey = "V1jhyoo97eyJCswxErzMb-DWD98DVgZi";
 const String auth0Audience = "api.foriatickets.com";
 
 /// Domain to send Auth0 requests.
-const String auth0Domain = "foriatickets.auth0.com";
+const String auth0Domain = "auth.foriatickets.com";
 
 /// Domain to send Auth0 requests.
-const String JWTIssuer = "https://foriatickets.auth0.com/";
+const String JWTIssuer = "https://auth.foriatickets.com/";
 
 /// Key name for the access token used in secure storage plugin.
 const String accessTokenKey = "OAUTH2_ACCESS_TOKEN";
