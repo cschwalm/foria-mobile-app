@@ -38,7 +38,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data
-                        android:host="foriatickets.auth0.com"
+                        android:host="auth.foriatickets.com"
                         android:pathPrefix="/android/${applicationId}/callback"
                         android:scheme="${applicationId}" />
             </intent-filter>
