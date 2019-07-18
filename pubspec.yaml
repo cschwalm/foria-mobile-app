@@ -29,6 +29,9 @@ dependencies:
   flutter_auth0:
     git:
       url: https://github.com/devdennysegura/flutter-auth0
+  openapi:
+    git:
+      url: ssh://git@bitbucket.org/foriatickets/foria-flutter-client.git
 
 dev_dependencies:
   flutter_test:
