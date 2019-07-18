@@ -22,7 +22,7 @@ class Login extends StatelessWidget {
             DecoratedBox(
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/images/red-logo.png'),
+                  image: AssetImage('assets/images/foria-logo.png'),
                   // ...
                 ),
                 // ...

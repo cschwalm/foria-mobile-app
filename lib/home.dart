@@ -1,57 +1,48 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import './tabs/tickets.dart' as _ticketsTab;
-import './tabs/settings.dart' as _settingsTab;
+import './tabs/my_passes.dart' as _myPassesTab;
+import './tabs/account.dart' as _accountTab;
 
 class Home extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
-
     return new Tabs();
   }
 }
 
 class FromRightToLeft<T> extends MaterialPageRoute<T> {
-  FromRightToLeft({ WidgetBuilder builder, RouteSettings settings })
+  FromRightToLeft({WidgetBuilder builder, RouteSettings settings})
       : super(builder: builder, settings: settings);
 
   @override
-  Widget buildTransitions(
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child) {
-
-    if (settings.isInitialRoute)
-      return child;
+  Widget buildTransitions(BuildContext context, Animation<double> animation,
+      Animation<double> secondaryAnimation, Widget child) {
+    if (settings.isInitialRoute) return child;
 
     return new SlideTransition(
       child: new Container(
-        decoration: new BoxDecoration(
-            boxShadow: [
-              new BoxShadow(
-                color: Colors.black26,
-                blurRadius: 25.0,
-              )
-            ]
-        ),
+        decoration: new BoxDecoration(boxShadow: [
+          new BoxShadow(
+            color: Colors.black26,
+            blurRadius: 25.0,
+          )
+        ]),
         child: child,
       ),
       position: new Tween<Offset>(
         begin: const Offset(1.0, 0.0),
         end: Offset.zero,
-      )
-          .animate(
-          new CurvedAnimation(
-            parent: animation,
-            curve: Curves.fastOutSlowIn,
-          )
-      ),
+      ).animate(new CurvedAnimation(
+        parent: animation,
+        curve: Curves.fastOutSlowIn,
+      )),
     );
   }
-  @override Duration get transitionDuration => const Duration(milliseconds: 400);
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 400);
 }
 
 class Tabs extends StatefulWidget {
@@ -60,7 +51,6 @@ class Tabs extends StatefulWidget {
 }
 
 class TabsState extends State<Tabs> {
-
   PageController _tabController;
 
   var _titleApp;
@@ -74,114 +64,71 @@ class TabsState extends State<Tabs> {
   }
 
   @override
-  void dispose(){
+  void dispose() {
     super.dispose();
     _tabController.dispose();
   }
 
   @override
-  Widget build (BuildContext context) => new Scaffold(
-
-
-    //App Bar
-      appBar: new AppBar(
-        title: new Text(
-          _titleApp,
-          style: new TextStyle(
-            fontSize: Theme.of(context).platform == TargetPlatform.iOS ? 17.0 : 20.0,
+  Widget build(BuildContext context) => new Scaffold(
+        //App Bar
+        appBar: new AppBar(
+          title: new Text(
+            _titleApp,
+            style: new TextStyle(
+              fontSize: Theme.of(context).platform == TargetPlatform.iOS
+                  ? 17.0
+                  : 20.0,
+            ),
           ),
+          elevation:
+              Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
         ),
-        elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
-      ),
 
-      //Content of tabs
-      body: new PageView(
-        controller: _tabController,
-        onPageChanged: onTabChanged,
-        children: <Widget>[
-          new _ticketsTab.Tickets(),
-          new _settingsTab.Settings()
-        ],
-      ),
+        //Content of tabs
+        body: new PageView(
+          controller: _tabController,
+          onPageChanged: onTabChanged,
+          children: <Widget>[
+            new _myPassesTab.MyPassesTab(),
+            new _accountTab.AccountTab()
+          ],
+        ),
 
-      //Tabs
-      bottomNavigationBar: Theme.of(context).platform == TargetPlatform.iOS ?
-      new CupertinoTabBar(
-        activeColor: Colors.blueGrey,
-        currentIndex: _tab,
-        onTap: onTap,
-        items: TabItems.map((TabItem) {
-          return new BottomNavigationBarItem(
-            title: new Text(TabItem.title),
-            icon: new Icon(TabItem.icon),
-          );
-        }).toList(),
-      ):
-      new BottomNavigationBar(
-        currentIndex: _tab,
-        onTap: onTap,
-        items: TabItems.map((TabItem) {
-          return new BottomNavigationBarItem(
-            title: new Text(TabItem.title),
-            icon: new Icon(TabItem.icon),
-          );
-        }).toList(),
-      ),
+        //Tabs
+        bottomNavigationBar: Theme.of(context).platform == TargetPlatform.iOS
+            ? new CupertinoTabBar(
+                activeColor: Theme.of(context).primaryColor,
+                iconSize: 26,
+                currentIndex: _tab,
+                onTap: onTap,
+                items: TabItems.map((TabItem) {
+                  return new BottomNavigationBarItem(
+                    title: new Text(TabItem.title),
+                    icon: new Icon(TabItem.icon),
+                    activeIcon: new Icon(TabItem.activeIcon),
+                  );
+                }).toList(),
+              )
+            : new BottomNavigationBar(
+                currentIndex: _tab,
+                onTap: onTap,
+                items: TabItems.map((TabItem) {
+                  return new BottomNavigationBarItem(
+                    title: new Text(TabItem.title),
+                    icon: new Icon(TabItem.icon),
+                    activeIcon: new Icon(TabItem.activeIcon),
+                  );
+                }).toList(),
+              ),
+      );
 
-      //Drawer
-      drawer: new Drawer(
-          child: new ListView(
-            children: <Widget>[
-              new Container(
-                height: 120.0,
-                child: new DrawerHeader(
-                  padding: new EdgeInsets.all(0.0),
-                  decoration: new BoxDecoration(
-                    color: new Color(0xFFECEFF1),
-                  ),
-                  child: new Center(
-                    child: new FlutterLogo(
-                      colors: Colors.blueGrey,
-                      size: 54.0,
-                    ),
-                  ),
-                ),
-              ),
-              new ListTile(
-                  leading: new Icon(Icons.chat),
-                  title: new Text('Support'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.of(context).pushNamed('/support');
-                  }
-              ),
-              new ListTile(
-                  leading: new Icon(Icons.info),
-                  title: new Text('About'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.of(context).pushNamed('/about');
-                  }
-              ),
-              new Divider(),
-              new ListTile(
-                  leading: new Icon(Icons.exit_to_app),
-                  title: new Text('Sign Out'),
-                  onTap: () {
-                    Navigator.pop(context);
-                  }
-              ),
-            ],
-          )
-      )
-  );
-
-  void onTap(int tab){
+  void onTap(int tab) {
     _tabController.jumpToPage(tab);
   }
 
   void onTabChanged(int tab) {
-    setState((){
+    setState(() {
       this._tab = tab;
     });
 
@@ -198,12 +145,22 @@ class TabsState extends State<Tabs> {
 }
 
 class TabItem {
-  const TabItem({ this.title, this.icon });
+  const TabItem({this.title, this.icon, this.activeIcon});
+
   final String title;
   final IconData icon;
+  final IconData activeIcon;
 }
 
 const List<TabItem> TabItems = const <TabItem>[
-  const TabItem(title: 'Tickets', icon: Icons.home),
-  const TabItem(title: 'Settings', icon: Icons.settings)
+  const TabItem(
+      title: 'My Passes',
+      icon: IconData(0xe900,fontFamily: 'ticket',),
+    activeIcon: IconData(0xe900,fontFamily: 'ticket',),
+  ),
+  const TabItem(
+      title: 'Account',
+      icon: FontAwesomeIcons.user,
+    activeIcon: FontAwesomeIcons.solidUser,
+  )
 ];

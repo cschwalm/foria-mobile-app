@@ -36,6 +36,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  font_awesome_flutter: ^8.0.1
 
 
 # For information on the generic Dart part of this file, see the
@@ -53,6 +54,7 @@ flutter:
   assets:
     - assets/jwks.json
     - assets/images/
+    - assets/ui_elements/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
@@ -65,7 +67,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
+  fonts:
+    - family: ticket
+      fonts:
+        - asset: assets/ui_elements/ticket.ttf
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf

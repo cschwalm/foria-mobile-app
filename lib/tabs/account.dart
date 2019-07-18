@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foria/utils.dart';
 
-class Settings extends StatelessWidget {
+class AccountTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) => new Container(
     child: new Column(
