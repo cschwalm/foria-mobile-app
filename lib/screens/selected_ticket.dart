@@ -18,7 +18,7 @@ class SelectedTicket extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: <Widget>[
-            SizedBox(height: 10,),
+            SizedBox(height: 20,),
             Row(children: <Widget>[
               Stack(
                 children: <Widget>[
@@ -119,7 +119,7 @@ class SelectedTicket extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(bottom: 60),
+              padding: const EdgeInsets.only(bottom: 20),
               child: Column(
                 children: <Widget>[
                   Text(
@@ -132,17 +132,24 @@ class SelectedTicket extends StatelessWidget {
                     child: Row(children: <Widget>[
                       Expanded(
                         child: CupertinoButton(
-                          child: Text('Transfer'),
+                          child: Text(
+                            'Sell',
+                            style: Theme.of(context).textTheme.button,),
                           padding: EdgeInsets.symmetric(horizontal: 0),
                           color: Theme.of(context).primaryColor,
+                          onPressed: () {},
                         ),
                       ),
                       SizedBox(width: 30,),
                       Expanded(
                         child: CupertinoButton(
-                          child: Text('Transfer'),
+                          child: Text(
+                              'Transfer',
+                            style: Theme.of(context).textTheme.button,
+                          ),
                           padding: EdgeInsets.symmetric(horizontal: 0),
                           color: Theme.of(context).primaryColor,
+                          onPressed: () {},
                         ),
                       ),
                     ],),
@@ -157,6 +164,4 @@ class SelectedTicket extends StatelessWidget {
       ),
     );
   }
-
-  SelectedTicket();
 }

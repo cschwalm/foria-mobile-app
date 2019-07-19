@@ -25,6 +25,7 @@ void main() async {
             fontFamily: 'Rubik',
             textTheme: TextTheme(
               title: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+              button: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white),
               body1: TextStyle(fontSize: 18.0, color: Colors.grey[700]),
               body2: TextStyle(fontSize: 14.0, color: Colors.grey[700]),
               display1: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.black),
