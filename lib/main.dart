@@ -20,6 +20,7 @@ void main() async {
             appBarTheme: AppBarTheme(
               color: Color(0xFFC5003C),
             ),
+
             primaryColor: Color(0xFFFF0266),
             primaryColorDark: Color(0xFFC5003C),
             fontFamily: 'Rubik',

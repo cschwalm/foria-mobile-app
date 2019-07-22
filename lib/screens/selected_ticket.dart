@@ -15,7 +15,7 @@ class SelectedTicket extends StatelessWidget {
         backgroundColor: Theme.of(context).primaryColorDark,
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           children: <Widget>[
             SizedBox(height: 20,),
@@ -90,7 +90,7 @@ class SelectedTicket extends StatelessWidget {
                       Icon(CupertinoIcons.right_chevron),
                     ],
                   ),
-                  SizedBox(width: 10,),
+                  SizedBox(height: 10,),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
