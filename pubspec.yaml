@@ -71,6 +71,9 @@ flutter:
     - family: ticket
       fonts:
         - asset: assets/ui_elements/ticket.ttf
+    - family: ellipse
+      fonts:
+        - asset: assets/ui_elements/ellipse.ttf
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf

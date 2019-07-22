@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import './tabs/my_passes.dart' as _myPassesTab;
-import './tabs/account.dart' as _accountTab;
+import './tabs/my_passes_tab.dart' as _myPassesTab;
+import './tabs/account_tab.dart' as _accountTab;
 
 class Home extends StatelessWidget {
   @override

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:foria/utils.dart';
 import 'package:flutter/cupertino.dart';
 import '../widgets/settings_item.dart';
-import '../screens/selected_ticket.dart';
+import '../screens/selected_ticket_screen.dart';
 
 class AccountTab extends StatelessWidget {
   @override
@@ -20,7 +20,7 @@ class AccountTab extends StatelessWidget {
               content: SettingsNavigationIndicator(),
               onPress: () {
                 Navigator.of(context).pushNamed(
-                  SelectedTicket.routeName,
+                  SelectedTicketScreen.routeName,
                   arguments: null,
                 );
               },
@@ -34,7 +34,7 @@ class AccountTab extends StatelessWidget {
               content: SettingsNavigationIndicator(),
               onPress: () {
                 Navigator.of(context).pushNamed(
-                  SelectedTicket.routeName,
+                  SelectedTicketScreen.routeName,
                   arguments: null,
                 );
               },
@@ -46,6 +46,7 @@ class AccountTab extends StatelessWidget {
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
+
                 children: <Widget>[
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16),

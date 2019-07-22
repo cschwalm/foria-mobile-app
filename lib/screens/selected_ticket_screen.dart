@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
-/// WHY DOES THE SCAFFOLD GET HIDDEN BEHIND TAB BAR AND NAV BAR
+import 'register_and_transfer_screen.dart';
 
-class SelectedTicket extends StatelessWidget {
 
-  static const routeName = '/my-ticket';
+class SelectedTicketScreen extends StatelessWidget {
+
+  static const routeName = '/selected-ticket';
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +150,12 @@ class SelectedTicket extends StatelessWidget {
                           ),
                           padding: EdgeInsets.symmetric(horizontal: 0),
                           color: Theme.of(context).primaryColor,
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.of(context).pushNamed(
+                              RegisterAndTransferScreen.routeName,
+                              arguments: null,
+                            );
+                          },
                         ),
                       ),
                     ],),
@@ -157,8 +163,6 @@ class SelectedTicket extends StatelessWidget {
                 ],
               ),
             ),
-
-
           ],
         ),
       ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../screens/selected_ticket.dart';
+import '../screens/selected_ticket_screen.dart';
 
 class MyPassesTab extends StatelessWidget {
 
@@ -42,7 +42,7 @@ class MyPassesTab extends StatelessWidget {
                         onTap: () {
 //                          Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => MyTicket()));
                           Navigator.of(context).pushNamed(
-                            SelectedTicket.routeName,
+                            SelectedTicketScreen.routeName,
                             arguments: null,
                           );
                         },
