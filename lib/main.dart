@@ -6,8 +6,14 @@ import 'package:foria/utils.dart';
 
 import 'screens/selected_ticket_screen.dart';
 import 'screens/register_and_transfer_screen.dart';
+import 'package:flutter/services.dart' show DeviceOrientation, SystemChrome;
 
 void main() async {
+
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 
   runApp(
       new MaterialApp(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:foria/main.dart';
+import 'package:foria/widgets/primary_button.dart';
 
 class StepTitle extends StatelessWidget {
   final String index;
@@ -56,7 +57,6 @@ class StepOne extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         StepTitle('1', 'Verify your account'),
@@ -76,41 +76,17 @@ class StepOne extends StatelessWidget {
             ]),
           ),
         ),
-        CupertinoButton(
-          padding: EdgeInsets.zero,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Icon(Icons.add_a_photo),
-              SizedBox(
-                width: 10,
-              ),
-              Text(
-                'Frontside photo of your ID',
-                style: Theme.of(context).textTheme.button,
-              ),
-            ],
-          ),
-          color: Theme.of(context).primaryColor,
-          onPressed: () {},
+        SizedBox(height: 20,),
+        PrimaryButton(
+          text: 'Frontside photo of your ID',
+          icon: Icons.add_a_photo,
+          onPress: () {},
         ),
-        CupertinoButton(
-          padding: EdgeInsets.zero,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Icon(Icons.add_a_photo),
-              SizedBox(
-                width: 10,
-              ),
-              Text(
-                'Backside photo of your ID',
-                style: Theme.of(context).textTheme.button,
-              ),
-            ],
-          ),
-          color: Theme.of(context).primaryColor,
-          onPressed: () {},
+        SizedBox(height: 20,),
+        PrimaryButton(
+          text: 'Backside photo of your ID',
+          icon: Icons.add_a_photo,
+          onPress: () {},
         ),
       ],
     );
@@ -125,26 +101,20 @@ class StepTwo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            StepTitle('2', 'Who should receive your ticket?'),
-            Padding(
-              padding: const EdgeInsets.only(left: 45),
-              child: Text(
-                'Note: transfers are not reversible',
-                style: Theme.of(context).textTheme.body2,
-              ),
-            )
-          ],
-        ),
+        SizedBox(height: 40,),
+        StepTitle('2', 'Who should receive your ticket?'),
         Padding(
             padding: const EdgeInsets.only(left: 45),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                Text(
+                  'Note: transfers are not reversible',
+                  style: Theme.of(context).textTheme.body2,
+                ),
+                SizedBox(height: 20,),
                 TextFormField(
                   decoration: InputDecoration(
                       filled: true,
@@ -194,19 +164,9 @@ class ProcessTransfer extends StatelessWidget {
         SizedBox(
           height: 20,
         ),
-        CupertinoButton(
-          padding: EdgeInsets.zero,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                'Process transfer',
-                style: Theme.of(context).textTheme.button,
-              ),
-            ],
-          ),
-          color: Theme.of(context).primaryColor,
-          onPressed: () {},
+        PrimaryButton(
+          text: 'Process transfer',
+          onPress: () {},
         ),
         SizedBox(
           height: 10,
@@ -241,13 +201,16 @@ class RegisterAndTransferScreen extends StatelessWidget {
 
         //Content of tabs
         body: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 40),
           child: new Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              Expanded(child: StepOne(),flex: 2,),
-              Expanded(child: StepTwo(),flex: 2,),
-              Expanded(child: ProcessTransfer(),flex: 1,),
+              StepOne(),
+              StepTwo(),
+              Expanded(
+                child: ProcessTransfer(),
+                flex: 1,
+              ),
             ],
           ),
         ),
