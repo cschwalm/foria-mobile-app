@@ -118,6 +118,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "8.5.0"
+  foria_flutter_client:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "34ae7631428019316d15818fde08980f419237e2"
+      url: "ssh://git@bitbucket.org/foriatickets/foria-flutter-client.git"
+    source: git
+    version: "1.0.0"
   http:
     dependency: transitive
     description:
@@ -153,15 +162,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.6"
-  openapi:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "73bfd8753f299a54a8303c1eaa84aaf4db5187ba"
-      url: "ssh://git@bitbucket.org/foriatickets/foria-flutter-client.git"
-    source: git
-    version: "1.0.0"
   otp:
     dependency: "direct main"
     description:
@@ -190,6 +190,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.1"
+  provider:
+    dependency: "direct main"
+    description:
+      name: provider
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.0+1"
   quiver:
     dependency: transitive
     description:

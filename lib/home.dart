@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:foria/providers/ticket_provider.dart';
+import 'package:provider/provider.dart';
 
 import './tabs/my_passes_tab.dart' as _myPassesTab;
 import './tabs/account_tab.dart' as _accountTab;
@@ -86,16 +88,15 @@ class TabsState extends State<Tabs> {
         ),
 
         //Content of tabs
-        body: new PageView(
-          controller: _tabController,
-          onPageChanged: onTabChanged,
-          children: <Widget>[
-            new _myPassesTab.MyPassesTab(),
-            new _accountTab.AccountTab()
-          ],
-        ),
-
-        //Tabs
+        body: new ChangeNotifierProvider(
+            builder: (context) => TicketProvider(),
+            child: new PageView(
+                controller: _tabController,
+                onPageChanged: onTabChanged,
+                children: <Widget>[
+                  new _myPassesTab.MyPassesTab(),
+                  new _accountTab.AccountTab()
+                ])),
         bottomNavigationBar: Theme.of(context).platform == TargetPlatform.iOS
             ? new CupertinoTabBar(
                 activeColor: Theme.of(context).primaryColor,
@@ -154,13 +155,19 @@ class TabItem {
 
 const List<TabItem> TabItems = const <TabItem>[
   const TabItem(
-      title: 'My Passes',
-      icon: IconData(0xe900,fontFamily: 'ticket',),
-    activeIcon: IconData(0xe900,fontFamily: 'ticket',),
+    title: 'My Passes',
+    icon: IconData(
+      0xe900,
+      fontFamily: 'ticket',
+    ),
+    activeIcon: IconData(
+      0xe900,
+      fontFamily: 'ticket',
+    ),
   ),
   const TabItem(
-      title: 'Account',
-      icon: FontAwesomeIcons.user,
+    title: 'Account',
+    icon: FontAwesomeIcons.user,
     activeIcon: FontAwesomeIcons.solidUser,
   )
 ];

@@ -6,12 +6,20 @@ import 'package:flutter_auth0/flutter_auth0.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foria/constants.dart';
 import 'package:foria/strings.dart';
+import 'package:foria_flutter_client/api.dart';
 import 'package:jose/jose.dart';
 
 final Auth0 _auth = new Auth0(clientId: auth0ClientKey, domain: auth0Domain);
 final WebAuth _web = new WebAuth(clientId: auth0ClientKey, domain: auth0Domain);
 
 final _storage = new FlutterSecureStorage();
+
+Future<ApiClient> obtainForiaApiClient() async {
+
+  JsonWebToken accessToken = await _loadAccessToken();
+  ApiClient apiClient = new ApiClient(accessToken: accessToken.toCompactSerialization());
+  return apiClient;
+}
 
 /// Shows the user a generic error message.
 void showErrorAlert(BuildContext context, String error) {
@@ -166,28 +174,13 @@ void webLogin(BuildContext context) {
 ///
 Future<bool> isUserLoggedIn() async {
 
-    String accessTokenStr = await _storage.read(key: accessTokenKey);
-
-    if (accessTokenStr == null) {
-      debugPrint("User is not logged in. No access token found.");
-      return false;
-    }
-
-    JsonWebToken jwt;
-    try {
-      jwt = new JsonWebToken.unverified(accessTokenStr);
-    } catch (e) {
-      debugPrint("Failed to parse JWT on login! - Error: $e");
-      return false;
-    }
-
+    JsonWebToken jwt = await _loadAccessToken();
 
     bool isExpired = DateTime.now().compareTo(jwt.claims.expiry) >= 0;
     if (isExpired) { //Expiration check should be skipped if there is no internet to allow offline access.
 
       try {
-        String newTokenStr = await _refreshToken();
-        jwt = new JsonWebToken.unverified(newTokenStr);
+        jwt = await _refreshToken();
       } catch (ex) {
         debugPrint("Exception caught refreshing token. Msg: $ex");
         return false;
@@ -199,13 +192,41 @@ Future<bool> isUserLoggedIn() async {
 }
 
 ///
+/// Obtains token from storage. Does NOT check for validity.
+///
+Future<JsonWebToken> _loadAccessToken() async {
+
+  String accessTokenStr = await _storage.read(key: accessTokenKey);
+
+  if (accessTokenStr == null) {
+    debugPrint("User is not logged in. No access token found.");
+    return null;
+  }
+
+  JsonWebToken jwt;
+  try {
+    jwt = new JsonWebToken.unverified(accessTokenStr);
+  } catch (e) {
+    debugPrint("Failed to parse JWT on login! - Error: $e");
+    return null;
+  }
+
+  bool isExpired = DateTime.now().compareTo(jwt.claims.expiry) >= 0;
+  if (isExpired) {
+    jwt = await _refreshToken();
+  }
+
+  return jwt;
+}
+
+///
 /// Fetches a new access token for when the current one is expired.
 /// This also validates the new access token, and if valid, replaces the previous token.
 ///
 /// On exception, the user should be logged out.
 /// Returns the new valid access token.
 ///
-Future<String> _refreshToken() async {
+Future<JsonWebToken> _refreshToken() async {
 
   String refreshToken = await _storage.read(key: refreshTokenKey);
   if (refreshToken == null) {
@@ -227,5 +248,5 @@ Future<String> _refreshToken() async {
 
   _storage.write(key: accessTokenKey, value: authToken);
   debugPrint("Token refresh complete.");
-  return authToken;
+  return _loadAccessToken();
 }
