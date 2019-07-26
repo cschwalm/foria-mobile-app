@@ -146,15 +146,6 @@ class PassOptions extends StatelessWidget {
             children: <Widget>[
               Expanded(
                 child: PrimaryButton(
-                  text: 'Sell',
-                  onPress: () {},
-                ),
-              ),
-              SizedBox(
-                width: 30,
-              ),
-              Expanded(
-                child: PrimaryButton(
                   text: 'Transfer',
                   onPress: () {
                     Navigator.of(context).pushNamed(

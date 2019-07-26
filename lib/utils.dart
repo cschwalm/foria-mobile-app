@@ -176,6 +176,10 @@ Future<bool> isUserLoggedIn() async {
 
     JsonWebToken jwt = await _loadAccessToken();
 
+    if (jwt == null) {
+      return false;
+    }
+
     bool isExpired = DateTime.now().compareTo(jwt.claims.expiry) >= 0;
     if (isExpired) { //Expiration check should be skipped if there is no internet to allow offline access.
 
