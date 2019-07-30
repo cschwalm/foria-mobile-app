@@ -40,9 +40,9 @@ dependencies:
       url: ssh://git@bitbucket.org/foriatickets/foria-flutter-client.git
 
 dev_dependencies:
+  mockito: ^4.1.0
   flutter_test:
     sdk: flutter
-
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec

@@ -12,6 +12,8 @@ import 'package:foria_flutter_client/api.dart';
 ///
 class TicketProvider extends ChangeNotifier {
 
+  EventApi _eventApi;
+
   final Set<Event> _eventList = new HashSet();
   final Set<Ticket> _ticketList = HashSet();
 
@@ -20,6 +22,10 @@ class TicketProvider extends ChangeNotifier {
 
   UnmodifiableListView<Event> get eventList => UnmodifiableListView(_eventList);
   UnmodifiableListView<Ticket> get userTicketList => UnmodifiableListView(_ticketList);
+
+  set eventApi(EventApi value) {
+    _eventApi = value;
+  }
 
   ///
   /// Obtains the latest set of Tickets for the authenticated user.
@@ -61,11 +67,14 @@ class TicketProvider extends ChangeNotifier {
       return _eventMap[eventId];
     }
 
-    ApiClient foriaApiClient = await obtainForiaApiClient();
-    EventApi eventApi = new EventApi(foriaApiClient);
+    if (_eventApi == null) {
+      ApiClient foriaApiClient = await obtainForiaApiClient();
+      _eventApi = new EventApi(foriaApiClient);
+    }
+
     Event event;
     try {
-      event = await eventApi.getEvent(eventId);
+      event = await _eventApi.getEvent(eventId);
     } on ApiException catch (ex) {
       print("### FORIA SERVER ERROR: getEventById ###");
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
