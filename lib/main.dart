@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:foria/home.dart';
-import 'package:foria/login.dart';
-import 'package:foria/utils.dart';
-
-import 'screens/selected_ticket_screen.dart';
-import 'screens/register_and_transfer_screen.dart';
 import 'package:flutter/services.dart' show DeviceOrientation, SystemChrome;
+import 'package:foria/utils/utils.dart';
+
+import 'screens/home.dart';
+import 'screens/login.dart';
+import 'screens/register_and_transfer_screen.dart';
+import 'screens/selected_ticket_screen.dart';
 
 void main() async {
 
@@ -19,13 +19,10 @@ void main() async {
       new MaterialApp(
         title: 'Foria',
         theme: new ThemeData(
-//            primarySwatch: Colors.blueGrey,
-//            scaffoldBackgroundColor: Colors.white,
             backgroundColor: Colors.white,
             appBarTheme: AppBarTheme(
               color: Color(0xFFC5003C),
             ),
-
             primaryColor: Color(0xFFFF0266),
             primaryColorDark: Color(0xFFC5003C),
             fontFamily: 'Rubik',
@@ -40,8 +37,8 @@ void main() async {
         ),
         home: await isUserLoggedIn() ? new Home() : new Login(),
         routes: {
-          '/login': (context) => Login(),
-          '/home': (context) => Home(),
+          Login.routeName: (context) => Login(),
+          Home.routeName: (context) => Home(),
           SelectedTicketScreen.routeName: (context) => SelectedTicketScreen(),
           RegisterAndTransferScreen.routeName: (context) => RegisterAndTransferScreen(),
         }

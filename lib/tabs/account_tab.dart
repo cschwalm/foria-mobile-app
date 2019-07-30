@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foria/utils.dart';
+import 'package:foria/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../widgets/contact_support.dart';

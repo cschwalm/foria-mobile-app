@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_auth0/flutter_auth0.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:foria/constants.dart';
-import 'package:foria/strings.dart';
+import 'package:foria/utils/constants.dart';
+import 'package:foria/utils/strings.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:jose/jose.dart';
 

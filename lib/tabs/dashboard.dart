@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_auth0/flutter_auth0.dart';
-import 'package:foria/constants.dart';
+import 'package:foria/utils/constants.dart';
 
 final Auth0 auth = new Auth0(clientId: auth0ClientKey, domain: auth0Domain);
 final WebAuth web = new WebAuth(clientId: auth0ClientKey, domain: auth0Domain);

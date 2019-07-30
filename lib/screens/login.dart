@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:foria/utils.dart';
+import 'package:foria/utils/utils.dart';
 
 class Login extends StatelessWidget {
 
-
+  static const routeName = '/login';
 
   ///
   /// Returns a centered application logo.
