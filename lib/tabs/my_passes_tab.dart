@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foria/providers/ticket_provider.dart';
+import 'package:foria/widgets/contact_support.dart';
 import 'package:provider/provider.dart';
 
 import '../screens/selected_ticket_screen.dart';
@@ -162,11 +163,15 @@ class MissingTicket extends StatelessWidget {
               'Missing your tickets?',
               style: Theme.of(context).textTheme.title,
             ),
-            Text('Contact Us',
-                style: TextStyle(
-                  color: Theme.of(context).primaryColor,
-                  fontSize: 14,
-                )),
+            SizedBox(height: 3,),
+            GestureDetector(
+              child: Text('Contact Us',
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 18,
+                  )),
+              onTap: () {contactSupport();},
+            ),
           ],
         ),
       ),

@@ -4,10 +4,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:provider/provider.dart';
 
-import './tabs/my_passes_tab.dart' as _myPassesTab;
-import './tabs/account_tab.dart' as _accountTab;
+import '../tabs/account_tab.dart' as _accountTab;
+import '../tabs/my_passes_tab.dart' as _myPassesTab;
 
 class Home extends StatelessWidget {
+
+  static const routeName = '/home';
+
   @override
   Widget build(BuildContext context) {
     return new Tabs();

@@ -1,8 +1,38 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:foria/widgets/primary_button.dart';
 
 import 'register_and_transfer_screen.dart';
+
+class SelectedTicketScreen extends StatelessWidget {
+
+  static const routeName = '/selected-ticket';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Foria Pass'),
+        backgroundColor: Theme.of(context).primaryColorDark,
+      ),
+      body: Padding(
+        padding: EdgeInsets.fromLTRB(16, 20, 16, 40),
+        child: Column(
+          children: <Widget>[
+            EventInfo(),
+            SizedBox(
+              height: 40,
+            ),
+            Expanded(
+              child: PassBody(),
+            ),
+            PassOptions(),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class EventInfo extends StatelessWidget {
   @override
@@ -159,35 +189,6 @@ class PassOptions extends StatelessWidget {
           ),
         )
       ],
-    );
-  }
-}
-
-class SelectedTicketScreen extends StatelessWidget {
-  static const routeName = '/selected-ticket';
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Foria Pass'),
-        backgroundColor: Theme.of(context).primaryColorDark,
-      ),
-      body: Padding(
-        padding: EdgeInsets.fromLTRB(16, 20, 16, 40),
-        child: Column(
-          children: <Widget>[
-            EventInfo(),
-            SizedBox(
-              height: 40,
-            ),
-            Expanded(
-              child: PassBody(),
-            ),
-            PassOptions(),
-          ],
-        ),
-      ),
     );
   }
 }

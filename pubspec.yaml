@@ -28,6 +28,10 @@ dependencies:
   jose: ^0.1.2
   otp: 1.0.1
   provider: ^3.0.0+1
+  flutter_email_sender: ^2.0.3
+  image_picker: ^0.6.0+15
+  path: ^1.6.2
+  path_provider: ^1.1.0
   flutter_auth0:
     git:
       url: https://github.com/devdennysegura/flutter-auth0

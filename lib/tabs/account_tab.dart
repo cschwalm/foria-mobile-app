@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:foria/utils.dart';
+import 'package:foria/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
+
+import '../widgets/contact_support.dart';
 import '../widgets/settings_item.dart';
 import '../screens/selected_ticket_screen.dart';
 
@@ -33,10 +35,7 @@ class AccountTab extends StatelessWidget {
               label: 'Contact Us',
               content: SettingsNavigationIndicator(),
               onPress: () {
-                Navigator.of(context).pushNamed(
-                  SelectedTicketScreen.routeName,
-                  arguments: null,
-                );
+                contactSupport();
               },
             ),
             Container(
