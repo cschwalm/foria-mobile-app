@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:foria/providers/selected_ticket_provider.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/widgets/contact_support.dart';
 import 'package:provider/provider.dart';
@@ -82,7 +83,7 @@ class EventCard extends StatelessWidget {
           onTap: () {
             Navigator.of(context).pushNamed(
               SelectedTicketScreen.routeName,
-              arguments: null,
+              arguments: SelectedTicketProvider(ticketProvider.eventList[index], null), //TODO: Use new method
             );
           },
           child: Card(

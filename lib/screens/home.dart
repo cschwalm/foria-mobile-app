@@ -13,7 +13,7 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Tabs();
+    return new Tabs(TicketProvider());
   }
 }
 
@@ -51,6 +51,10 @@ class FromRightToLeft<T> extends MaterialPageRoute<T> {
 }
 
 class Tabs extends StatefulWidget {
+  
+  TicketProvider _ticketProvider;
+  Tabs(this._ticketProvider);
+
   @override
   TabsState createState() => new TabsState();
 }
@@ -92,7 +96,7 @@ class TabsState extends State<Tabs> {
 
         //Content of tabs
         body: new ChangeNotifierProvider(
-            builder: (context) => TicketProvider(),
+            builder: (context) => (widget._ticketProvider),
             child: new PageView(
                 controller: _tabController,
                 onPageChanged: onTabChanged,
