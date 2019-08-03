@@ -1,6 +1,6 @@
-/// General purpose error messages for any Auth0 failures.
+/// General purpose messages.
 
-const String supportEmailAddress = "info@foriatickets.com";
+const String supportEmailAddress = "support@foriatickets.com";
 
 const String supportEmailSubject = "Foria Support";
 

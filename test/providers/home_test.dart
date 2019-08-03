@@ -38,7 +38,8 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.byType(EventCard), findsNWidgets(_generateFakeTickets().length));
+    expect(find.byType(Card), findsNWidgets(_generateFakeTickets().length));
+    expect(find.byType(MissingTicket), findsNothing);
   });
 
   testWidgets('myPassesTab contains no events in list', (WidgetTester tester) async {
@@ -51,8 +52,12 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.byType(EventCard), findsNothing);
+    final gFinder = find.descendant(of: find.byType(MissingTicket), matching: find.byType(GestureDetector));
+
+    expect(find.byType(Card), findsNothing);
+    expect(gFinder, findsOneWidget);
   });
+
 }
 
 ///
