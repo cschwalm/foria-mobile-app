@@ -58,18 +58,6 @@ void main() {
     expect(gFinder, findsOneWidget);
   });
 
-  testWidgets('myPassesTab contains no events in list', (WidgetTester tester) async {
-
-    when(ticketProviderMock.eventList).thenReturn(UnmodifiableListView(new List()));
-
-    await tester.pumpWidget(MaterialApp(
-      home: Tabs(ticketProviderMock),
-    ));
-
-    await tester.pumpAndSettle();
-
-    expect(find.byType(Card), findsNothing);
-  });
 }
 
 ///
