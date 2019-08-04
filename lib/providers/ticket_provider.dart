@@ -13,9 +13,10 @@ import 'package:foria_flutter_client/api.dart';
 class TicketProvider extends ChangeNotifier {
 
   EventApi _eventApi;
+  UserApi _userApi;
 
   final Set<Event> _eventList = new HashSet();
-  final Set<Ticket> _ticketList = HashSet();
+  final Set<Ticket> _ticketList = new HashSet();
 
   final HashMap<String, Event> _eventMap = new HashMap();
   final HashMap<String, Venue> _venueMap = new HashMap();
@@ -27,17 +28,41 @@ class TicketProvider extends ChangeNotifier {
     _eventApi = value;
   }
 
+
+  set userApi(UserApi value) {
+    _userApi = value;
+  }
+
+  ///
+  /// Returns a subset of tickets from the specified ticket ID.
+  ///
+  Set<Ticket> getTicketsForEventId(String eventId) {
+
+    assert (eventId != null);
+
+    Set<Ticket> tickets = new Set<Ticket>();
+    for (Ticket ticket in _ticketList) {
+      if (ticket.eventId == eventId) {
+        tickets.add(ticket);
+      }
+    }
+
+    return tickets;
+  }
+
   ///
   /// Obtains the latest set of Tickets for the authenticated user.
   ///
   Future<void> fetchUserTickets() async {
-    ApiClient foriaApiClient = await obtainForiaApiClient();
 
-    UserApi userApi = new UserApi(foriaApiClient);
+    if (_eventApi == null) {
+      ApiClient foriaApiClient = await obtainForiaApiClient();
+      _userApi = new UserApi(foriaApiClient);
+    }
     List<Ticket> tickets;
 
     try {
-      tickets = await userApi.getTickets();
+      tickets = await _userApi.getTickets();
     } on ApiException catch (ex) {
       print("### FORIA SERVER ERROR: getTickets ###");
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
@@ -59,7 +84,8 @@ class TicketProvider extends ChangeNotifier {
   }
 
   Future<Event> fetchEventById(String eventId) async {
-    if (eventId.isEmpty) {
+
+    if (eventId == null || eventId.isEmpty) {
       return null;
     }
 
