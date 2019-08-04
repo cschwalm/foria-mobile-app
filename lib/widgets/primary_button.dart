@@ -7,14 +7,21 @@ class PrimaryButton extends StatelessWidget {
   final Function onPress;
   final IconData icon;
   final bool isActive;
+  final double minSize;
 
-  PrimaryButton(
-      {@required this.text, @required this.onPress, this.icon, this.isActive = true});
+  PrimaryButton({
+    @required this.text,
+    @required this.onPress,
+    this.icon,
+    this.isActive = true,
+    this.minSize = 44,
+  });
 
 
   @override
   Widget build(BuildContext context) {
     return CupertinoButton(
+      minSize: minSize,
       padding: EdgeInsets.zero,
       color: isActive ? Theme.of(context).primaryColor : theme.shapeGrey,
       onPressed: onPress,

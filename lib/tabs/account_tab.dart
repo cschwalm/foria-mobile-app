@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:foria/utils/strings.dart';
 import 'package:foria/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -18,7 +19,7 @@ class AccountTab extends StatelessWidget {
               height: 0.3,
             ),
             SettingsItem(
-              label: 'FAQ',
+              label: FAQ,
               content: SettingsNavigationIndicator(),
               onPress: () {
                 Navigator.of(context).pushNamed(
@@ -32,7 +33,7 @@ class AccountTab extends StatelessWidget {
               height: 0.3,
             ),
             SettingsItem(
-              label: 'Contact Us',
+              label: contactUs,
               content: SettingsNavigationIndicator(),
               onPress: () {
                 contactSupport();
@@ -53,7 +54,7 @@ class AccountTab extends StatelessWidget {
                       Expanded(
                         child: CupertinoButton(
                           child: Text(
-                            'Logout',
+                            textLogout,
                             style: Theme.of(context).textTheme.button,
                           ),
                           color: Theme.of(context).primaryColor,

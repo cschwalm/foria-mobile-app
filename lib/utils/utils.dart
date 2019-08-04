@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_auth0/flutter_auth0.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:foria/screens/home.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/strings.dart';
+import 'package:foria/widgets/confirm_email_popup.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:jose/jose.dart';
@@ -115,6 +117,7 @@ void logout(BuildContext context) {
 /// On error, a pop-up will be displayed showing a generic error message.
 ///
 void webLogin(BuildContext context) {
+  final bool _isEmailConfirmed = true;                            ///TODO @corbin to add logic determining if user's email is confirmed
 
   _web
       .authorize(
@@ -125,7 +128,11 @@ void webLogin(BuildContext context) {
       .then((_) {
     // Navigate to the main screen if login passed.
     debugPrint("Auth Passed. Navigating to home screen");
-    Navigator.pushReplacementNamed(context, '/home');
+    if(_isEmailConfirmed) {
+      Navigator.pushReplacementNamed(context, Home.routeName);
+    } else {
+      confirmEmailPopUp(context);
+    }
   }).catchError((err) {
     debugPrint('Auth Error: $err');
     showErrorAlert(context, loginError);

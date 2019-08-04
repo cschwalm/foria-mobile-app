@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:foria/utils/static_images.dart';
+import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/primary_button.dart';
 
 import 'register_and_transfer_screen.dart';
@@ -12,7 +14,7 @@ class SelectedTicketScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Foria Pass'),
+        title: Text(foriaPass),
         backgroundColor: Theme.of(context).primaryColorDark,
       ),
       body: Padding(
@@ -41,7 +43,7 @@ class EventInfo extends StatelessWidget {
       children: <Widget>[
         Stack(
           children: <Widget>[
-            Image.asset('assets/ui_elements/calendar-icon.png'),
+            Image.asset(calendarImage),
             Padding(
               padding: const EdgeInsets.only(top: 17),
               child: Container(
@@ -130,13 +132,13 @@ class PassBody extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Text(
-              "Your pass refreshes in  ",
+              passRefresh,
               style: Theme.of(context).textTheme.body2,
             ),
             Stack(
               children: <Widget>[
                 Image.asset(
-                  'assets/ui_elements/refresh-icon.png',
+                  refreshIcon,
                   width: 30,
                   height: 30,
                 ),
@@ -164,7 +166,7 @@ class PassOptions extends StatelessWidget {
     return Column(
       children: <Widget>[
         Text(
-          "Pass Options",
+          passOptions,
           style: Theme.of(context).textTheme.title,
         ),
         SizedBox(
@@ -176,7 +178,7 @@ class PassOptions extends StatelessWidget {
             children: <Widget>[
               Expanded(
                 child: PrimaryButton(
-                  text: 'Transfer',
+                  text: textTransfer,
                   onPress: () {
                     Navigator.of(context).pushNamed(
                       RegisterAndTransferScreen.routeName,
