@@ -6,9 +6,17 @@ const String textLogout = 'Logout';
 
 // Auth0 strings. //
 
+const String loginRegister = 'Sign Up / Sign In';
+
 const String loginError = "There was an issue logging into your account. " +
     "Please check your internet connection and try again. " +
     "If the issue continues, contact support listed in the app store.";
+
+const String emailConfirmationRequired = 'Email Confirmation Required';
+
+const String pleaseConfirmEmail = 'Please check your email for an email confirmation request. Once completed you\'ll be able to log in.';
+
+const String iveConfirmedEmail = 'I\'ve confirmed my email';
 
 // Contact Us Strings. //
 
