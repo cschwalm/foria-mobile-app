@@ -110,6 +110,7 @@ class TabsState extends State<Tabs> {
                 iconSize: 26,
                 currentIndex: _tab,
                 onTap: onTap,
+                backgroundColor: Colors.white,
                 items: TabItems.map((TabItem) {
                   return new BottomNavigationBarItem(
                     title: new Text(TabItem.title),
@@ -121,6 +122,7 @@ class TabsState extends State<Tabs> {
             : new BottomNavigationBar(
                 currentIndex: _tab,
                 onTap: onTap,
+                backgroundColor: Colors.white,
                 items: TabItems.map((TabItem) {
                   return new BottomNavigationBarItem(
                     title: new Text(TabItem.title),
