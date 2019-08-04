@@ -73,7 +73,9 @@ class EventCard extends StatelessWidget {
                 Navigator.of(context).pushNamed(
                   SelectedTicketScreen.routeName,
                   arguments: SelectedTicketProvider(
-                      _eventData.eventList[index], null), //TODO: Use new method
+                      _eventData.eventList[index],
+                      _eventData.getTicketsForEventId(_eventData.eventList[index].id)
+                  ),
                 );
               },
               child: Card(
