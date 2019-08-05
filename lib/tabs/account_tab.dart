@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:foria/widgets/primary_button.dart';
 
 import '../widgets/contact_support.dart';
 import '../widgets/settings_item.dart';
@@ -13,7 +14,9 @@ class AccountTab extends StatelessWidget {
         color: Color(0xfff0f0f0),
         child: Column(
           children: <Widget>[
-            SizedBox(height: 20,),
+            SizedBox(
+              height: 20,
+            ),
             Container(
               color: Color(0xffbcbbc1),
               height: 0.3,
@@ -46,31 +49,19 @@ class AccountTab extends StatelessWidget {
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
-
                 children: <Widget>[
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(children: <Widget>[
-                      Expanded(
-                        child: CupertinoButton(
-                          child: Text(
-                            textLogout,
-                            style: Theme.of(context).textTheme.button,
-                          ),
-                          color: Theme.of(context).primaryColor,
-                          onPressed: () {
-                            logout(context);
-                          },
-                        ),
-                      ),
-                    ],
+                    padding: EdgeInsets.fromLTRB(16,0,16,20),
+                    child: PrimaryButton(
+                      text: textLogout,
+                      onPress: () {
+                        logout(context);
+                      },
                     ),
                   ),
-                  SizedBox(height: 20,),
                 ],
               ),
             ),
-
           ],
         ),
       );
