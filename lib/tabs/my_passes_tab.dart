@@ -19,7 +19,7 @@ class MyPassesTab extends StatefulWidget {
 class _MyPassesTabState extends State<MyPassesTab> {
   bool _isInit = true;
   bool _isLoading = false;
-  bool _isUserLoggedIntoAnotherDevice = true;
+  bool _isUserLoggedIntoAnotherDevice = false;
 
   @override
   void didChangeDependencies() {
@@ -69,6 +69,7 @@ class EventCard extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
             child: GestureDetector(
+              key: Key(_eventData.eventList[index].id),
               onTap: () {
                 Navigator.of(context).pushNamed(
                   SelectedTicketScreen.routeName,
