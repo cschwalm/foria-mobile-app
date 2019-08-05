@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show DeviceOrientation, SystemChrome;
+import 'package:foria/screens/email_verification_failure.dart';
 import 'package:foria/utils/utils.dart';
 
 import 'screens/home.dart';
@@ -35,15 +36,29 @@ void main() async {
               headline: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.black,fontFamily: 'Rubik',),
             ),
         ),
-        home: await isUserLoggedIn() ? new Home() : new Login(),
+        home: await _determineHomeWidget(),
         routes: {
-          Login.routeName: (context) => Login(),
           Home.routeName: (context) => Home(),
+          Login.routeName: (context) => Login(),
+          EmailVerificationFailure.routeName: (context) => EmailVerificationFailure(),
           SelectedTicketScreen.routeName: (context) => SelectedTicketScreen(),
           RegisterAndTransferScreen.routeName: (context) => RegisterAndTransferScreen(),
         }
     )
   );
+}
+
+Future<Widget> _determineHomeWidget() async {
+  
+  if (! await isUserLoggedIn(true)) {
+    return Login();
+  }
+  
+  if (! await isUserEmailVerified()) {
+    return EmailVerificationFailure();
+  }
+
+  return Home();
 }
 
 const Color textGrey = Color(0xFFC7C7C7);

@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_auth0/flutter_auth0.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:foria/screens/email_verification_failure.dart';
 import 'package:foria/screens/home.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/strings.dart';
-import 'package:foria/widgets/confirm_email_popup.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:jose/jose.dart';
@@ -17,10 +17,30 @@ final WebAuth _web = new WebAuth(clientId: auth0ClientKey, domain: auth0Domain);
 
 final _storage = new FlutterSecureStorage();
 
+///
+/// Returns API client for use in Foria API libs.
+/// This correctly sets the Bearer token for OAuth2 server authentication.
+///
 Future<ApiClient> obtainForiaApiClient() async {
-  JsonWebToken accessToken = await _loadAccessToken();
+
+  JsonWebToken accessToken = await _loadToken(accessTokenKey);
+
+  if (accessToken == null) {
+    return null;
+  }
+
+  bool isExpired = DateTime.now().compareTo(accessToken.claims.expiry) >= 0;
+  if (isExpired) {
+    try {
+      accessToken = await forceTokenRefresh();
+    } catch (ex) {
+      throw ex;
+    }
+  }
+
   ApiClient apiClient =
       new ApiClient(accessToken: accessToken.toCompactSerialization());
+
   return apiClient;
 }
 
@@ -28,12 +48,12 @@ Future<ApiClient> obtainForiaApiClient() async {
 /// Stores the exchanged tokens securely in storage.
 ///
 Future<void> _storeAuthInfo(dynamic authInfo) async {
-  print('Auth0 Grant Response: $authInfo');
+
   String authToken = authInfo['access_token'];
   String idToken = authInfo['id_token'];
   String refreshToken = authInfo['refresh_token'];
 
-  if (authToken == null || refreshToken == null) {
+  if (authToken == null || idToken == null) {
     debugPrint("Returned tokens are null. Skipping secure storage.");
     throw new Exception("Returned tokens are null. Skipping secure storage.");
   }
@@ -41,13 +61,16 @@ Future<void> _storeAuthInfo(dynamic authInfo) async {
   bool isIdTokenValid = await _validateJwt(idToken, auth0ClientKey);
   bool isAuthTokenValid = await _validateJwt(authToken, auth0Audience);
 
-  if (!isIdTokenValid || !isAuthTokenValid || refreshToken == null) {
+  if (refreshToken != null) {
+    _storage.write(key: refreshTokenKey, value: refreshToken);
+  }
+
+  if (!isIdTokenValid || !isAuthTokenValid) {
     debugPrint("Token vaidation failure!");
     throw new Exception("Token failed validation.");
   } else {
     _storage.write(key: accessTokenKey, value: authToken);
     _storage.write(key: idTokenKey, value: idToken);
-    _storage.write(key: refreshTokenKey, value: refreshToken);
 
     debugPrint("Tokens stored in secure storage.");
   }
@@ -76,7 +99,6 @@ Future<bool> _validateJwt(String encodedJwt, String audience) async {
   var keyStore = new JsonWebKeyStore()..addKey(JsonWebKey.fromJson(jwks));
 
   bool verified = await jwt.verify(keyStore);
-  debugPrint("JWT Verified: $verified");
 
   if (!verified) {
     return false;
@@ -116,28 +138,54 @@ void logout(BuildContext context) {
 ///
 /// On error, a pop-up will be displayed showing a generic error message.
 ///
-void webLogin(BuildContext context) {
-  final bool _isEmailConfirmed = true;                            ///TODO @corbin to add logic determining if user's email is confirmed
+void webLogin(BuildContext context) async {
 
-  _web
-      .authorize(
-        audience: auth0Audience,
-        scope: 'openid profile offline_access',
-      )
-      .then((authInfo) => _storeAuthInfo(authInfo))
-      .then((_) {
-    // Navigate to the main screen if login passed.
-    debugPrint("Auth Passed. Navigating to home screen");
-    if(_isEmailConfirmed) {
-      Navigator.pushReplacementNamed(context, Home.routeName);
-    } else {
-      confirmEmailPopUp(context);
+  await _web.authorize(
+
+    audience: auth0Audience,
+    scope: 'openid profile email offline_access',
+  ).then((authInfo) async {
+
+    if (authInfo == null || authInfo['access_token'] == null) {
+      debugPrint("Account Blocked. Tokens empty.");
+      showErrorAlert(context, loginError);
+      return;
     }
-  }).catchError((err) {
+
+    await _storeAuthInfo(authInfo);
+
+    if (! await isUserEmailVerified()) {
+      Navigator.pushReplacementNamed(context, EmailVerificationFailure.routeName);
+      return;
+    }
+
+    Navigator.pushReplacementNamed(context, Home.routeName);
+
+  }).catchError((err) async {
+
     debugPrint('Auth Error: $err');
     showErrorAlert(context, loginError);
-    return;
   });
+}
+
+Future<bool> isUserEmailVerified() async {
+
+  JsonWebToken jwt = await _loadToken(idTokenKey);
+
+  if (jwt == null) {
+    debugPrint("ERROR: No token found in storage. Not able to email verify.");
+    return false;
+  }
+
+  Map<String, dynamic> claims = jwt.claims.toJson();
+  if (!claims.containsKey("email_verified")) {
+
+    print("ERROR: email_verified claim missing. Is email scope set?");
+    return false;
+  }
+
+  debugPrint("Email verified: ${claims["email_verified"]}");
+  return claims["email_verified"];
 }
 
 ///
@@ -145,36 +193,39 @@ void webLogin(BuildContext context) {
 /// refresh tokens.
 ///
 /// On failure this method will return false.
+/// Expiration check should be skipped if there is no internet to allow offline access.
 ///
-Future<bool> isUserLoggedIn() async {
+Future<bool> isUserLoggedIn(bool doExpirationCheck) async {
 
-  JsonWebToken jwt = await _loadAccessToken();
+  JsonWebToken jwt = await _loadToken(idTokenKey);
 
   if (jwt == null) {
+    debugPrint("No token found in storage. User is not logged in.");
     return false;
   }
 
   bool isExpired = DateTime.now().compareTo(jwt.claims.expiry) >= 0;
-  if (isExpired) {
-    //Expiration check should be skipped if there is no internet to allow offline access.
+  if (doExpirationCheck && isExpired) {
 
     try {
-      jwt = await _refreshToken();
+      jwt = await forceTokenRefresh();
     } catch (ex) {
       debugPrint("Exception caught refreshing token. Msg: $ex");
       return false;
     }
   }
 
+  debugPrint("JWT Claims: ${jwt.claims}");
   debugPrint("User is logged in with a valid token.");
   return true;
 }
 
 ///
-/// Obtains token from storage. Does NOT check for validity.
+/// Obtains server access token from storage.
+/// Does not preform validations.
 ///
-Future<JsonWebToken> _loadAccessToken() async {
-  String accessTokenStr = await _storage.read(key: accessTokenKey);
+Future<JsonWebToken> _loadToken(String tokenName) async {
+  String accessTokenStr = await _storage.read(key: tokenName);
 
   if (accessTokenStr == null) {
     debugPrint("User is not logged in. No access token found.");
@@ -189,11 +240,6 @@ Future<JsonWebToken> _loadAccessToken() async {
     return null;
   }
 
-  bool isExpired = DateTime.now().compareTo(jwt.claims.expiry) >= 0;
-  if (isExpired) {
-    jwt = await _refreshToken();
-  }
-
   return jwt;
 }
 
@@ -204,7 +250,7 @@ Future<JsonWebToken> _loadAccessToken() async {
 /// On exception, the user should be logged out.
 /// Returns the new valid access token.
 ///
-Future<JsonWebToken> _refreshToken() async {
+Future<JsonWebToken> forceTokenRefresh() async {
 
   String refreshToken = await _storage.read(key: refreshTokenKey);
 
@@ -213,18 +259,17 @@ Future<JsonWebToken> _refreshToken() async {
     throw new Exception("Refresh token is null when attempting refresh!");
   }
 
-  var auth0Result = await _auth.refreshToken(refreshToken: refreshToken);
-  debugPrint("Refresh Response received: $auth0Result");
-
-  String authToken = auth0Result['access_token'];
-
-  bool isAuthTokenValid = await _validateJwt(authToken, auth0Audience);
-  if (!isAuthTokenValid) {
-    debugPrint("Returned auth token is not valid!");
-    throw new Exception("Returned auth token is not valid!");
+  var auth0Result;
+  try {
+    auth0Result = await _auth.refreshToken(refreshToken: refreshToken);
+    debugPrint("Refresh Response received: $auth0Result");
+  } catch (ex) {
+    print("ERROR: Refresh failed on Auth0 side.");
+    throw ex;
   }
 
-  _storage.write(key: accessTokenKey, value: authToken);
+  await _storeAuthInfo(auth0Result);
+
   debugPrint("Token refresh complete.");
-  return _loadAccessToken();
+  return _loadToken(accessTokenKey);
 }
