@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:foria/main.dart';
 import 'package:foria/utils/utils.dart';
+import 'package:foria/widgets/contact_support.dart';
 import 'package:foria/widgets/primary_button.dart';
 import 'package:foria/widgets/settings_item.dart';
 
@@ -12,45 +14,44 @@ class VenueScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: settingsBackgroundColor,
       appBar: AppBar(
         title: Text(venueAccount),
         backgroundColor: Theme.of(context).primaryColorDark,
       ),
       body: Column(
         children: <Widget>[
-          SizedBox(
-            height: 20,
-          ),
-          Container(
-            color: Color(0xffbcbbc1),
-            height: 0.3,
-          ),
+          SizedBox(height: 10,),
+          SettingItemDivider(),
           SettingsItem(
             label: FAQ,
             content: SettingsNavigationIndicator(),
             onPress: () {},
           ),
-          Container(
-            color: Color(0xffbcbbc1),
-            height: 0.3,
+          SettingItemDivider(),
+          SettingsItem(
+            label: contactUs,
+            content: SettingsNavigationIndicator(),
+            onPress: () {
+              contactSupport();
+            },
           ),
+          MajorSettingItemDivider(),
           SettingsItem(
             label: textLogout,
+            labelTextStyle: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold,color: Theme.of(context).primaryColor),
             content: SettingsNavigationIndicator(),
             onPress: () {
               logout(context);
             },
           ),
-          Container(
-            color: Color(0xffbcbbc1),
-            height: 0.3,
-          ),
+          SettingItemDivider(),
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.fromLTRB(16, 0, 16, 20),
+                  padding: EdgeInsets.fromLTRB(16, 0, 16, 40),
                   child: PrimaryButton(
                     text: scanTickets,
                     onPress: () {},

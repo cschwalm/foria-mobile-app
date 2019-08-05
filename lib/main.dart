@@ -48,5 +48,6 @@ void main() async {
   );
 }
 
-const Color textGrey = Color(0xFFC7C7C7);
-const Color shapeGrey = Color(0xFFC7C7C7);
+const Color textGreyColor = Color(0xFFC7C7C7);
+const Color shapeGreyColor = Color(0xFFC7C7C7);
+const Color settingsBackgroundColor = Color(0xffEEEEEE);

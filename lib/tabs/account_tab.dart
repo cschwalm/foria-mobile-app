@@ -18,10 +18,7 @@ class AccountTab extends StatelessWidget {
           SizedBox(
             height: 20,
           ),
-          Container(
-            color: Color(0xffbcbbc1),
-            height: 0.3,
-          ),
+          SettingItemDivider(),
           SettingsItem(
             label: FAQ,
             content: SettingsNavigationIndicator(),
@@ -31,10 +28,7 @@ class AccountTab extends StatelessWidget {
               );
             },
           ),
-          Container(
-            color: Color(0xffbcbbc1),
-            height: 0.3,
-          ),
+          SettingItemDivider(),
           SettingsItem(
             label: contactUs,
             content: SettingsNavigationIndicator(),
@@ -42,10 +36,7 @@ class AccountTab extends StatelessWidget {
               contactSupport();
             },
           ),
-          Container(
-            color: Color(0xffbcbbc1),
-            height: 0.3,
-          ),
+          SettingItemDivider(),
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,

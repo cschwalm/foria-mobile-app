@@ -23,7 +23,7 @@ class PrimaryButton extends StatelessWidget {
     return CupertinoButton(
       minSize: minSize,
       padding: EdgeInsets.zero,
-      color: isActive ? Theme.of(context).primaryColor : theme.shapeGrey,
+      color: isActive ? Theme.of(context).primaryColor : theme.shapeGreyColor,
       onPressed: onPress,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
