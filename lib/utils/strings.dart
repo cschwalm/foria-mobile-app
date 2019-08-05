@@ -4,6 +4,12 @@ const String textTransfer = 'Transfer';
 
 const String textLogout = 'Logout';
 
+// General purpose strings. //
+
+const String venueAccount = 'Venue Account';
+
+const String scanTickets = 'Scan Tickets';
+
 // Auth0 strings. //
 
 const String loginRegister = 'Sign Up / Sign In';

@@ -163,7 +163,6 @@ class DeviceConflict extends StatelessWidget {
           ),
           PrimaryButton(
             text: relocateTickets,
-            isActive: true,
             onPress: () {},
           ),
         ],
