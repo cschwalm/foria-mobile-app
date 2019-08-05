@@ -17,63 +17,93 @@ class MyPassesTab extends StatefulWidget {
   _MyPassesTabState createState() => _MyPassesTabState();
 }
 
+enum _LoadingState {
+
+  EMAIL_VERIFY,
+  LOAD_TICKETS,
+  DONE
+}
+
+///
+/// Contains simple state machine to handle three flows.
+/// Step 1: Tab opened. Nothing has been done. We need to display loading and check email verify.
+/// Step 2: Email is verified, display spinner and load tickets.
+/// Step 3: Display tickets results.
+///
 class _MyPassesTabState extends State<MyPassesTab> {
 
-  bool _isFirstRun = true;
-  bool _isLoading = true;
-  bool _isUserLoggedIntoAnotherDevice = true;
+  _LoadingState _currentState = _LoadingState.EMAIL_VERIFY;
+  bool _isUserEmailCheckFinished = false;
+  bool _isTicketsLoaded = false;
+
   bool _isUserEmailVerified = false;
 
   @override
-  void didChangeDependencies() async {
+  void didChangeDependencies() {
 
-    if (_isFirstRun) {
+    switch (_currentState) {
 
-      setState(() {
-        _isLoading = true;
-      });
+      case _LoadingState.EMAIL_VERIFY:
 
-      isUserEmailVerified().then((isEmailVerified) {
+        if (!_isUserEmailCheckFinished) {
+          isUserEmailVerified().then((isEmailVerified) {
+            setState(() {
+              _isUserEmailCheckFinished = true;
+              _isUserEmailVerified = isEmailVerified;
 
-        setState(() {
+              //If email is verified, set next state and start the initial load.
+              if (_isUserEmailVerified) {
+                _isTicketsLoaded = false;
+                _currentState = _LoadingState.LOAD_TICKETS;
 
-          _isUserEmailVerified = isEmailVerified;
-
-          if (_isUserEmailVerified) {
-
-            //Email is verified. Set spinner to load tickets.
-            _isLoading = true;
-            Provider.of<TicketProvider>(context).fetchUserTickets().then((_) {
-              _isLoading = false; //All done. Everything is fully loaded.
+                _loadTicketsAndSetState();
+              }
             });
-          } else {
-            _isLoading = false;
-          }
-        });
-      });
+          });
+        }
 
-      _isFirstRun = false;
+        break;
+
+      case _LoadingState.LOAD_TICKETS:
+
+        if (!_isTicketsLoaded) {
+          _loadTicketsAndSetState();
+        }
+        break;
+
+      case _LoadingState.DONE:
+        break;
     }
 
     super.didChangeDependencies();
+  }
+
+  ///
+  /// Triggers ticket load and resets spinner.
+  ///
+  void _loadTicketsAndSetState() {
+
+    //Email is verified. Load tickets and stop spinner when completed.
+    Provider.of<TicketProvider>(context).fetchUserTickets().then((_) {
+      setState(() {
+        _isTicketsLoaded = true;
+        _currentState = _LoadingState.DONE;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final _eventData = Provider.of<TicketProvider>(context, listen: false);
 
-    if (_isLoading) {
+    if ( (_currentState == _LoadingState.EMAIL_VERIFY && !_isUserEmailCheckFinished) || _currentState == _LoadingState.LOAD_TICKETS) {
       return CupertinoActivityIndicator(
         radius: 15,
       );
     }
 
-    if (!_isUserEmailVerified) {
+    if (_currentState == _LoadingState.EMAIL_VERIFY) {
       return EmailVerificationConflict(this.emailVerifyCallback);
-    }
-
-    if (_isUserLoggedIntoAnotherDevice) {
-      return DeviceConflict();
     }
 
     if (_eventData.eventList.length <= 0) {
@@ -86,11 +116,17 @@ class _MyPassesTabState extends State<MyPassesTab> {
   void emailVerifyCallback() async {
 
     await forceTokenRefresh();
-    if (await isUserEmailVerified()) {
-      setState(() {
-        _isUserEmailVerified = true;
-      });
-    }
+    bool isEmailVerified = await isUserEmailVerified();
+
+      if (isEmailVerified) {
+        setState(() {
+          _isUserEmailCheckFinished = true;
+          _isUserEmailVerified = true;
+          _currentState = _LoadingState.LOAD_TICKETS;
+
+          _loadTicketsAndSetState();
+        });
+      }
   }
 }
 
@@ -220,7 +256,7 @@ class EmailVerificationConflict extends StatelessWidget {
       content: Column(
         children: <Widget>[
           Text(
-            activeOnAnotherDevice,
+            emailConfirmationRequired,
             style: Theme.of(context).textTheme.title,
             textAlign: TextAlign.center,
           ),
@@ -228,7 +264,7 @@ class EmailVerificationConflict extends StatelessWidget {
             height: 25,
           ),
           Text(
-            toAccessTickets,
+            pleaseConfirmEmail,
             style: Theme.of(context).textTheme.body1,
             textAlign: TextAlign.center,
           ),
