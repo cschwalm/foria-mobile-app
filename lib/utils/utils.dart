@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_auth0/flutter_auth0.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:foria/screens/email_verification_failure.dart';
 import 'package:foria/screens/home.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/strings.dart';
@@ -153,11 +152,6 @@ void webLogin(BuildContext context) async {
     }
 
     await _storeAuthInfo(authInfo);
-
-    if (! await isUserEmailVerified()) {
-      Navigator.pushReplacementNamed(context, EmailVerificationFailure.routeName);
-      return;
-    }
 
     Navigator.pushReplacementNamed(context, Home.routeName);
 

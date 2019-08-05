@@ -28,18 +28,27 @@ class _MyPassesTabState extends State<MyPassesTab> {
   void didChangeDependencies() async {
 
     if (_isFirstRun) {
+
       setState(() {
         _isLoading = true;
       });
 
       isUserEmailVerified().then((isEmailVerified) {
+
         setState(() {
 
-          Provider.of<TicketProvider>(context).fetchUserTickets().then((_) {
-            setState(() {
-              _isLoading = false;
+          _isUserEmailVerified = isEmailVerified;
+
+          if (_isUserEmailVerified) {
+
+            //Email is verified. Set spinner to load tickets.
+            _isLoading = true;
+            Provider.of<TicketProvider>(context).fetchUserTickets().then((_) {
+              _isLoading = false; //All done. Everything is fully loaded.
             });
-          });
+          } else {
+            _isLoading = false;
+          }
         });
       });
 
@@ -66,11 +75,12 @@ class _MyPassesTabState extends State<MyPassesTab> {
     if (_isUserLoggedIntoAnotherDevice) {
       return DeviceConflict();
     }
-    if (_eventData.eventList.length >= 1) {
-      return EventCard();
+
+    if (_eventData.eventList.length <= 0) {
+      return MissingTicket();
     }
 
-    return MissingTicket();
+    return EventCard();
   }
 
   void emailVerifyCallback() async {
@@ -200,7 +210,7 @@ class DeviceConflict extends StatelessWidget {
 
 class EmailVerificationConflict extends StatelessWidget {
 
-  Function _mainButtonCallback;
+  final Function _mainButtonCallback;
 
   EmailVerificationConflict(this._mainButtonCallback);
 
