@@ -1,13 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/utils/strings.dart';
+import 'package:foria/utils/utils.dart';
 
-Future<void> confirmEmailPopUp(BuildContext context) async {
-  return showDialog<void>(
-    context: context,
-    barrierDismissible: false, // user must tap button!
-    builder: (BuildContext context) {
-      return CupertinoAlertDialog(
+import 'home.dart';
+
+class EmailVerificationFailure extends StatelessWidget {
+
+  static const routeName = '/email_not_verified';
+
+  @override
+  Widget build (BuildContext context) => new Scaffold(
+      backgroundColor: Colors.white,
+      body: CupertinoAlertDialog(
         title: Text(emailConfirmationRequired),
         content: SingleChildScrollView(
           child: ListBody(
@@ -21,12 +26,15 @@ Future<void> confirmEmailPopUp(BuildContext context) async {
           FlatButton(
             child: Text(iveConfirmedEmail,
               style: TextStyle(color: Theme.of(context).primaryColor),),
-            onPressed: () {
-              Navigator.of(context).pop();
+            onPressed: () async {
+              await forceTokenRefresh();
+
+              if (await isUserEmailVerified()) {
+                Navigator.pushNamed(context, Home.routeName);
+              }
             },
           ),
         ],
-      );
-    },
+      )
   );
 }
