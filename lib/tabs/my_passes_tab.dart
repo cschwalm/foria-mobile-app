@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:foria/providers/selected_ticket_provider.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/strings.dart';
+import 'package:foria/utils/utils.dart';
 import 'package:foria/widgets/contact_support.dart';
 import 'package:foria/widgets/primary_button.dart';
 import 'package:provider/provider.dart';
@@ -17,25 +18,34 @@ class MyPassesTab extends StatefulWidget {
 }
 
 class _MyPassesTabState extends State<MyPassesTab> {
-  bool _isInit = true;
-  bool _isLoading = false;
+
+  bool _isFirstRun = true;
+  bool _isLoading = true;
   bool _isUserLoggedIntoAnotherDevice = true;
+  bool _isUserEmailVerified = false;
 
   @override
-  void didChangeDependencies() {
-    if (_isInit) {
+  void didChangeDependencies() async {
+
+    if (_isFirstRun) {
       setState(() {
         _isLoading = true;
       });
 
-      Provider.of<TicketProvider>(context).fetchUserTickets().then((_) {
+      isUserEmailVerified().then((isEmailVerified) {
         setState(() {
-          _isLoading = false;
+
+          Provider.of<TicketProvider>(context).fetchUserTickets().then((_) {
+            setState(() {
+              _isLoading = false;
+            });
+          });
         });
       });
 
-      _isInit = false;
+      _isFirstRun = false;
     }
+
     super.didChangeDependencies();
   }
 
@@ -48,13 +58,29 @@ class _MyPassesTabState extends State<MyPassesTab> {
         radius: 15,
       );
     }
+
+    if (!_isUserEmailVerified) {
+      return EmailVerificationConflict(this.emailVerifyCallback);
+    }
+
     if (_isUserLoggedIntoAnotherDevice) {
       return DeviceConflict();
     }
     if (_eventData.eventList.length >= 1) {
       return EventCard();
     }
+
     return MissingTicket();
+  }
+
+  void emailVerifyCallback() async {
+
+    await forceTokenRefresh();
+    if (await isUserEmailVerified()) {
+      setState(() {
+        _isUserEmailVerified = true;
+      });
+    }
   }
 }
 
@@ -165,6 +191,46 @@ class DeviceConflict extends StatelessWidget {
             text: relocateTickets,
             isActive: true,
             onPress: () {},
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class EmailVerificationConflict extends StatelessWidget {
+
+  Function _mainButtonCallback;
+
+  EmailVerificationConflict(this._mainButtonCallback);
+
+  @override
+  Widget build(BuildContext context) {
+    return PopUpCard(
+      content: Column(
+        children: <Widget>[
+          Text(
+            activeOnAnotherDevice,
+            style: Theme.of(context).textTheme.title,
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(
+            height: 25,
+          ),
+          Text(
+            toAccessTickets,
+            style: Theme.of(context).textTheme.body1,
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(
+            height: 25,
+          ),
+          PrimaryButton(
+            text: iveConfirmedEmail,
+            isActive: true,
+            onPress: () {
+              _mainButtonCallback();
+            },
           ),
         ],
       ),

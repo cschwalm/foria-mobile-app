@@ -1,9 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/utils/strings.dart';
-import 'package:foria/utils/utils.dart';
-
-import 'home.dart';
 
 class EmailVerificationFailure extends StatelessWidget {
 
@@ -26,13 +23,7 @@ class EmailVerificationFailure extends StatelessWidget {
           FlatButton(
             child: Text(iveConfirmedEmail,
               style: TextStyle(color: Theme.of(context).primaryColor),),
-            onPressed: () async {
-              await forceTokenRefresh();
-
-              if (await isUserEmailVerified()) {
-                Navigator.pushNamed(context, Home.routeName);
-              }
-            },
+            onPressed: () {},
           ),
         ],
       )

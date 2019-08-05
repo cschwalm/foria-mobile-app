@@ -54,9 +54,7 @@ Future<Widget> _determineHomeWidget() async {
     return Login();
   }
   
-  if (! await isUserEmailVerified()) {
-    return EmailVerificationFailure();
-  }
+
 
   return Home();
 }
