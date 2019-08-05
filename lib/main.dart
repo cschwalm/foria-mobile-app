@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show DeviceOrientation, SystemChrome;
+import 'package:foria/screens/venue_screen.dart';
 import 'package:foria/utils/utils.dart';
 
 import 'screens/home.dart';
@@ -41,6 +42,7 @@ void main() async {
           Home.routeName: (context) => Home(),
           SelectedTicketScreen.routeName: (context) => SelectedTicketScreen(),
           RegisterAndTransferScreen.routeName: (context) => RegisterAndTransferScreen(),
+          VenueScreen.routeName: (context) => VenueScreen(),
         }
     )
   );

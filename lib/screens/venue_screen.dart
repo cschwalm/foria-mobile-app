@@ -1,12 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:foria/utils/utils.dart';
 import 'package:foria/widgets/primary_button.dart';
+import 'package:foria/widgets/settings_item.dart';
 
 import '../utils/strings.dart';
 
 class VenueScreen extends StatelessWidget {
-
-  static const routeName = '/selected-ticket';
+  static const routeName = '/venue-screen';
 
   @override
   Widget build(BuildContext context) {
@@ -15,38 +16,50 @@ class VenueScreen extends StatelessWidget {
         title: Text(venueAccount),
         backgroundColor: Theme.of(context).primaryColorDark,
       ),
-      body: Padding(
-        padding: EdgeInsets.fromLTRB(16, 20, 16, 40),
-        child: Column(
-          children: <Widget>[
-            (),
-            SizedBox(
-              height: 40,
-            ),
-            Expanded(
-              child: PassBody(),
-            ),
-            PrimaryButton(
-              text: scanTickets,
-              icon: Icons.camera,
-              onPress: () {},
-            ),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(16,0,16,20),
-                    child: PrimaryButton(
-                      text: textLogout,
-                      onPress: () {},
-                    ),
+      body: Column(
+        children: <Widget>[
+          SizedBox(
+            height: 20,
+          ),
+          Container(
+            color: Color(0xffbcbbc1),
+            height: 0.3,
+          ),
+          SettingsItem(
+            label: FAQ,
+            content: SettingsNavigationIndicator(),
+            onPress: () {},
+          ),
+          Container(
+            color: Color(0xffbcbbc1),
+            height: 0.3,
+          ),
+          SettingsItem(
+            label: textLogout,
+            content: SettingsNavigationIndicator(),
+            onPress: () {
+              logout(context);
+            },
+          ),
+          Container(
+            color: Color(0xffbcbbc1),
+            height: 0.3,
+          ),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.fromLTRB(16, 0, 16, 20),
+                  child: PrimaryButton(
+                    text: scanTickets,
+                    onPress: () {},
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
