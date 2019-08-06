@@ -5,6 +5,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:foria/main.dart';
 
 // The widgets in this file present a Cupertino-style settings item to the user.
 // In the future, the Cupertino package in the Flutter SDK will include
@@ -65,6 +66,7 @@ class SettingsItem extends StatefulWidget {
     this.content,
     this.subtitle,
     this.onPress,
+    this.labelTextStyle,
     Key key,
   })  : assert(label != null),
         super(key: key);
@@ -74,6 +76,7 @@ class SettingsItem extends StatefulWidget {
   final Widget content;
   final String subtitle;
   final SettingsItemCallback onPress;
+  final TextStyle labelTextStyle;
 
   @override
   State<StatefulWidget> createState() => SettingsItemState();
@@ -86,7 +89,7 @@ class SettingsItemState extends State<SettingsItem> {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      color: pressed ? Color(0xffd9d9d9) : Color(0x00000000),
+      color: pressed ? Color(0xffd9d9d9) : Color(0xffFFFFFF),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () async {
@@ -147,8 +150,12 @@ class SettingsItemState extends State<SettingsItem> {
                         )
                       : Padding(
                           padding: EdgeInsets.only(top: 1.5),
-                          child: Text(widget.label,
-                              style: Theme.of(context).textTheme.title),
+                          child: Text(
+                            widget.label,
+                            style: widget.labelTextStyle == null
+                                ? Theme.of(context).textTheme.title
+                                : widget.labelTextStyle,
+                          ),
                         ),
                 ),
               ),
@@ -160,6 +167,32 @@ class SettingsItemState extends State<SettingsItem> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class SettingItemDivider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Color(0xffbcbbc1),
+      height: 0.3,
+    );
+  }
+}
+
+class MajorSettingItemDivider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        SettingItemDivider(),
+        Container(
+          color: settingsBackgroundColor,
+          height: 10,
+        ),
+        SettingItemDivider(),
+      ],
     );
   }
 }

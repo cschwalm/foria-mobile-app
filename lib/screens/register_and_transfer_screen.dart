@@ -22,7 +22,7 @@ class StepTitle extends StatelessWidget {
               height: 35,
               width: 35,
               decoration: new BoxDecoration(
-                color: shapeGrey,
+                color: shapeGreyColor,
                 shape: BoxShape.circle,
               ),
             ),

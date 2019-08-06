@@ -141,6 +141,7 @@ class EventCard extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
             child: GestureDetector(
+              key: Key(_eventData.eventList[index].id),
               onTap: () {
                 Navigator.of(context).pushNamed(
                   SelectedTicketScreen.routeName,
@@ -235,7 +236,6 @@ class DeviceConflict extends StatelessWidget {
           ),
           PrimaryButton(
             text: relocateTickets,
-            isActive: true,
             onPress: () {},
           ),
         ],

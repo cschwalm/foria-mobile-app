@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:foria/providers/selected_ticket_provider.dart';
 import 'package:foria/utils/static_images.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/primary_button.dart';
@@ -39,6 +40,9 @@ class SelectedTicketScreen extends StatelessWidget {
 class EventInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final _selectedEventData =
+    ModalRoute.of(context).settings.arguments as SelectedTicketProvider;
+
     return Row(
       children: <Widget>[
         Stack(
@@ -50,18 +54,10 @@ class EventInfo extends StatelessWidget {
                 height: 59,
                 width: 71,
                 alignment: Alignment.center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      "Apr",
-                      style: Theme.of(context).textTheme.display1,
-                    ),
-                    Text(
-                      "20",
-                      style: Theme.of(context).textTheme.display1,
-                    ),
-                  ],
+                child: Text(
+                  'Apr\n20',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.display1,
                 ),
               ),
             ),
@@ -74,7 +70,7 @@ class EventInfo extends StatelessWidget {
           child: Column(
             children: <Widget>[
               Text(
-                "Rufus",
+                _selectedEventData.event.name,
                 style: Theme.of(context).textTheme.headline,
               ),
               Text(

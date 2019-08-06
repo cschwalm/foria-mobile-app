@@ -4,67 +4,76 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/screens/home.dart';
+import 'package:foria/screens/selected_ticket_screen.dart';
 import 'package:foria/tabs/my_passes_tab.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:mockito/mockito.dart';
 
-
 class MockTicketProvider extends Mock implements TicketProvider {}
+
+class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
 final String _ticketId = "12345-1234-1234-12345";
 final String _userId = "12345-222-222-2222";
 final String _eventName = 'TestEvent';
 
 void main() {
-
   final TicketProvider ticketProviderMock = new MockTicketProvider();
+  NavigatorObserver mockObserver;
 
   setUp(() {
+    mockObserver = MockNavigatorObserver();
 
     List<Ticket> tickets = _generateFakeTickets();
     List<Event> events = _generateFakeEvents();
-    when(ticketProviderMock.userTicketList).thenReturn(UnmodifiableListView(tickets));
+    when(ticketProviderMock.userTicketList)
+        .thenReturn(UnmodifiableListView(tickets));
     when(ticketProviderMock.eventList).thenReturn(UnmodifiableListView(events));
-    when(ticketProviderMock.fetchUserTickets()).thenAnswer( (_) async { return; });
-
-//thenReturn(new Future<void>())
+    when(ticketProviderMock.fetchUserTickets()).thenAnswer((_) async {
+      return;
+    });
   });
 
-  testWidgets('myPassesTab contains one event in list', (WidgetTester tester) async {
-
+  testWidgets('selectedTicketScreen containes proper event name',
+      (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
       home: Tabs(ticketProviderMock),
+      navigatorObservers: [mockObserver],
+      routes: {
+        SelectedTicketScreen.routeName: (context) => SelectedTicketScreen(),
+      },
     ));
 
     await tester.pumpAndSettle();
 
-    expect(find.byType(Card), findsNWidgets(_generateFakeTickets().length));
-    expect(find.byType(MissingTicket), findsNothing);
-  });
+    final Key keyOfFirstEventCard = Key(_generateFakeEvents()[0].id);
 
-  testWidgets('myPassesTab contains no events in list', (WidgetTester tester) async {
+    final cardFinder = find.descendant(
+        of: find.byType(EventCard),
+        matching: find.byKey(keyOfFirstEventCard));
 
-    when(ticketProviderMock.eventList).thenReturn(UnmodifiableListView(new List()));
-
-    await tester.pumpWidget(MaterialApp(
-      home: Tabs(ticketProviderMock),
-    ));
+    await tester.tap(cardFinder);
 
     await tester.pumpAndSettle();
 
-    final gFinder = find.descendant(of: find.byType(MissingTicket), matching: find.byType(GestureDetector));
+    final String nameOfFirstEventCard = _generateFakeEvents()[0].name;
 
-    expect(find.byType(Card), findsNothing);
-    expect(gFinder, findsOneWidget);
+    final eventNameFinder = find.descendant(
+        of: find.byType(EventInfo),
+        matching: find.text(nameOfFirstEventCard));
+
+    verify(mockObserver.didPush(any, any));
+
+    expect(find.byType(SelectedTicketScreen), findsOneWidget);
+
+    expect(eventNameFinder, findsOneWidget);
   });
-
 }
 
 ///
 /// Generates mock tickets for use in TicketProvider
 ///
 List<Ticket> _generateFakeTickets() {
-
   List<Ticket> tickets = new List<Ticket>();
 
   for (int i = 0; i < 3; i++) {
@@ -89,11 +98,9 @@ List<Ticket> _generateFakeTickets() {
 /// Generates mock events for use in TicketProvider
 ///
 List<Event> _generateFakeEvents() {
-
   List<Event> events = new List<Event>();
 
   for (int i = 0; i < 3; i++) {
-
     Address testAddress = new Address();
     testAddress.city = 'San Francisco';
     testAddress.country = 'USA';
