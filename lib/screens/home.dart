@@ -52,7 +52,7 @@ class FromRightToLeft<T> extends MaterialPageRoute<T> {
 
 class Tabs extends StatefulWidget {
   
-  TicketProvider _ticketProvider;
+  final TicketProvider _ticketProvider;
   Tabs(this._ticketProvider);
 
   @override
@@ -111,11 +111,11 @@ class TabsState extends State<Tabs> {
                 currentIndex: _tab,
                 onTap: onTap,
                 backgroundColor: Colors.white,
-                items: TabItems.map((TabItem) {
+                items: TabItems.map((tabItem) {
                   return new BottomNavigationBarItem(
-                    title: new Text(TabItem.title),
-                    icon: new Icon(TabItem.icon),
-                    activeIcon: new Icon(TabItem.activeIcon),
+                    title: new Text(tabItem.title),
+                    icon: new Icon(tabItem.icon),
+                    activeIcon: new Icon(tabItem.activeIcon),
                   );
                 }).toList(),
               )
@@ -123,11 +123,11 @@ class TabsState extends State<Tabs> {
                 currentIndex: _tab,
                 onTap: onTap,
                 backgroundColor: Colors.white,
-                items: TabItems.map((TabItem) {
+                items: TabItems.map((tabItem) {
                   return new BottomNavigationBarItem(
-                    title: new Text(TabItem.title),
-                    icon: new Icon(TabItem.icon),
-                    activeIcon: new Icon(TabItem.activeIcon),
+                    title: new Text(tabItem.title),
+                    icon: new Icon(tabItem.icon),
+                    activeIcon: new Icon(tabItem.activeIcon),
                   );
                 }).toList(),
               ),
