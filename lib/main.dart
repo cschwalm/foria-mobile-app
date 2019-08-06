@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show DeviceOrientation, SystemChrome;
 import 'package:foria/screens/venue_screen.dart';
-import 'package:foria/utils/utils.dart';
+import 'package:foria/utils/auth_utils.dart';
 
 import 'screens/home.dart';
 import 'screens/login.dart';
