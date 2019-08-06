@@ -2,12 +2,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show DeviceOrientation, SystemChrome;
 import 'package:foria/screens/venue_screen.dart';
-import 'package:foria/utils/utils.dart';
+import 'package:foria/utils/auth_utils.dart';
 
 import 'screens/home.dart';
 import 'screens/login.dart';
 import 'screens/register_and_transfer_screen.dart';
 import 'screens/selected_ticket_screen.dart';
+
+const Color textGreyColor = Color(0xFFC7C7C7);
+const Color shapeGreyColor = Color(0xFFC7C7C7);
+const Color settingsBackgroundColor = Color(0xffEEEEEE);
 
 void main() async {
 
@@ -36,10 +40,10 @@ void main() async {
               headline: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.black,fontFamily: 'Rubik',),
             ),
         ),
-        home: await isUserLoggedIn() ? new Home() : new Login(),
+        home: await _determineHomeWidget(),
         routes: {
-          Login.routeName: (context) => Login(),
           Home.routeName: (context) => Home(),
+          Login.routeName: (context) => Login(),
           SelectedTicketScreen.routeName: (context) => SelectedTicketScreen(),
           RegisterAndTransferScreen.routeName: (context) => RegisterAndTransferScreen(),
           VenueScreen.routeName: (context) => VenueScreen(),
@@ -48,6 +52,14 @@ void main() async {
   );
 }
 
-const Color textGreyColor = Color(0xFFC7C7C7);
-const Color shapeGreyColor = Color(0xFFC7C7C7);
-const Color settingsBackgroundColor = Color(0xffEEEEEE);
+Future<Widget> _determineHomeWidget() async {
+
+  if (! await isUserLoggedIn(true)) {
+    return Login();
+  }
+
+  return Home();
+}
+
+const Color textGrey = Color(0xFFC7C7C7);
+const Color shapeGrey = Color(0xFFC7C7C7);

@@ -1,8 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/screens/venue_screen.dart';
+import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/strings.dart';
-import 'package:foria/utils/utils.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:foria/widgets/primary_button.dart';
 
 import '../widgets/contact_support.dart';

@@ -9,7 +9,7 @@ class MockUserApi extends Mock implements UserApi {}
 
 void main() {
 
-  const _channel = const MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
+  final _channel = MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
   final eventApi = MockEventApi();
   final userApi = MockUserApi();
   final TicketProvider ticketProvider = new TicketProvider();

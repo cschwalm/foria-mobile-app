@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
-import 'package:foria/utils/utils.dart';
+import 'package:foria/utils/auth_utils.dart';
 import 'package:foria_flutter_client/api.dart';
 
 ///
