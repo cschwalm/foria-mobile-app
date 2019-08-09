@@ -5,6 +5,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_auth0/flutter_auth0.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foria/screens/home.dart';
+import 'package:foria/screens/venue_screen.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
@@ -142,7 +143,7 @@ void webLogin(BuildContext context) async {
   await _web.authorize(
 
     audience: auth0Audience,
-    scope: 'openid profile email offline_access',
+    scope: 'openid profile email offline_access write:venue_redeem',
   ).then((authInfo) async {
 
     if (authInfo == null || authInfo['access_token'] == null) {
@@ -153,13 +154,51 @@ void webLogin(BuildContext context) async {
 
     await _storeAuthInfo(authInfo);
 
-    Navigator.pushReplacementNamed(context, Home.routeName);
+    if (await doesUserHaveVenueAccess()) {
+      Navigator.pushReplacementNamed(context, VenueScreen.routeName);
+    } else {
+      Navigator.pushReplacementNamed(context, Home.routeName);
+    }
 
   }).catchError((err) async {
 
     debugPrint('Auth Error: $err');
     showErrorAlert(context, loginError);
   });
+}
+
+///
+/// Checks to see if the logged in account is a venue. If so, we send them to
+/// the venue flow of the app.
+///
+/// Checks Auth0 permission scope "write:venue_redeem"
+///
+Future<bool> doesUserHaveVenueAccess() async {
+
+  JsonWebToken jwt = await _loadToken(accessTokenKey);
+
+  if (jwt == null) {
+    debugPrint("ERROR: No token found in storage. Not able to check venue.");
+    return false;
+  }
+
+  Map<String, dynamic> claims = jwt.claims.toJson();
+  if (claims != null && claims.containsKey("scope")) {
+
+    String scopeStr = claims["scope"];
+    List<String> scopeArr = scopeStr.split(" ");
+
+    for (String scope in scopeArr) {
+
+      if (scope == "write:venue_redeem") {
+
+        debugPrint("User is acessing a venue account.");
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 Future<bool> isUserEmailVerified() async {

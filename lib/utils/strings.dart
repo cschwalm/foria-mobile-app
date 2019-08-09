@@ -30,6 +30,8 @@ const String contactUs = 'Contact Us';
 
 const String FAQ = 'FAQ';
 
+const String FAQUrl = "https://foriatickets.zendesk.com/hc/en-us";
+
 const String supportEmailAddress = "support@foriatickets.com";
 
 const String supportEmailSubject = "Foria Support";

@@ -58,6 +58,10 @@ Future<Widget> _determineHomeWidget() async {
     return Login();
   }
 
+  if (await doesUserHaveVenueAccess()) {
+    return VenueScreen();
+  }
+
   return Home();
 }
 
