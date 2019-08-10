@@ -29,13 +29,24 @@ enum _LoadingState {
 /// Step 2: Email is verified, display spinner and load tickets.
 /// Step 3: Display tickets results.
 ///
-class _MyPassesTabState extends State<MyPassesTab> {
+class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClientMixin<MyPassesTab> {
 
-  _LoadingState _currentState = _LoadingState.EMAIL_VERIFY;
-  bool _isUserEmailCheckFinished = false;
-  bool _isTicketsLoaded = false;
+  _LoadingState _currentState;
+  bool _isUserEmailCheckFinished;
+  bool _isTicketsLoaded;
 
-  bool _isUserEmailVerified = false;
+  bool _isUserEmailVerified;
+
+  @override
+  void initState() {
+
+    _currentState = _LoadingState.EMAIL_VERIFY;
+    _isUserEmailCheckFinished = false;
+    _isTicketsLoaded = false;
+
+    _isUserEmailVerified = false;
+    super.initState();
+  }
 
   @override
   void didChangeDependencies() {
@@ -93,6 +104,7 @@ class _MyPassesTabState extends State<MyPassesTab> {
 
   @override
   Widget build(BuildContext context) {
+
     final _eventData = Provider.of<TicketProvider>(context, listen: false);
 
     if ( (_currentState == _LoadingState.EMAIL_VERIFY && !_isUserEmailCheckFinished) || _currentState == _LoadingState.LOAD_TICKETS) {
@@ -109,6 +121,7 @@ class _MyPassesTabState extends State<MyPassesTab> {
       return MissingTicket();
     }
 
+    super.build(context);
     return EventCard();
   }
 
@@ -127,6 +140,9 @@ class _MyPassesTabState extends State<MyPassesTab> {
         });
       }
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class EventCard extends StatelessWidget {
