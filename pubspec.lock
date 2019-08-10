@@ -63,7 +63,7 @@ packages:
       name: crypto
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.6"
+    version: "2.1.1+1"
   crypto_keys:
     dependency: transitive
     description:
@@ -95,10 +95,10 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: fcd3650597e699fb3ba2b0e9eb19855806358d20
+      resolved-ref: aeed33594bbfb7791a4412530f050f4dc97ebd66
       url: "https://github.com/devdennysegura/flutter-auth0"
     source: git
-    version: "0.2.1"
+    version: "0.3.1"
   flutter_email_sender:
     dependency: "direct main"
     description:
@@ -130,7 +130,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: fe3a6907a8c1df71331f67db7bdad93f0b30bc2d
+      resolved-ref: baa8136df4a4fcd8210952c6f89e47987f238fec
       url: "ssh://git@bitbucket.org/foriatickets/foria-flutter-client.git"
     source: git
     version: "1.0.0"
@@ -154,7 +154,14 @@ packages:
       name: image_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.0+18"
+    version: "0.6.1+2"
+  intl:
+    dependency: "direct main"
+    description:
+      name: intl
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.15.8"
   jose:
     dependency: "direct main"
     description:

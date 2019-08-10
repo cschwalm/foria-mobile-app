@@ -91,12 +91,10 @@ void main() {
 /// Generates mock events for use in TicketProvider
 ///
 List<Event> _generateFakeEvents() {
-
   List<Event> events = new List<Event>();
 
   for (int i = 0; i < 3; i++) {
-
-    Address testAddress = new Address();
+    EventAddress testAddress = new EventAddress();
     testAddress.city = 'San Francisco';
     testAddress.country = 'USA';
     testAddress.state = 'CA';
@@ -107,7 +105,7 @@ List<Event> _generateFakeEvents() {
     event.name = _eventName;
     event.id = 'TestEvent$i';
     event.description = 'test description';
-    event.time = DateTime.now();
+    event.startTime = DateTime.now();
     event.imageUrl = 'foriatickets.com/img/large-square-logo';
 
     events.add(event);

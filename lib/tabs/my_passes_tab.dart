@@ -11,7 +11,6 @@ import 'package:provider/provider.dart';
 import '../screens/selected_ticket_screen.dart';
 
 class MyPassesTab extends StatefulWidget {
-  static List<String> date = ['day 1', 'day 2'];
 
   @override
   _MyPassesTabState createState() => _MyPassesTabState();
@@ -134,6 +133,7 @@ class EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _eventData = Provider.of<TicketProvider>(context, listen: false);
+    
 
     return ListView.builder(
         itemCount: _eventData.eventList.length,
@@ -164,11 +164,11 @@ class EventCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Text(
-                            "Apr",
+                            dateFormatShortMonth.format(_eventData.eventList[index].startTime),
                             style: Theme.of(context).textTheme.title,
                           ),
                           Text(
-                            "20",
+                            _eventData.eventList[index].startTime.day.toString(),
                             style: Theme.of(context).textTheme.title,
                           ),
                         ],
@@ -183,7 +183,7 @@ class EventCard extends StatelessWidget {
                             style: Theme.of(context).textTheme.title,
                           ),
                           Text(
-                            '8:00PM - Late',
+                            dateFormatTime.format(_eventData.eventList[index].startTime),
                             style: Theme.of(context).textTheme.body1,
                           ),
                         ],

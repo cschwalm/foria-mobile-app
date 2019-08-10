@@ -9,10 +9,6 @@ import 'screens/login.dart';
 import 'screens/register_and_transfer_screen.dart';
 import 'screens/selected_ticket_screen.dart';
 
-const Color textGreyColor = Color(0xFFC7C7C7);
-const Color shapeGreyColor = Color(0xFFC7C7C7);
-const Color settingsBackgroundColor = Color(0xffEEEEEE);
-
 void main() async {
 
   SystemChrome.setPreferredOrientations([
@@ -65,5 +61,6 @@ Future<Widget> _determineHomeWidget() async {
   return Home();
 }
 
-const Color textGrey = Color(0xFFC7C7C7);
-const Color shapeGrey = Color(0xFFC7C7C7);
+const Color textGreyColor = Color(0xFFC7C7C7);
+const Color shapeGreyColor = Color(0xFFC7C7C7);
+const Color settingsBackgroundColor = Color(0xffEEEEEE);
