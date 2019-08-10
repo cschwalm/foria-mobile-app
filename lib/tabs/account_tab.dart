@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:foria/screens/venue_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/primary_button.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../widgets/contact_support.dart';
 import '../widgets/settings_item.dart';
@@ -22,10 +22,12 @@ class AccountTab extends StatelessWidget {
           SettingsItem(
             label: FAQ,
             content: SettingsNavigationIndicator(),
-            onPress: () {
-              Navigator.of(context).pushNamed(
-                VenueScreen.routeName,
-              );
+            onPress: () async {
+              if (await canLaunch(FAQUrl)) {
+                await launch(FAQUrl);
+              } else {
+                print("Failed to load FAQ URL.");
+              }
             },
           ),
           SettingItemDivider(),
