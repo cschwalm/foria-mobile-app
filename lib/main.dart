@@ -27,7 +27,6 @@ void main() async {
             primaryColor: Color(0xFFFF0266),
             primaryColorDark: Color(0xFFC5003C),
             fontFamily: 'Rubik',
-
             textTheme: TextTheme(
               title: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
               button: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white),

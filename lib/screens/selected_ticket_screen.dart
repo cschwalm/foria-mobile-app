@@ -5,22 +5,42 @@ import 'package:foria/providers/selected_ticket_provider.dart';
 import 'package:foria/utils/static_images.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/primary_button.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'register_and_transfer_screen.dart';
 
-class SelectedTicketScreen extends StatelessWidget {
+class SelectedTicketScreen extends StatefulWidget {
+
   static const routeName = '/selected-ticket';
+  final SelectedTicketProvider selectedTicketProvider;
+
+  SelectedTicketScreen({this.selectedTicketProvider});
+
+  @override
+  _SelectedTicketScreenState createState() => _SelectedTicketScreenState();
+}
+
+class _SelectedTicketScreenState extends State<SelectedTicketScreen> {
+
+  SelectedTicketProvider _selectedTicketProvider;
 
   @override
   Widget build(BuildContext context) {
+
+    _selectedTicketProvider = widget.selectedTicketProvider != null ?
+    widget.selectedTicketProvider : ModalRoute.of(context).settings.arguments as SelectedTicketProvider;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(foriaPass),
         backgroundColor: Theme.of(context).primaryColorDark,
       ),
       backgroundColor: settingsBackgroundColor,
-      body: PassBody(),
+      body: ChangeNotifierProvider(
+        builder: (context) => (_selectedTicketProvider),
+        child: PassBody(),
+      )
     );
   }
 }
@@ -29,10 +49,9 @@ class PassBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _selectedEventData =
-    ModalRoute.of(context).settings.arguments as SelectedTicketProvider;
 
-    final int passCount = _selectedEventData.eventTickets.length;
+    final SelectedTicketProvider selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: false);
+    final int passCount = selectedTicketProvider.eventTickets.length;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -56,10 +75,9 @@ class PassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _selectedEventData =
-    ModalRoute.of(context).settings.arguments as SelectedTicketProvider;
-    final passNumber = index+1;
 
+    final SelectedTicketProvider selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: false);
+    final passNumber = index + 1;
 
     return SafeArea(
       child: Card(
@@ -77,7 +95,7 @@ class PassCard extends StatelessWidget {
               ),
               SizedBox(height: 5,),
               Text(
-                _selectedEventData.eventTickets[index].ticketTypeConfig.name,
+                selectedTicketProvider.eventTickets[index].ticketTypeConfig.name,
                 style: Theme.of(context).textTheme.title,
               ),
               SizedBox(
@@ -103,104 +121,101 @@ class PassCard extends StatelessWidget {
 }
 
 class EventInfo extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
-    final _selectedEventData =
-        ModalRoute.of(context).settings.arguments as SelectedTicketProvider;
 
-    DateTime _startDateTime = _selectedEventData.event.startTime;
-    String _month = dateFormatShortMonth.format(_startDateTime);
-    String _day = _startDateTime.day.toString();
-    String _startClockTime = dateFormatTime.format(_startDateTime);
+    final SelectedTicketProvider selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: false);
+
+    DateTime startDateTime = selectedTicketProvider.event.startTime;
+    String month = dateFormatShortMonth.format(startDateTime);
+    String day = startDateTime.day.toString();
+    String startClockTime = dateFormatTime.format(startDateTime);
 
     return Container(
       color: Colors.white,
       child: Row(
-          children: <Widget>[
-            Stack(
-              children: <Widget>[
-                Image.asset(calendarImage),
-                Padding(
-                  padding: const EdgeInsets.only(top: 17),
-                  child: Container(
-                    height: 59,
-                    width: 71,
-                    alignment: Alignment.center,
-                    child: Text(
-                      '$_month\n$_day',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.display1,
-                    ),
+        children: <Widget>[
+          Stack(
+            children: <Widget>[
+              Image.asset(calendarImage),
+              Padding(
+                padding: const EdgeInsets.only(top: 17),
+                child: Container(
+                  height: 59,
+                  width: 71,
+                  alignment: Alignment.center,
+                  child: Text(
+                    '$month\n$day',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.display1,
                   ),
                 ),
-              ],
-            ),
-            SizedBox(
-              width: 16,
-            ),
-            Expanded(
-              child: Column(
-                children: <Widget>[
-                  Text(
-                    _selectedEventData.event.name,
-                    style: Theme.of(context).textTheme.headline,
-                  ),
-                  Text(
-                    _selectedEventData.event.address.venueName,
-                    style: Theme.of(context).textTheme.body1,
-                  ),
-                  Text(
-                    _startClockTime,
-                    style: Theme.of(context).textTheme.body1,
-                  ),
-                ],
-                crossAxisAlignment: CrossAxisAlignment.start,
               ),
+            ],
+          ),
+          SizedBox(
+            width: 16,
+          ),
+          Expanded(
+            child: Column(
+              children: <Widget>[
+                Text(
+                  selectedTicketProvider.event.name,
+                  style: Theme.of(context).textTheme.headline,
+                ),
+                Text(
+                  selectedTicketProvider.event.address.venueName,
+                  style: Theme.of(context).textTheme.body1,
+                ),
+                Text(
+                  startClockTime,
+                  style: Theme.of(context).textTheme.body1,
+                ),
+              ],
+              crossAxisAlignment: CrossAxisAlignment.start,
             ),
-          ],
-        ),);
+          ),
+        ],
+      ),);
   }
 }
 
 class Directions extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
-    final _eventData =
-        ModalRoute.of(context).settings.arguments as SelectedTicketProvider;
-    final _add = _eventData.event.address;
+
+    final SelectedTicketProvider selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: false);
+    final addr = selectedTicketProvider.event.address;
 
     return GestureDetector(
-        child: Row(
-          children: <Widget>[
-            Icon(
-              Icons.location_on,
-              color: Theme.of(context).primaryColor,
-            ),
-            Text(
-              '' + directionsText,
-              style: TextStyle(
-                  fontSize: 18, color: Theme.of(context).primaryColor),
-            ),
-          ],
-        ),
-        onTap: () async {
-          var url = googleMapsSearchUrl +
-              Uri.encodeFull(_add.streetAddress) +
-              '%20' +
-              Uri.encodeFull(_add.city) +
-              '%20' +
-              Uri.encodeFull(_add.state);
-          if (await canLaunch(url)) {
-            await launch(url);
-          } else {
-            throw 'Could not launch $url';
-          }
-        },
+      child: Row(
+        children: <Widget>[
+          Icon(
+            Icons.location_on,
+            color: Theme.of(context).primaryColor,
+          ),
+          Text(
+            '' + directionsText,
+            style: TextStyle(
+                fontSize: 18, color: Theme.of(context).primaryColor),
+          ),
+        ],
+      ),
+      onTap: () async {
+
+        var url = googleMapsSearchUrl + Uri.encodeFull(addr.streetAddress + " " + addr.city + " " + addr.state + " " + addr.zip);
+
+        if (await canLaunch(url)) {
+          await launch(url);
+        } else {
+          print('Could not launch $url');
+        }
+      },
     );
   }
 }
-
-
 
 class PassRefresh extends StatelessWidget {
   @override
@@ -240,17 +255,17 @@ class PassOptions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-          children: <Widget>[
-            PrimaryButton(
-              text: textTransfer,
-              onPress: () {
-                Navigator.of(context).pushNamed(
-                  RegisterAndTransferScreen.routeName,
-                  arguments: null,
-                );
-              },
-            ),
-          ],
+      children: <Widget>[
+        PrimaryButton(
+          text: textTransfer,
+          onPress: () {
+            Navigator.of(context).pushNamed(
+              RegisterAndTransferScreen.routeName,
+              arguments: null,
+            );
+          },
+        ),
+      ],
     );
   }
 }

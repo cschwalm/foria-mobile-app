@@ -95,10 +95,10 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: fcd3650597e699fb3ba2b0e9eb19855806358d20
+      resolved-ref: aeed33594bbfb7791a4412530f050f4dc97ebd66
       url: "https://github.com/devdennysegura/flutter-auth0"
     source: git
-    version: "0.2.1"
+    version: "0.3.1"
   flutter_email_sender:
     dependency: "direct main"
     description:
@@ -154,7 +154,7 @@ packages:
       name: image_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.1"
+    version: "0.6.1+2"
   intl:
     dependency: "direct main"
     description:
