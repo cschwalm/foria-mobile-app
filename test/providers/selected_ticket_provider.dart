@@ -8,6 +8,7 @@ import 'package:foria/screens/selected_ticket_screen.dart';
 import 'package:foria/tabs/my_passes_tab.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:mockito/mockito.dart';
+import 'package:flutter/services.dart';
 
 class MockTicketProvider extends Mock implements TicketProvider {}
 
@@ -20,6 +21,7 @@ final String _eventName = 'TestEvent';
 void main() {
   final TicketProvider ticketProviderMock = new MockTicketProvider();
   NavigatorObserver mockObserver;
+  final _channel = const MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
 
   setUp(() {
     mockObserver = MockNavigatorObserver();
@@ -29,9 +31,29 @@ void main() {
     when(ticketProviderMock.userTicketList)
         .thenReturn(UnmodifiableListView(tickets));
     when(ticketProviderMock.eventList).thenReturn(UnmodifiableListView(events));
-    when(ticketProviderMock.fetchUserTickets()).thenAnswer((_) async {
-      return;
+    when(ticketProviderMock.fetchUserTickets()).thenAnswer( (_) async { return; });
+
+    _channel.setMockMethodCallHandler((MethodCall methodCall) async {
+
+      if (methodCall.method == 'read') {
+        return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjIxNDc0ODM2NDcsImVtYWlsX3ZlcmlmaWVkIjp0cnVlfQ.rgvCxxhoZHs94LHV-m86mvgEZFFZK-VQc_5GZH4m1q4";
+      }
+
+      return null;
     });
+  });
+
+  testWidgets('myPassesTab contains one event in list', (WidgetTester tester) async {
+
+    await tester.pumpWidget(MaterialApp(
+      home: Tabs(ticketProviderMock),
+    ));
+
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Card), findsNWidgets(_generateFakeEvents().length));
+    expect(find.byType(MissingTicket), findsNothing);
+    expect(find.byType(EmailVerificationConflict), findsNothing);
   });
 
   testWidgets('selectedTicketScreen containes proper event name',
@@ -101,7 +123,7 @@ List<Event> _generateFakeEvents() {
   List<Event> events = new List<Event>();
 
   for (int i = 0; i < 3; i++) {
-    Address testAddress = new Address();
+    EventAddress testAddress = new EventAddress();
     testAddress.city = 'San Francisco';
     testAddress.country = 'USA';
     testAddress.state = 'CA';
@@ -112,7 +134,7 @@ List<Event> _generateFakeEvents() {
     event.name = _eventName;
     event.id = 'TestEvent$i';
     event.description = 'test description';
-    event.time = DateTime.now();
+    event.startTime = DateTime.now();
     event.imageUrl = 'foriatickets.com/img/large-square-logo';
 
     events.add(event);

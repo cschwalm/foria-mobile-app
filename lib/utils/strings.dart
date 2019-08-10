@@ -1,10 +1,21 @@
+import 'package:intl/intl.dart';
+
+
+// Date string formatting. //
+
+final dateFormatShortMonth = DateFormat('MMM');
+
+final dateFormatTime = DateFormat('jm');
+
 // General purpose strings. //
 
 const String textTransfer = 'Transfer';
 
 const String textLogout = 'Logout';
 
-// General purpose strings. //
+const String googleMapsSearchUrl = 'https://www.google.com/maps/search/?api=1&query=';
+
+// Venue related strings. //
 
 const String venueAccount = 'Venue Account';
 
@@ -57,3 +68,5 @@ const String foriaPass ='Foria Pass';
 const String passRefresh ='Your pass refreshes in  ';
 
 const String passOptions = 'Pass Options';
+
+const String directionsText = 'Directions';

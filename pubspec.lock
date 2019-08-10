@@ -63,7 +63,7 @@ packages:
       name: crypto
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.6"
+    version: "2.1.1+1"
   crypto_keys:
     dependency: transitive
     description:
@@ -130,7 +130,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: fe3a6907a8c1df71331f67db7bdad93f0b30bc2d
+      resolved-ref: baa8136df4a4fcd8210952c6f89e47987f238fec
       url: "ssh://git@bitbucket.org/foriatickets/foria-flutter-client.git"
     source: git
     version: "1.0.0"
@@ -154,7 +154,14 @@ packages:
       name: image_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.0+18"
+    version: "0.6.1"
+  intl:
+    dependency: "direct main"
+    description:
+      name: intl
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.15.8"
   jose:
     dependency: "direct main"
     description:
@@ -286,6 +293,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.6"
+  url_launcher:
+    dependency: "direct main"
+    description:
+      name: url_launcher
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "5.1.2"
   vector_math:
     dependency: transitive
     description:
