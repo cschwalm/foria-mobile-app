@@ -4,8 +4,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../tabs/account_tab.dart' as _accountTab;
-import '../tabs/my_passes_tab.dart' as _myPassesTab;
+import '../tabs/account_tab.dart';
+import '../tabs/my_passes_tab.dart';
 
 class Home extends StatelessWidget {
 
@@ -60,16 +60,22 @@ class Tabs extends StatefulWidget {
 }
 
 class TabsState extends State<Tabs> {
-  PageController _tabController;
 
-  var _titleApp;
+  PageController _tabController;
+  MyPassesTab _myPassesTab;
+  AccountTab _accountTab;
+
+  String _titleApp;
   int _tab = 0;
 
   @override
   void initState() {
-    super.initState();
     _tabController = new PageController();
+    _myPassesTab = new MyPassesTab();
+    _accountTab = new AccountTab();
+
     this._titleApp = TabItems[0].title;
+    super.initState();
   }
 
   @override
@@ -79,82 +85,97 @@ class TabsState extends State<Tabs> {
   }
 
   @override
-  Widget build(BuildContext context) => new Scaffold(
-        //App Bar
-        appBar: new AppBar(
-          title: new Text(
-            _titleApp,
-            style: new TextStyle(
-              fontSize: Theme.of(context).platform == TargetPlatform.iOS
-                  ? 17.0
-                  : 20.0,
-            ),
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      //App Bar
+      appBar: new AppBar(
+        title: new Text(
+          _titleApp,
+          style: new TextStyle(
+            fontSize: Theme
+                .of(context)
+                .platform == TargetPlatform.iOS
+                ? 17.0
+                : 20.0,
           ),
-          elevation:
-              Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
         ),
+        elevation:
+        Theme
+            .of(context)
+            .platform == TargetPlatform.iOS ? 0.0 : 4.0,
+      ),
 
-        //Content of tabs
-        body: new ChangeNotifierProvider(
-            builder: (context) => (widget._ticketProvider),
-            child: new PageView(
-                controller: _tabController,
-                onPageChanged: onTabChanged,
-                children: <Widget>[
-                  new _myPassesTab.MyPassesTab(),
-                  new _accountTab.AccountTab()
-                ])),
-        bottomNavigationBar: Theme.of(context).platform == TargetPlatform.iOS
-            ? new CupertinoTabBar(
-                activeColor: Theme.of(context).primaryColor,
-                iconSize: 26,
-                currentIndex: _tab,
-                onTap: onTap,
-                backgroundColor: Colors.white,
-                items: TabItems.map((tabItem) {
-                  return new BottomNavigationBarItem(
-                    title: new Text(tabItem.title),
-                    icon: new Icon(tabItem.icon),
-                    activeIcon: new Icon(tabItem.activeIcon),
-                  );
-                }).toList(),
-              )
-            : new BottomNavigationBar(
-                currentIndex: _tab,
-                onTap: onTap,
-                backgroundColor: Colors.white,
-                items: TabItems.map((tabItem) {
-                  return new BottomNavigationBarItem(
-                    title: new Text(tabItem.title),
-                    icon: new Icon(tabItem.icon),
-                    activeIcon: new Icon(tabItem.activeIcon),
-                  );
-                }).toList(),
-              ),
-      );
+      //Content of tabs
+      body: new ChangeNotifierProvider(
+          builder: (context) => (widget._ticketProvider),
+          child: new PageView(
+              controller: _tabController,
+              onPageChanged: onTabChanged,
+              children: <Widget>[
+                _myPassesTab,
+                _accountTab
+              ])),
+      bottomNavigationBar: Theme
+          .of(context)
+          .platform == TargetPlatform.iOS
+          ? new CupertinoTabBar(
+        activeColor: Theme
+            .of(context)
+            .primaryColor,
+        iconSize: 26,
+        currentIndex: _tab,
+        onTap: onTap,
+        backgroundColor: Colors.white,
+        items: TabItems.map((tabItem) {
+          return new BottomNavigationBarItem(
+            title: new Text(tabItem.title),
+            icon: new Icon(tabItem.icon),
+            activeIcon: new Icon(tabItem.activeIcon),
+          );
+        }).toList(),
+      )
+          : new BottomNavigationBar(
+        currentIndex: _tab,
+        onTap: onTap,
+        backgroundColor: Colors.white,
+        items: TabItems.map((tabItem) {
+          return new BottomNavigationBarItem(
+            title: new Text(tabItem.title),
+            icon: new Icon(tabItem.icon),
+            activeIcon: new Icon(tabItem.activeIcon),
+          );
+        }).toList(),
+      ),
+    );
+  }
 
   void onTap(int tab) {
-    _tabController.jumpToPage(tab);
+
+    setState(() {
+      _tabController.jumpToPage(tab);
+    });
   }
 
   void onTabChanged(int tab) {
+
     setState(() {
       this._tab = tab;
+
+      switch (tab) {
+        case 0:
+          this._titleApp = TabItems[0].title;
+          break;
+
+        case 1:
+          this._titleApp = TabItems[1].title;
+          break;
+      }
     });
-
-    switch (tab) {
-      case 0:
-        this._titleApp = TabItems[0].title;
-        break;
-
-      case 1:
-        this._titleApp = TabItems[1].title;
-        break;
-    }
   }
 }
 
 class TabItem {
+
   const TabItem({this.title, this.icon, this.activeIcon});
 
   final String title;
