@@ -10,8 +10,8 @@
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:name="io.flutter.app.FlutterApplication"
-        android:label="foria"
-        android:icon="@mipmap/ic_launcher">
+        android:label="Foria"
+        android:icon="@mipmap/foria_launcher">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTask"
