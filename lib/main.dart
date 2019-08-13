@@ -37,7 +37,7 @@ void main() async {
               headline: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.black,fontFamily: 'Rubik',),
             ),
         ),
-        home: await _determineHomeWidget(),
+        home: SplashScreen(),
         routes: {
           Home.routeName: (context) => Home(),
           Login.routeName: (context) => Login(),
@@ -48,19 +48,6 @@ void main() async {
         }
     )
   );
-}
-
-Future<Widget> _determineHomeWidget() async {
-
-  if (! await isUserLoggedIn(true)) {
-    return Login();
-  }
-
-  if (await doesUserHaveVenueAccess()) {
-    return VenueScreen();
-  }
-
-  return Home();
 }
 
 const Color textGreyColor = Color(0xFFC7C7C7);
