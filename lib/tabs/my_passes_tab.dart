@@ -94,7 +94,7 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
   void _loadTicketsAndSetState() {
 
     //Email is verified. Load tickets and stop spinner when completed.
-    Provider.of<TicketProvider>(context).fetchUserTickets().then((_) {
+    Provider.of<TicketProvider>(context).loadUserData().then((_) {
       setState(() {
         _isTicketsLoaded = true;
         _currentState = _LoadingState.DONE;

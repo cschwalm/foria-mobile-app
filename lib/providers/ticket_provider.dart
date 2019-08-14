@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:foria/utils/auth_utils.dart';
+import 'package:foria/utils/database_utils.dart';
 import 'package:foria_flutter_client/api.dart';
 
 ///
@@ -18,8 +19,7 @@ class TicketProvider extends ChangeNotifier {
   final Set<Event> _eventList = new HashSet();
   final Set<Ticket> _ticketList = new HashSet();
 
-  final HashMap<String, Event> _eventMap = new HashMap();
-  final HashMap<String, Venue> _venueMap = new HashMap();
+  final DatabaseUtils _databaseUtils = new DatabaseUtils();
 
   UnmodifiableListView<Event> get eventList => UnmodifiableListView(_eventList);
   UnmodifiableListView<Ticket> get userTicketList => UnmodifiableListView(_ticketList);
@@ -53,44 +53,78 @@ class TicketProvider extends ChangeNotifier {
   ///
   /// Obtains the latest set of Tickets for the authenticated user.
   ///
-  Future<void> fetchUserTickets() async {
+  Future<void> loadUserData([bool forceRefresh = false]) async {
 
-    if (_eventApi == null) {
+    Set<Ticket> tickets;
+    if (!forceRefresh) {
+
+      tickets = await _databaseUtils.getAllTickets();
+      if (tickets != null) {
+
+        _ticketList.addAll(tickets);
+        _eventList.addAll(await _buildEventSet(tickets));
+        return;
+      }
+    }
+
+    if (_userApi == null) {
       ApiClient foriaApiClient = await obtainForiaApiClient();
       _userApi = new UserApi(foriaApiClient);
     }
-    List<Ticket> tickets;
 
     try {
-      tickets = await _userApi.getTickets();
+      tickets = (await _userApi.getTickets()).toSet();
     } on ApiException catch (ex) {
       print("### FORIA SERVER ERROR: getTickets ###");
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
       rethrow;
     }
-    _ticketList.addAll(tickets);
 
-    //Create a list of unique events for the set of user tickets.
-    Set<String> processedEventIdSet = new HashSet();
-    for (Ticket ticket in _ticketList) {
-      if (!processedEventIdSet.contains(ticket.eventId)) {
-        Event event = await fetchEventById(ticket.eventId);
-        _eventList.add(event);
-        processedEventIdSet.add(ticket.eventId);
-      }
-    }
+    debugPrint("Loaded ${tickets.length} tickets from Foria API.");
+    await _databaseUtils.storeTicketSet(tickets.toSet());
+
+    _ticketList.addAll(tickets);
+    _eventList.addAll(await _buildEventSet(tickets));
 
     notifyListeners();
   }
 
-  Future<Event> fetchEventById(String eventId) async {
+  ///
+  /// Create a list of unique events for the set of user tickets.
+  ///
+  Future<Set<Event>> _buildEventSet(Set<Ticket> tickets) async {
+
+    Set<Event> events = Set<Event>();
+
+    Set<String> processedEventIdSet = new HashSet();
+    for (Ticket ticket in tickets) {
+      if (!processedEventIdSet.contains(ticket.eventId)) {
+        Event event = await fetchEventById(ticket.eventId);
+        events.add(event);
+        processedEventIdSet.add(ticket.eventId);
+      }
+    }
+
+    return events;
+  }
+
+  ///
+  /// Loads event information specified by eventId.
+  /// Stores in local db for offline use.
+  ///
+  Future<Event> fetchEventById(String eventId, [forceRefresh = false]) async {
 
     if (eventId == null || eventId.isEmpty) {
       return null;
     }
 
-    if (_eventMap.containsKey(eventId)) {
-      return _eventMap[eventId];
+    if (!forceRefresh) {
+
+      Event event = await _databaseUtils.getEvent(eventId);
+      if (event != null) {
+        debugPrint("EventId: $eventId loaded from offline database");
+        return event;
+      }
     }
 
     if (_eventApi == null) {
@@ -107,18 +141,13 @@ class TicketProvider extends ChangeNotifier {
       rethrow;
     }
 
-    _eventMap[eventId] = event;
-    print("Added event to cache with ID: $eventId");
+    await _databaseUtils.storeEvent(event);
     return event;
   }
 
   Future<Venue> fetchVenueById(String venueId) async {
     if (venueId.isEmpty) {
       return null;
-    }
-
-    if (_venueMap.containsKey(venueId)) {
-      return _venueMap[venueId];
     }
 
     ApiClient foriaApiClient = await obtainForiaApiClient();
@@ -131,8 +160,7 @@ class TicketProvider extends ChangeNotifier {
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
       rethrow;
     }
-    _venueMap[venueId] = venue;
-    print("Added venue to cache with ID: $venueId");
+
     return venue;
   }
 }

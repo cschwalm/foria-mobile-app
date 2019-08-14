@@ -43,7 +43,7 @@ void main() {
 
       when(eventApi.getEvent(testEventId)).thenAnswer((_) async => eventMock);
 
-      Event actual = await ticketProvider.fetchEventById(testEventId);
+      Event actual = await ticketProvider.fetchEventById(testEventId, true);
       expect(actual, anything);
       expect(actual.id, equals(testEventId));
       expect(actual.name, equals(eventMock.name));
@@ -82,7 +82,7 @@ void main() {
     when(eventApi.getEvent(testEventId)).thenAnswer((_) async => eventMock);
     when(eventApi.getEvent(testEventId2)).thenAnswer((_) async => eventMock1);
 
-    await ticketProvider.fetchUserTickets();
+    await ticketProvider.loadUserData(true);
     List<Ticket> actual = ticketProvider.userTicketList.toList();
 
     expect(actual.length, equals(2));
@@ -121,7 +121,7 @@ void main() {
     when(eventApi.getEvent(testEventId)).thenAnswer((_) async => eventMock);
     when(eventApi.getEvent(testEventId2)).thenAnswer((_) async => eventMock1);
 
-    await ticketProvider.fetchUserTickets();
+    await ticketProvider.loadUserData(true);
     Set<Ticket> actual = ticketProvider.getTicketsForEventId(testEventId);
 
     expect(actual.length, equals(1));
