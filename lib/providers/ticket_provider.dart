@@ -13,16 +13,19 @@ import 'package:foria_flutter_client/api.dart';
 ///
 class TicketProvider extends ChangeNotifier {
 
+  DatabaseUtils _databaseUtils = new DatabaseUtils();
   EventApi _eventApi;
   UserApi _userApi;
 
   final Set<Event> _eventList = new HashSet();
   final Set<Ticket> _ticketList = new HashSet();
 
-  final DatabaseUtils _databaseUtils = new DatabaseUtils();
-
   UnmodifiableListView<Event> get eventList => UnmodifiableListView(_eventList);
   UnmodifiableListView<Ticket> get userTicketList => UnmodifiableListView(_ticketList);
+
+  set databaseUtils(DatabaseUtils value) {
+    _databaseUtils = value;
+  }
 
   set eventApi(EventApi value) {
     _eventApi = value;

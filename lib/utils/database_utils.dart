@@ -19,9 +19,10 @@ class DatabaseUtils {
   StoreRef<String, Map<String, dynamic>> _ticketListStore = StoreRef<String, Map<String, dynamic>>(ticketListStoreName);
 
   final int _dbVersionCode = 1;
+  final Random _random = Random.secure();
+
   static final String _dbFilename = "foria.db";
   static final String _dbCryptoKeyRef = "FORIA_DATABASE_KEY";
-  final Random _random = Random.secure();
   static final String eventStoreName = "events";
   static final String ticketListStoreName = "tickets";
 
