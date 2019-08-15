@@ -128,6 +128,8 @@ void logout(BuildContext context) {
   _storage.deleteAll();
 
   debugPrint("Logout called. Secrets deleted.");
+
+  _web.clearSession();
   Navigator.pushReplacementNamed(context, '/login');
 }
 
