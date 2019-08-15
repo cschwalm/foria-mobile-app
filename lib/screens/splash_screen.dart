@@ -1,12 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:foria/main.dart';
 import 'package:foria/screens/venue_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
 
 import 'home.dart';
 import 'login.dart';
 
+///
+/// First screen shown to user. Transitions away automatically.
+///
 class SplashScreen extends StatefulWidget {
+
   static const routeName = '/splash-screen';
 
   @override
@@ -15,78 +20,59 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
 
-  bool _loadLoginScreen = false;
-  bool _loadVenueScreen = false;
-  bool _loadHomeScreen = false;
-
   AnimationController controller;
   Animation<double> animation;
 
-  initState() {
-    super.initState();
-    controller = AnimationController(
-        duration: const Duration(seconds: 2), vsync: this);
-    animation = CurvedAnimation(parent: controller, curve: Curves.easeIn);
- controller.forward();
-  }
-
   @override
-  void didChangeDependencies() {
-    isUserLoggedIn(true).then((bool isUserLoggedIn){
-      if (! isUserLoggedIn){
-        setState(() {
-          _loadLoginScreen = true;
-        });
-      } else {
-        doesUserHaveVenueAccess().then((bool doesUserHaveVenueAccess){
-          if (doesUserHaveVenueAccess){
-            setState(() {
-              _loadVenueScreen = true;
-            });
-          } else {
-            setState(() {
-              _loadHomeScreen = true;
-            });
-          }
-        });
+  initState() {
+
+    super.initState();
+    controller = AnimationController(duration: const Duration(seconds: 2), vsync: this);
+    animation = CurvedAnimation(parent: controller, curve: Curves.easeIn);
+    controller.forward();
+    controller.addStatusListener((AnimationStatus status) {
+
+      if (status == AnimationStatus.completed) {
+        _determineNavigationRoute();
       }
     });
-    super.didChangeDependencies();
   }
 
-  Widget _buildChild() {
-    if(_loadLoginScreen) {
-      return Login();
+  Future<void> _determineNavigationRoute() async {
+
+    if (!await isUserLoggedIn(true)) {
+      navigatorKey.currentState.pushReplacementNamed(Login.routeName);
+    } else if (await doesUserHaveVenueAccess()) {
+      navigatorKey.currentState.pushReplacementNamed(VenueScreen.routeName);
+    } else {
+      navigatorKey.currentState.pushReplacementNamed(Home.routeName);
     }
-    if(_loadVenueScreen){
-      return VenueScreen();
-    }
-    if(_loadHomeScreen){
-      return Home();
-    }
-    return _splashScreenContents();
   }
 
-  Widget _splashScreenContents(){
-    return Container(
-      color: Colors.white,
-      child: Center(
-        child: _loadLoginScreen ? Login() :
-        Container(
-            width: 200,
-            child: FadeTransition(
-              opacity: animation,
-              child: Image.asset(
-                'assets/images/foria-logo.png',
-              ),
-            )
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 50),
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: Container(
+                  width: 200,
+                  child: FadeTransition(
+                    opacity: animation,
+                    child: Image.asset(
+                      'assets/images/foria-logo.png',
+                    ),
+                  )),
+            ),
+            Container(
+              height: 70,
+            ),
+          ],
         ),
       ),
     );
-  }
-  Widget build(BuildContext context) {
-
-    return _buildChild();
   }
 }
 
