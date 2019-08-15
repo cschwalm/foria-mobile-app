@@ -1,13 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show DeviceOrientation, SystemChrome;
+import 'package:flutter/services.dart';
+import 'package:foria/screens/splash_screen.dart';
 import 'package:foria/screens/venue_screen.dart';
-import 'package:foria/utils/auth_utils.dart';
 
+import 'navigation/CustomNoTransition.dart';
 import 'screens/home.dart';
 import 'screens/login.dart';
 import 'screens/register_and_transfer_screen.dart';
 import 'screens/selected_ticket_screen.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+const Color textGreyColor = Color(0xFFC7C7C7);
+const Color shapeGreyColor = Color(0xFFC7C7C7);
+const Color settingsBackgroundColor = Color(0xffEEEEEE);
 
 void main() async {
 
@@ -19,6 +27,7 @@ void main() async {
   runApp(
       new MaterialApp(
         title: 'Foria',
+        navigatorKey: navigatorKey,
         theme: new ThemeData(
             backgroundColor: Colors.white,
             appBarTheme: AppBarTheme(
@@ -36,31 +45,36 @@ void main() async {
               headline: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.black,fontFamily: 'Rubik',),
             ),
         ),
-        home: await _determineHomeWidget(),
-        routes: {
-          Home.routeName: (context) => Home(),
-          Login.routeName: (context) => Login(),
-          SelectedTicketScreen.routeName: (context) => SelectedTicketScreen(),
-          RegisterAndTransferScreen.routeName: (context) => RegisterAndTransferScreen(),
-          VenueScreen.routeName: (context) => VenueScreen(),
+
+        onGenerateRoute: (RouteSettings settings) {
+
+          switch (settings.name) {
+
+            case Home.routeName:
+              return MaterialPageRoute(builder: (context)=> Home());
+              break;
+
+            case Login.routeName:
+              return CustomNoTransition(builder: (context)=> Login());
+              break;
+
+            case SelectedTicketScreen.routeName:
+              return MaterialPageRoute(builder: (context)=> SelectedTicketScreen());
+              break;
+
+            case RegisterAndTransferScreen.routeName:
+              return MaterialPageRoute(builder: (context)=> RegisterAndTransferScreen());
+              break;
+
+            case VenueScreen.routeName:
+              return MaterialPageRoute(builder: (context)=> VenueScreen());
+              break;
+
+            default:
+              return CustomNoTransition(builder: (context)=> SplashScreen());
+              break;
+          }
         }
     )
   );
 }
-
-Future<Widget> _determineHomeWidget() async {
-
-  if (! await isUserLoggedIn(true)) {
-    return Login();
-  }
-
-  if (await doesUserHaveVenueAccess()) {
-    return VenueScreen();
-  }
-
-  return Home();
-}
-
-const Color textGreyColor = Color(0xFFC7C7C7);
-const Color shapeGreyColor = Color(0xFFC7C7C7);
-const Color settingsBackgroundColor = Color(0xffEEEEEE);
