@@ -48,7 +48,7 @@ class PassBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final SelectedTicketProvider selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: true);
+    final SelectedTicketProvider selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: false);
     final int passCount = selectedTicketProvider.eventTickets.length;
 
     return Padding(

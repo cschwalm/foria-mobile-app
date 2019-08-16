@@ -72,8 +72,8 @@ class TicketProvider extends ChangeNotifier {
       print("### FORIA SERVER ERROR: getTickets ###");
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
       throw new Exception(ex.message);
-    } on Exception {
-      print("### UNKNOWN ERROR: getTickets ###");
+    } catch (e) {
+      print("### UNKNOWN ERROR: getTickets Msg: ${e.toString()} ###");
       rethrow;
     }
 
