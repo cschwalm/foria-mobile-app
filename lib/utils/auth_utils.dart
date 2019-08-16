@@ -268,8 +268,8 @@ Future<bool> isUserLoggedIn(bool doExpirationCheck) async {
     try {
       jwt = await forceTokenRefresh();
     } catch (ex) {
-      debugPrint("Exception caught refreshing token. Msg: $ex");
-      return false;
+      debugPrint("Exception caught refreshing token. Device might be offline. Msg: ${ex.toString()}");
+      return true;
     }
   }
 
