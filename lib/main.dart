@@ -51,27 +51,27 @@ void main() async {
           switch (settings.name) {
 
             case Home.routeName:
-              return MaterialPageRoute(builder: (context)=> Home());
+              return MaterialPageRoute(builder: (context)=> Home(), settings: settings);
               break;
 
             case Login.routeName:
-              return CustomNoTransition(builder: (context)=> Login());
+              return CustomNoTransition(builder: (context)=> Login(), settings: settings);
               break;
 
             case SelectedTicketScreen.routeName:
-              return MaterialPageRoute(builder: (context)=> SelectedTicketScreen());
+              return MaterialPageRoute(builder: (context)=> SelectedTicketScreen(), settings: settings);
               break;
 
             case RegisterAndTransferScreen.routeName:
-              return MaterialPageRoute(builder: (context)=> RegisterAndTransferScreen());
+              return MaterialPageRoute(builder: (context)=> RegisterAndTransferScreen(), settings: settings);
               break;
 
             case VenueScreen.routeName:
-              return MaterialPageRoute(builder: (context)=> VenueScreen());
+              return MaterialPageRoute(builder: (context)=> VenueScreen(), settings: settings);
               break;
 
             default:
-              return CustomNoTransition(builder: (context)=> SplashScreen());
+              return CustomNoTransition(builder: (context)=> SplashScreen(), settings: settings);
               break;
           }
         }

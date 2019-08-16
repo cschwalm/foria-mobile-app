@@ -22,7 +22,7 @@ void main() {
 
     List<Event> events = _generateFakeEvents();
     when(ticketProviderMock.eventList).thenReturn(UnmodifiableListView(events));
-    when(ticketProviderMock.loadUserData()).thenAnswer( (_) async { return; });
+    when(ticketProviderMock.loadUserDataFromNetwork()).thenAnswer( (_) async { return; });
 
     _channel.setMockMethodCallHandler((MethodCall methodCall) async {
 
