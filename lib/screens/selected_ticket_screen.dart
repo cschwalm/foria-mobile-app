@@ -23,12 +23,10 @@ class SelectedTicketScreen extends StatefulWidget {
 
 class _SelectedTicketScreenState extends State<SelectedTicketScreen> {
 
-  SelectedTicketProvider _selectedTicketProvider;
-
   @override
   Widget build(BuildContext context) {
 
-    _selectedTicketProvider = widget.selectedTicketProvider != null ?
+    SelectedTicketProvider selectedTicketProvider = widget.selectedTicketProvider != null ?
     widget.selectedTicketProvider : ModalRoute.of(context).settings.arguments as SelectedTicketProvider;
 
     return Scaffold(
@@ -38,7 +36,7 @@ class _SelectedTicketScreenState extends State<SelectedTicketScreen> {
       ),
       backgroundColor: settingsBackgroundColor,
       body: ChangeNotifierProvider(
-        builder: (context) => (_selectedTicketProvider),
+        builder: (context) => (selectedTicketProvider),
         child: PassBody(),
       )
     );
@@ -50,7 +48,7 @@ class PassBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final SelectedTicketProvider selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: false);
+    final SelectedTicketProvider selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: true);
     final int passCount = selectedTicketProvider.eventTickets.length;
 
     return Padding(

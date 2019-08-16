@@ -33,7 +33,7 @@ void main() {
     _channel.setMockMethodCallHandler(null);
   });
 
-  test("test fetchEventById", () async {
+  test("test fetchEventById from network", () async {
 
     final EventApi eventApi = new MockEventApi();
     ticketProvider.eventApi = eventApi;
@@ -46,13 +46,13 @@ void main() {
 
       when(eventApi.getEvent(testEventId)).thenAnswer((_) async => eventMock);
 
-      Event actual = await ticketProvider.fetchEventById(testEventId, true);
+      Event actual = await ticketProvider.fetchEventByIdViaNetwork(testEventId);
       expect(actual, anything);
       expect(actual.id, equals(testEventId));
       expect(actual.name, equals(eventMock.name));
   });
 
-  test("test fetchEventById with forceRefreshFalse", () async {
+  test("test fetchEventById with loadFromDatabase", () async {
 
     final EventApi eventApi = new MockEventApi();
     ticketProvider.eventApi = eventApi;
@@ -65,7 +65,7 @@ void main() {
 
     when(databaseUtils.getEvent(testEventId)).thenAnswer((_) async => eventMock);
 
-    Event actual = await ticketProvider.fetchEventById(testEventId, false);
+    Event actual = await ticketProvider.fetchEventByIdViaDatabase(testEventId);
     expect(actual, anything);
     expect(actual.id, equals(testEventId));
     expect(actual.name, equals(eventMock.name));
@@ -73,7 +73,7 @@ void main() {
     verifyZeroInteractions(eventApi);
   });
 
-  test("test getUserTickets", () async {
+  test("test getUserTickets from network", () async {
 
     final EventApi eventApi = new MockEventApi();
     final UserApi userApi = new MockUserApi();
@@ -112,13 +112,13 @@ void main() {
     when(eventApi.getEvent(testEventId)).thenAnswer((_) async => eventMock);
     when(eventApi.getEvent(testEventId2)).thenAnswer((_) async => eventMock1);
 
-    await ticketProvider.loadUserData(true);
+    await ticketProvider.loadUserDataFromNetwork();
     List<Ticket> actual = ticketProvider.userTicketList.toList();
 
     expect(actual.length, equals(2));
   });
 
-  test("test getUserTickets with forceRefreshFalse", () async {
+  test("test getUserTickets with loadFromDatabase", () async {
 
     final EventApi eventApi = new MockEventApi();
     ticketProvider.eventApi = eventApi;
@@ -153,7 +153,7 @@ void main() {
     when(databaseUtils.getEvent(testEventId)).thenAnswer((_) async => eventMock);
     when(databaseUtils.getEvent(testEventId2)).thenAnswer((_) async => eventMock1);
 
-    await ticketProvider.loadUserData(false);
+    await ticketProvider.loadUserDataFromLocalDatabase();
     List<Ticket> actual = ticketProvider.userTicketList.toList();
 
     expect(actual.length, equals(2));
@@ -199,7 +199,7 @@ void main() {
     when(eventApi.getEvent(testEventId)).thenAnswer((_) async => eventMock);
     when(eventApi.getEvent(testEventId2)).thenAnswer((_) async => eventMock1);
 
-    await ticketProvider.loadUserData(true);
+    await ticketProvider.loadUserDataFromNetwork();
     Set<Ticket> actual = ticketProvider.getTicketsForEventId(testEventId);
 
     expect(actual.length, equals(1));

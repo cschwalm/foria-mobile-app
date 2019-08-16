@@ -54,55 +54,66 @@ class TicketProvider extends ChangeNotifier {
   }
 
   ///
-  /// Obtains the latest set of Tickets for the authenticated user.
+  /// Obtains the latest set of Tickets for the authenticated user via network.
   ///
-  Future<void> loadUserData([bool forceRefresh = false]) async {
-
-    Set<Ticket> tickets;
-    if (!forceRefresh) {
-
-      tickets = await _databaseUtils.getAllTickets();
-      if (tickets != null) {
-
-        _ticketList.addAll(tickets);
-        _eventList.addAll(await _buildEventSet(tickets));
-        return;
-      }
-    }
+  /// Throws exception on network error.
+  ///
+  Future<void> loadUserDataFromNetwork() async {
 
     if (_userApi == null) {
       ApiClient foriaApiClient = await obtainForiaApiClient();
       _userApi = new UserApi(foriaApiClient);
     }
 
+    Set<Ticket> tickets;
     try {
       tickets = (await _userApi.getTickets()).toSet();
     } on ApiException catch (ex) {
       print("### FORIA SERVER ERROR: getTickets ###");
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      throw new Exception(ex.message);
+    } on Exception {
+      print("### UNKNOWN ERROR: getTickets ###");
       rethrow;
     }
 
     debugPrint("Loaded ${tickets.length} tickets from Foria API.");
-    await _databaseUtils.storeTicketSet(tickets.toSet());
+    _databaseUtils.storeTicketSet(tickets.toSet());
 
     _ticketList.addAll(tickets);
-    _eventList.addAll(await _buildEventSet(tickets));
+    _eventList.addAll(await _buildEventSet(tickets, true));
 
+    notifyListeners();
+  }
+
+  ///
+  /// Obtains the latest set of Tickets for the authenticated user via database.
+  ///
+  Future<void> loadUserDataFromLocalDatabase() async {
+
+    Set<Ticket> tickets = await _databaseUtils.getAllTickets();
+    if (tickets == null) {
+      debugPrint('No tickets stored in offline storage.');
+      return;
+    }
+
+    debugPrint("Loaded ${tickets.length} tickets from offline database.");
+    _ticketList.addAll(tickets);
+    _eventList.addAll(await _buildEventSet(tickets, false));
     notifyListeners();
   }
 
   ///
   /// Create a list of unique events for the set of user tickets.
   ///
-  Future<Set<Event>> _buildEventSet(Set<Ticket> tickets) async {
+  Future<Set<Event>> _buildEventSet(Set<Ticket> tickets, bool forceRefresh) async {
 
     Set<Event> events = Set<Event>();
 
     Set<String> processedEventIdSet = new HashSet();
     for (Ticket ticket in tickets) {
       if (!processedEventIdSet.contains(ticket.eventId)) {
-        Event event = await fetchEventById(ticket.eventId);
+        Event event = forceRefresh ? await fetchEventByIdViaNetwork(ticket.eventId) : await fetchEventByIdViaDatabase(ticket.eventId);
         events.add(event);
         processedEventIdSet.add(ticket.eventId);
       }
@@ -112,22 +123,15 @@ class TicketProvider extends ChangeNotifier {
   }
 
   ///
-  /// Loads event information specified by eventId.
+  /// Loads event information specified by eventId via API.
   /// Stores in local db for offline use.
   ///
-  Future<Event> fetchEventById(String eventId, [forceRefresh = false]) async {
+  /// Throws exception on network error.
+  ///
+  Future<Event> fetchEventByIdViaNetwork(String eventId) async {
 
     if (eventId == null || eventId.isEmpty) {
       return null;
-    }
-
-    if (!forceRefresh) {
-
-      Event event = await _databaseUtils.getEvent(eventId);
-      if (event != null) {
-        debugPrint("EventId: $eventId loaded from offline database");
-        return event;
-      }
     }
 
     if (_eventApi == null) {
@@ -144,26 +148,27 @@ class TicketProvider extends ChangeNotifier {
       rethrow;
     }
 
-    await _databaseUtils.storeEvent(event);
+    debugPrint("EventId: $eventId loaded from network.");
+    _databaseUtils.storeEvent(event);
+
     return event;
   }
 
-  Future<Venue> fetchVenueById(String venueId) async {
-    if (venueId.isEmpty) {
+  ///
+  /// Loads event information specified by eventId via the database.
+  /// Throws an exception if not found.
+  ///
+  Future<Event> fetchEventByIdViaDatabase(String eventId) async {
+
+    if (eventId == null || eventId.isEmpty) {
       return null;
     }
 
-    ApiClient foriaApiClient = await obtainForiaApiClient();
-    VenueApi venueApi = new VenueApi(foriaApiClient);
-    Venue venue;
-    try {
-      venue = await venueApi.getVenue(venueId);
-    } on ApiException catch (ex) {
-      print("### FORIA SERVER ERROR: getVenueById ###");
-      print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
-      rethrow;
+    Event event = await _databaseUtils.getEvent(eventId);
+    if (event == null) {
+      throw new Exception('Expected eventId: $eventId not in local database.');
     }
-
-    return venue;
+    debugPrint("EventId: $eventId loaded from offline database.");
+    return event;
   }
 }

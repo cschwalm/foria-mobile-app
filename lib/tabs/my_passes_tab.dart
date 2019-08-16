@@ -5,6 +5,7 @@ import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/contact_support.dart';
+import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria/widgets/primary_button.dart';
 import 'package:provider/provider.dart';
 
@@ -91,13 +92,29 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
   ///
   /// Triggers ticket load and resets spinner.
   ///
-  void _loadTicketsAndSetState() {
+  Future<void> _loadTicketsAndSetState() async {
+
+    setState(() {
+      _isTicketsLoaded = false;
+      _currentState = _LoadingState.LOAD_TICKETS;
+    });
 
     //Email is verified. Load tickets and stop spinner when completed.
-    Provider.of<TicketProvider>(context).loadUserData().then((_) {
+    TicketProvider ticketProvider = Provider.of<TicketProvider>(context);
+    ticketProvider.loadUserDataFromNetwork().then((_) {
       setState(() {
         _isTicketsLoaded = true;
         _currentState = _LoadingState.DONE;
+      });
+    }).catchError((error) {
+
+      print('getTickets network call failed. Loading from offline database.');
+      showErrorAlert(context, ticketLoadingFailure);
+      ticketProvider.loadUserDataFromLocalDatabase().then((_) {
+        setState(() {
+          _isTicketsLoaded = true;
+          _currentState = _LoadingState.DONE;
+        });
       });
     });
   }
@@ -122,7 +139,10 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
     }
 
     super.build(context);
-    return EventCard();
+    return RefreshIndicator(
+        onRefresh: _loadTicketsAndSetState,
+        child: EventCard()
+    );
   }
 
   void emailVerifyCallback() async {
@@ -148,7 +168,7 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
 class EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final _eventData = Provider.of<TicketProvider>(context, listen: false);
+    final _eventData = Provider.of<TicketProvider>(context, listen: true);
     
 
     return ListView.builder(

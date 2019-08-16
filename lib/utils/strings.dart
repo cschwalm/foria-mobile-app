@@ -63,6 +63,9 @@ const String toAccessTickets = 'To access your tickets, you must deactivate them
 
 const String relocateTickets = 'Relocate Tickets';
 
+const String ticketLoadingFailure = 'It looks like you\'re currently offline.\n'
+    'Don\'t worry, we\'re using an offline copy of your tickets.';
+
 // selected_ticket_screen Strings. //
 
 const String foriaPass ='Foria Pass';
