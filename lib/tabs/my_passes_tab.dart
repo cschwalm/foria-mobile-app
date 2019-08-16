@@ -94,11 +94,6 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
   ///
   Future<void> _loadTicketsAndSetState() async {
 
-    setState(() {
-      _isTicketsLoaded = false;
-      _currentState = _LoadingState.LOAD_TICKETS;
-    });
-
     //Email is verified. Load tickets and stop spinner when completed.
     TicketProvider ticketProvider = Provider.of<TicketProvider>(context);
     ticketProvider.loadUserDataFromNetwork().then((_) {
@@ -117,6 +112,21 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
         });
       });
     });
+  }
+
+  ///
+  /// Helper function that allows ticket loading to be blocked until finishing.
+  ///
+  Future<void> _awaitTicketLoad() async {
+
+    TicketProvider ticketProvider = Provider.of<TicketProvider>(context);
+    try {
+      await ticketProvider.loadUserDataFromNetwork();
+    } catch (ex) {
+      print('getTickets network call failed during manual refresh. Loading from offline database.');
+      showErrorAlert(context, ticketLoadingFailure);
+      await ticketProvider.loadUserDataFromLocalDatabase();
+    }
   }
 
   @override
@@ -140,7 +150,7 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
 
     super.build(context);
     return RefreshIndicator(
-        onRefresh: _loadTicketsAndSetState,
+        onRefresh: _awaitTicketLoad,
         child: EventCard()
     );
   }
