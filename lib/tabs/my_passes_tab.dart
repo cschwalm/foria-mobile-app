@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/providers/selected_ticket_provider.dart';
@@ -102,7 +103,6 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
         _currentState = _LoadingState.DONE;
       });
     }).catchError((error) {
-
       print('getTickets network call failed. Loading from offline database.');
       showErrorAlert(context, ticketLoadingFailure);
       ticketProvider.loadUserDataFromLocalDatabase().then((_) {
@@ -176,10 +176,20 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
 }
 
 class EventCard extends StatelessWidget {
+
+  Widget _imageUnavailableWidget() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Icon(Icons.error, color: Colors.red,),
+        Text(imageUnavailable,textAlign: TextAlign.center,)
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final _eventData = Provider.of<TicketProvider>(context, listen: true);
-    
 
     return ListView.builder(
         itemCount: _eventData.eventList.length,
@@ -238,15 +248,26 @@ class EventCard extends StatelessWidget {
                     Container(
                       height: 100,
                       width: 100,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(10),
-                          bottomRight: Radius.circular(10),
-                        ),
-                        image: DecorationImage(
-                          fit: BoxFit.cover,
-                          image: AssetImage('assets/ui_elements/rufus.jpg'),
-                        ),
+                      child: CachedNetworkImage(
+                        placeholder: (context, url) =>
+                            CupertinoActivityIndicator(),
+                        errorWidget: (context, url, error) {
+                          return _imageUnavailableWidget();
+                        },
+                        imageUrl: _eventData.eventList[index].imageUrl,
+                        imageBuilder: (context, imageProvider) =>
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(10),
+                                  bottomRight: Radius.circular(10),
+                                ),
+                                image: DecorationImage(
+                                  image: imageProvider,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
                       ),
                     ),
                   ],
@@ -349,7 +370,6 @@ class MissingTicket extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 25),
-
           GestureDetector(
             child: Text(contactUs,
                 style: TextStyle(
@@ -395,7 +415,6 @@ class PopUpCard extends StatelessWidget {
             ],
           ),
           Expanded(
-
             child: SizedBox(),
           ),
         ],
