@@ -1,5 +1,7 @@
 import 'dart:collection';
+import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/database_utils.dart';
@@ -15,13 +17,17 @@ class TicketProvider extends ChangeNotifier {
 
   DatabaseUtils _databaseUtils = new DatabaseUtils();
   EventApi _eventApi;
+  TicketApi _ticketApi;
   UserApi _userApi;
 
-  final Set<Event> _eventList = new HashSet();
-  final Set<Ticket> _ticketList = new HashSet();
+  final Set<Event> _eventSet = new HashSet();
+  final Set<Ticket> _ticketSet = new HashSet();
 
-  UnmodifiableListView<Event> get eventList => UnmodifiableListView(_eventList);
-  UnmodifiableListView<Ticket> get userTicketList => UnmodifiableListView(_ticketList);
+  bool _ticketsActiveOnOtherDevice = false;
+
+  UnmodifiableListView<Event> get eventList => UnmodifiableListView(_eventSet);
+  bool get ticketsActiveOnOtherDevice => _ticketsActiveOnOtherDevice;
+  UnmodifiableListView<Ticket> get userTicketList => UnmodifiableListView(_ticketSet);
 
   set databaseUtils(DatabaseUtils value) {
     _databaseUtils = value;
@@ -31,9 +37,56 @@ class TicketProvider extends ChangeNotifier {
     _eventApi = value;
   }
 
+  set ticketApi(TicketApi value) {
+    _ticketApi = value;
+  }
 
   set userApi(UserApi value) {
     _userApi = value;
+  }
+
+  ///
+  /// Checks the ticket set for tickets that are in ISSUED status.
+  /// If tickets are in ISSUED status, tickets are activated and ticket secret
+  /// is stored in local database.
+  ///
+  /// If stored, ticket set is updated to account for new status.
+  ///
+  Future<void> _activateAllIssuedTickets(final Set<Ticket> tickets) async {
+
+    if (_ticketApi == null) {
+      ApiClient foriaApiClient = await obtainForiaApiClient();
+      _ticketApi = new TicketApi(foriaApiClient);
+    }
+
+    int ticketsActivated = 0;
+    for (Ticket ticket in tickets) {
+
+      if (ticket.status != 'ISSUED') {
+        continue;
+      }
+
+      ActivationResult result;
+      try {
+        result = await _ticketApi.activateTicket(ticket.id);
+      } on ApiException catch (ex) {
+        debugPrint("### FORIA SERVER ERROR: activateTicket ###");
+        debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+        throw new Exception(ex.message);
+      } catch (e) {
+        debugPrint("### NETWORK ERROR: activateTicket Msg: ${e.toString()} ###");
+        rethrow;
+      }
+
+      //Remove old ticket object and add new one containing updated status.
+      ticket.status = result.ticket.status;
+
+      ticketsActivated++;
+      final String ticketSecret = result.ticketSecret;
+      await _databaseUtils.storeTicketSecret(ticket.id, ticketSecret);
+    }
+
+    debugPrint('Activated $ticketsActivated tickets.');
   }
 
   ///
@@ -44,7 +97,7 @@ class TicketProvider extends ChangeNotifier {
     assert (eventId != null);
 
     Set<Ticket> tickets = new Set<Ticket>();
-    for (Ticket ticket in _ticketList) {
+    for (Ticket ticket in _ticketSet) {
       if (ticket.eventId == eventId) {
         tickets.add(ticket);
       }
@@ -78,10 +131,22 @@ class TicketProvider extends ChangeNotifier {
     }
 
     debugPrint("Loaded ${tickets.length} tickets from Foria API.");
-    _databaseUtils.storeTicketSet(tickets.toSet());
 
-    _ticketList.addAll(tickets);
-    _eventList.addAll(await _buildEventSet(tickets, true));
+    await _activateAllIssuedTickets(tickets);
+    await _databaseUtils.storeTicketSet(tickets.toSet());
+
+    _ticketSet.clear();
+    _eventSet.clear();
+
+    final bool areTicketsActiveElsewhere = await _areTicketsActiveElsewhere(tickets);
+    if (areTicketsActiveElsewhere) {
+
+      _ticketsActiveOnOtherDevice = true;
+    } else {
+
+      _ticketSet.addAll(tickets);
+      _eventSet.addAll(await _buildEventSet(tickets, true));
+    }
 
     notifyListeners();
   }
@@ -98,8 +163,9 @@ class TicketProvider extends ChangeNotifier {
     }
 
     debugPrint("Loaded ${tickets.length} tickets from offline database.");
-    _ticketList.addAll(tickets);
-    _eventList.addAll(await _buildEventSet(tickets, false));
+    _ticketSet.clear();
+    _ticketSet.addAll(tickets);
+    _eventSet.addAll(await _buildEventSet(tickets, false));
     notifyListeners();
   }
 
@@ -123,11 +189,46 @@ class TicketProvider extends ChangeNotifier {
   }
 
   ///
+  /// Determines if ticket is active on a different device by checking for valid ticket secret.
+  ///
+  Future<bool> _areTicketsActiveElsewhere(final Set<Ticket> tickets) async {
+
+    for (Ticket ticket in tickets) {
+
+      //Only check tickets that are in active status.
+      if (ticket.status != 'ACTIVE') {
+        debugPrint('Ticket with ticketId: ${ticket.id} is not ACTIVE. Skipping ticket secret check.');
+        continue;
+      }
+
+      final actualTicketSecretHex = ticket.secretHash;
+      final String loadedTicketSecret = await _databaseUtils.getTicketSecret(ticket.id);
+
+      if (loadedTicketSecret == null) {
+        debugPrint('Failed to load ticket secret for ticketId: ${ticket.id}. Ticket is active on another device.');
+        return true;
+      }
+
+      final List<int> loadedTicketSecretBytes = utf8.encode(loadedTicketSecret);
+      final String loadedTicketSecretHashHex = sha512.convert(loadedTicketSecretBytes).toString();
+
+      if (loadedTicketSecretHashHex != actualTicketSecretHex) {
+        debugPrint('Server ticketId: ${ticket.id} hash: $actualTicketSecretHex does not equal stored hash: $loadedTicketSecretHashHex');
+        return true;
+      }
+    }
+
+    debugPrint('All tickets are ACTIVE and valid on this device.');
+    return false;
+  }
+
+  ///
   /// Loads event information specified by eventId via API.
   /// Stores in local db for offline use.
   ///
   /// Throws exception on network error.
   ///
+  @visibleForTesting
   Future<Event> fetchEventByIdViaNetwork(String eventId) async {
 
     if (eventId == null || eventId.isEmpty) {
@@ -158,6 +259,7 @@ class TicketProvider extends ChangeNotifier {
   /// Loads event information specified by eventId via the database.
   /// Throws an exception if not found.
   ///
+  @visibleForTesting
   Future<Event> fetchEventByIdViaDatabase(String eventId) async {
 
     if (eventId == null || eventId.isEmpty) {

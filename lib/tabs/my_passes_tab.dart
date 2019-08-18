@@ -132,7 +132,7 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
   @override
   Widget build(BuildContext context) {
 
-    final _eventData = Provider.of<TicketProvider>(context, listen: false);
+    final eventData = Provider.of<TicketProvider>(context, listen: false);
 
     if ( (_currentState == _LoadingState.EMAIL_VERIFY && !_isUserEmailCheckFinished) || _currentState == _LoadingState.LOAD_TICKETS) {
       return CupertinoActivityIndicator(
@@ -144,7 +144,11 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
       return EmailVerificationConflict(this.emailVerifyCallback);
     }
 
-    if (_eventData.eventList.length <= 0) {
+    if (eventData.ticketsActiveOnOtherDevice) {
+      return DeviceConflict();
+    }
+
+    if (eventData.eventList.length <= 0) {
       return MissingTicket();
     }
 

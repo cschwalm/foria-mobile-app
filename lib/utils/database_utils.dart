@@ -17,6 +17,7 @@ class DatabaseUtils {
   Database _db;
   StoreRef<String, Map<String, dynamic>> _eventStore = StoreRef<String, Map<String, dynamic>>(eventStoreName);
   StoreRef<String, Map<String, dynamic>> _ticketListStore = StoreRef<String, Map<String, dynamic>>(ticketListStoreName);
+  StoreRef<String, String> _ticketSecretStore = StoreRef<String, String>(ticketSecretStoreName);
 
   final int _dbVersionCode = 1;
   final Random _random = Random.secure();
@@ -24,6 +25,7 @@ class DatabaseUtils {
   static final String _dbFilename = "foria.db";
   static final String _dbCryptoKeyRef = "FORIA_DATABASE_KEY";
   static final String eventStoreName = "events";
+  static final String ticketSecretStoreName = "secrets";
   static final String ticketListStoreName = "tickets";
 
   ///
@@ -156,6 +158,42 @@ class DatabaseUtils {
 
     debugPrint('Loaded ${ticketSet.length} tickets from local storage.');
     return ticketSet;
+  }
+
+  ///
+  /// Stores ticket secret in database.
+  ///
+  Future<void> storeTicketSecret(String ticketId, String ticketSecret) async {
+
+    if (ticketId == null || ticketSecret == null) {
+      return null;
+    }
+
+    if (_db == null) {
+      await _initDatabase();
+    }
+
+    await _ticketSecretStore.record(ticketId).put(_db, ticketSecret);
+    debugPrint('Stored ticket secret with ticketId: $ticketId');
+  }
+
+  ///
+  /// Obtains ticket secret for stored ticket in database.
+  ///
+  Future<String> getTicketSecret(String ticketId) async {
+
+    if (ticketId == null) {
+      return null;
+    }
+
+    if (_db == null) {
+      await _initDatabase();
+    }
+
+    String ticketSecret = await _ticketSecretStore.record(ticketId).get(_db);
+    debugPrint('Obtained ticket secret from database for ticketId: $ticketId.');
+
+    return ticketSecret;
   }
 
   ///
