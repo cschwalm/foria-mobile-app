@@ -92,7 +92,6 @@ class TicketProvider extends ChangeNotifier {
   ///
   /// Returns a subset of tickets from the specified ticket ID.
   ///
-  @visibleForTesting
   Set<Ticket> getTicketsForEventId(String eventId) {
 
     assert (eventId != null);
