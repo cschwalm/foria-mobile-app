@@ -36,6 +36,8 @@ void main() {
 
   testWidgets('myPassesTab contains one event in list', (WidgetTester tester) async {
 
+    when(ticketProviderMock.ticketsActiveOnOtherDevice).thenReturn(false);
+
     await tester.pumpWidget(MaterialApp(
       home: Tabs(ticketProviderMock),
     ));
@@ -50,6 +52,7 @@ void main() {
   testWidgets('myPassesTab contains no events in list', (WidgetTester tester) async {
 
     when(ticketProviderMock.eventList).thenReturn(UnmodifiableListView(new List()));
+    when(ticketProviderMock.ticketsActiveOnOtherDevice).thenReturn(false);
 
     await tester.pumpWidget(MaterialApp(
       home: Tabs(ticketProviderMock),

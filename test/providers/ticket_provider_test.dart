@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foria/providers/ticket_provider.dart';
@@ -7,6 +9,7 @@ import 'package:mockito/mockito.dart';
 
 class MockDatabaseUtils extends Mock implements DatabaseUtils {}
 class MockEventApi extends Mock implements EventApi {}
+class MockTicketApi extends Mock implements TicketApi {}
 class MockUserApi extends Mock implements UserApi {}
 
 void main() {
@@ -31,6 +34,55 @@ void main() {
 
   tearDown(() {
     _channel.setMockMethodCallHandler(null);
+  });
+
+  test("test activateTickets", () async {
+
+    final EventApi eventApi = new MockEventApi();
+    final TicketApi ticketApi = new MockTicketApi();
+    final UserApi userApi = new MockUserApi();
+
+    ticketProvider.eventApi = eventApi;
+    ticketProvider.ticketApi = ticketApi;
+    ticketProvider.userApi = userApi;
+
+    List<Ticket> tickets = _buildFakeTickets();
+
+    Ticket activeTicketMock = new Ticket();
+    activeTicketMock.id = Random.secure().nextInt(5).toString();
+    activeTicketMock.status = 'ACTIVE';
+    activeTicketMock.eventId = tickets[0].eventId;
+
+    ActivationResult activationResultMock = new ActivationResult();
+    activationResultMock.ticket = activeTicketMock;
+    activationResultMock.ticketSecret = "TEST_SECRET";
+
+    Event eventMock = new Event();
+    eventMock.id = tickets[0].eventId;
+    eventMock.name = "Test Event";
+
+    Event eventMock1 = new Event();
+    eventMock1.id = tickets[1].eventId;
+    eventMock1.name = "Test Event 2";
+
+    when(userApi.getTickets()).thenAnswer((_) async => tickets);
+
+    when(eventApi.getEvent(tickets[0].eventId)).thenAnswer((_) async => eventMock);
+    when(eventApi.getEvent(tickets[1].eventId)).thenAnswer((_) async => eventMock1);
+
+    when(ticketApi.activateTicket(any)).thenAnswer((_) async => activationResultMock);
+    when(databaseUtils.storeTicketSecret(activeTicketMock.eventId, activationResultMock.ticketSecret)).thenAnswer((_) async => null);
+    when(databaseUtils.getTicketSecret(any)).thenAnswer((_) async => activationResultMock.ticketSecret);
+
+    //Mock load data
+    await ticketProvider.loadUserDataFromNetwork();
+
+    final List<Ticket> actual = ticketProvider.userTicketList.toList();
+    for (Ticket ticket in actual) {
+      expect(ticket.status, equals('ACTIVE'));
+    }
+
+    expect(actual.length, equals(3));
   });
 
   test("test fetchEventById from network", () async {
@@ -81,41 +133,25 @@ void main() {
     ticketProvider.eventApi = eventApi;
     ticketProvider.userApi = userApi;
 
-    String testId = "12345";
-    String testId2 = "111111";
-
-    String testEventId = "55555";
-    String testEventId2 = "99999";
-
-    Ticket ticketMock = new Ticket();
-    ticketMock.id = testId;
-    ticketMock.eventId = testEventId;
-
-    Ticket ticketMock2 = new Ticket();
-    ticketMock2.id = testId2;
-    ticketMock2.eventId = testEventId2;
-
-    List<Ticket> tickets = List<Ticket>();
-    tickets.add(ticketMock);
-    tickets.add(ticketMock2);
+    List<Ticket> tickets = _buildFakeTickets();
 
     Event eventMock = new Event();
-    eventMock.id = testEventId;
+    eventMock.id = tickets.first.eventId ;
     eventMock.name = "Test Event";
 
     Event eventMock1 = new Event();
-    eventMock1.id = testEventId2;
+    eventMock1.id = tickets.first.eventId;
     eventMock1.name = "Test Event 2";
 
     when(userApi.getTickets()).thenAnswer((_) async => tickets);
 
-    when(eventApi.getEvent(testEventId)).thenAnswer((_) async => eventMock);
-    when(eventApi.getEvent(testEventId2)).thenAnswer((_) async => eventMock1);
+    when(eventApi.getEvent(tickets[0].eventId)).thenAnswer((_) async => eventMock);
+    when(eventApi.getEvent(tickets[1].eventId)).thenAnswer((_) async => eventMock1);
 
     await ticketProvider.loadUserDataFromNetwork();
     List<Ticket> actual = ticketProvider.userTicketList.toList();
 
-    expect(actual.length, equals(2));
+    expect(actual.length, equals(tickets.length));
   });
 
   test("test getUserTickets with loadFromDatabase", () async {
@@ -123,40 +159,24 @@ void main() {
     final EventApi eventApi = new MockEventApi();
     ticketProvider.eventApi = eventApi;
 
-    String testId = "12345";
-    String testId2 = "111111";
-
-    String testEventId = "55555";
-    String testEventId2 = "99999";
-
-    Ticket ticketMock = new Ticket();
-    ticketMock.id = testId;
-    ticketMock.eventId = testEventId;
-
-    Ticket ticketMock2 = new Ticket();
-    ticketMock2.id = testId2;
-    ticketMock2.eventId = testEventId2;
-
-    List<Ticket> tickets = List<Ticket>();
-    tickets.add(ticketMock);
-    tickets.add(ticketMock2);
+    List<Ticket> tickets = _buildFakeTickets();
 
     Event eventMock = new Event();
-    eventMock.id = testEventId;
+    eventMock.id = tickets[0].eventId;
     eventMock.name = "Test Event";
 
     Event eventMock1 = new Event();
-    eventMock1.id = testEventId2;
+    eventMock1.id = tickets[1].eventId;
     eventMock1.name = "Test Event 2";
 
     when(databaseUtils.getAllTickets()).thenAnswer((_) async => tickets.toSet());
-    when(databaseUtils.getEvent(testEventId)).thenAnswer((_) async => eventMock);
-    when(databaseUtils.getEvent(testEventId2)).thenAnswer((_) async => eventMock1);
+    when(databaseUtils.getEvent(tickets[0].eventId)).thenAnswer((_) async => eventMock);
+    when(databaseUtils.getEvent(tickets[1].eventId)).thenAnswer((_) async => eventMock1);
 
     await ticketProvider.loadUserDataFromLocalDatabase();
     List<Ticket> actual = ticketProvider.userTicketList.toList();
 
-    expect(actual.length, equals(2));
+    expect(actual.length, equals(tickets.length));
     verifyZeroInteractions(eventApi);
   });
 
@@ -168,40 +188,63 @@ void main() {
     ticketProvider.eventApi = eventApi;
     ticketProvider.userApi = userApi;
 
-    String testId = "12345";
-    String testId2 = "111111";
-
-    String testEventId = "55555";
-    String testEventId2 = "99999";
-
-    Ticket ticketMock = new Ticket();
-    ticketMock.id = testId;
-    ticketMock.eventId = testEventId;
-
-    Ticket ticketMock2 = new Ticket();
-    ticketMock2.id = testId2;
-    ticketMock2.eventId = testEventId2;
-
-    List<Ticket> tickets = List<Ticket>();
-    tickets.add(ticketMock);
-    tickets.add(ticketMock2);
+    List<Ticket> tickets = _buildFakeTickets();
 
     Event eventMock = new Event();
-    eventMock.id = testEventId;
+    eventMock.id = tickets[0].eventId;
     eventMock.name = "Test Event";
 
     Event eventMock1 = new Event();
-    eventMock1.id = testEventId2;
+    eventMock1.id = tickets[1].eventId;
     eventMock1.name = "Test Event 2";
 
     when(userApi.getTickets()).thenAnswer((_) async => tickets);
 
-    when(eventApi.getEvent(testEventId)).thenAnswer((_) async => eventMock);
-    when(eventApi.getEvent(testEventId2)).thenAnswer((_) async => eventMock1);
+    when(eventApi.getEvent(tickets[0].eventId)).thenAnswer((_) async => eventMock);
+    when(eventApi.getEvent(tickets[1].eventId)).thenAnswer((_) async => eventMock1);
 
     await ticketProvider.loadUserDataFromNetwork();
-    Set<Ticket> actual = ticketProvider.getTicketsForEventId(testEventId);
+    Set<Ticket> actual = ticketProvider.getTicketsForEventId(tickets[0].eventId);
 
     expect(actual.length, equals(1));
   });
+}
+
+///
+/// Builds fake tickets for mocking in tests.
+///
+List<Ticket> _buildFakeTickets() {
+
+  String testTicketId = "12345";
+  String testIdTicket2 = "111111";
+  String testIdTicket3 = "333333";
+  String testHash = '28f8ceb3b46cc0fad2dc0729ecb4e240f0160b2d3fb9f2269ad8f85c2914f5eca119fafab8e575e93f3b7a15a195599cd1e0c3fe2c901f73d152150044a46654';
+
+  String testEventId = "55555";
+  String testEventId2 = "99999";
+
+  Ticket ticketMock = new Ticket();
+  ticketMock.id = testTicketId;
+  ticketMock.eventId = testEventId;
+  ticketMock.status = 'ACTIVE';
+  ticketMock.secretHash = testHash;
+
+  Ticket ticketMock2 = new Ticket();
+  ticketMock2.id = testIdTicket2;
+  ticketMock2.eventId = testEventId2;
+  ticketMock2.status = 'ISSUED';
+  ticketMock2.secretHash = testHash;
+
+  Ticket ticketMock3 = new Ticket();
+  ticketMock3.id = testIdTicket3;
+  ticketMock3.eventId = testEventId2;
+  ticketMock3.status = 'ISSUED';
+  ticketMock3.secretHash = testHash;
+
+  List<Ticket> tickets = List<Ticket>();
+  tickets.add(ticketMock);
+  tickets.add(ticketMock2);
+  tickets.add(ticketMock3);
+
+  return tickets;
 }
