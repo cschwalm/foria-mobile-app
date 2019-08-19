@@ -46,50 +46,6 @@ class TicketProvider extends ChangeNotifier {
   }
 
   ///
-  /// Checks the ticket set for tickets that are in ISSUED status.
-  /// If tickets are in ISSUED status, tickets are activated and ticket secret
-  /// is stored in local database.
-  ///
-  /// If stored, ticket set is updated to account for new status.
-  ///
-  Future<void> _activateAllIssuedTickets(final Set<Ticket> tickets) async {
-
-    if (_ticketApi == null) {
-      ApiClient foriaApiClient = await obtainForiaApiClient();
-      _ticketApi = new TicketApi(foriaApiClient);
-    }
-
-    int ticketsActivated = 0;
-    for (Ticket ticket in tickets) {
-
-      if (ticket.status != 'ISSUED') {
-        continue;
-      }
-
-      ActivationResult result;
-      try {
-        result = await _ticketApi.activateTicket(ticket.id);
-      } on ApiException catch (ex) {
-        debugPrint("### FORIA SERVER ERROR: activateTicket ###");
-        debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
-        throw new Exception(ex.message);
-      } catch (e) {
-        debugPrint("### NETWORK ERROR: activateTicket Msg: ${e.toString()} ###");
-        rethrow;
-      }
-
-      //Remove old ticket object and add new one containing updated status.
-      ticket.status = result.ticket.status;
-
-      ticketsActivated++;
-      final String ticketSecret = result.ticketSecret;
-      await _databaseUtils.storeTicketSecret(ticket.id, ticketSecret);
-    }
-
-    debugPrint('Activated $ticketsActivated tickets.');
-  }
-
-  ///
   /// Returns a subset of tickets from the specified ticket ID.
   ///
   Set<Ticket> getTicketsForEventId(String eventId) {
@@ -135,19 +91,16 @@ class TicketProvider extends ChangeNotifier {
     await _activateAllIssuedTickets(tickets);
     await _databaseUtils.storeTicketSet(tickets.toSet());
 
+    final bool areTicketsActiveElsewhere = await _areTicketsActiveElsewhere(tickets);
+    if (areTicketsActiveElsewhere) {
+      _ticketsActiveOnOtherDevice = true;
+    }
+
     _ticketSet.clear();
     _eventSet.clear();
 
-    final bool areTicketsActiveElsewhere = await _areTicketsActiveElsewhere(tickets);
-    if (areTicketsActiveElsewhere) {
-
-      _ticketsActiveOnOtherDevice = true;
-    } else {
-
-      _ticketSet.addAll(tickets);
-      _eventSet.addAll(await _buildEventSet(tickets, true));
-    }
-
+    _ticketSet.addAll(tickets);
+    _eventSet.addAll(await _buildEventSet(tickets, true));
     notifyListeners();
   }
 
@@ -170,22 +123,94 @@ class TicketProvider extends ChangeNotifier {
   }
 
   ///
-  /// Create a list of unique events for the set of user tickets.
+  /// Calling this allows the user to access new ticket secrets causing the
+  /// old device to lose access to tickets.
   ///
-  Future<Set<Event>> _buildEventSet(Set<Ticket> tickets, bool forceRefresh) async {
+  Future<void> reactivateTickets() async {
 
-    Set<Event> events = Set<Event>();
-
-    Set<String> processedEventIdSet = new HashSet();
-    for (Ticket ticket in tickets) {
-      if (!processedEventIdSet.contains(ticket.eventId)) {
-        Event event = forceRefresh ? await fetchEventByIdViaNetwork(ticket.eventId) : await fetchEventByIdViaDatabase(ticket.eventId);
-        events.add(event);
-        processedEventIdSet.add(ticket.eventId);
-      }
+    if (_ticketApi == null) {
+      ApiClient foriaApiClient = await obtainForiaApiClient();
+      _ticketApi = new TicketApi(foriaApiClient);
     }
 
-    return events;
+    if (!ticketsActiveOnOtherDevice) {
+      return;
+    }
+
+    Set<Ticket> newTickets = new Set<Ticket>();
+    for (Ticket ticket in _ticketSet) {
+
+      if (ticket.status != 'ACTIVE') {
+        continue;
+      }
+
+      ActivationResult result;
+      try {
+        result = await _ticketApi.reactivateTicket(ticket.id);
+      } on ApiException catch (ex) {
+        debugPrint("### FORIA SERVER ERROR: reactivateTicket ###");
+        debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+        throw new Exception(ex.message);
+      } catch (e) {
+        debugPrint("### NETWORK ERROR: reactivateTicket Msg: ${e.toString()} ###");
+        rethrow;
+      }
+
+      newTickets.add(result.ticket);
+      final String ticketSecret = result.ticketSecret;
+      await _databaseUtils.storeTicketSecret(ticket.id, ticketSecret);
+    }
+
+    _ticketSet.clear();
+    _ticketSet.addAll(newTickets);
+
+    debugPrint('Reactivated ${newTickets.length} tickets.');
+    _ticketsActiveOnOtherDevice = false;
+    notifyListeners();
+  }
+
+  ///
+  /// Checks the ticket set for tickets that are in ISSUED status.
+  /// If tickets are in ISSUED status, tickets are activated and ticket secret
+  /// is stored in local database.
+  ///
+  /// If stored, ticket set is updated to account for new status.
+  ///
+  Future<void> _activateAllIssuedTickets(final Set<Ticket> tickets) async {
+
+    if (_ticketApi == null) {
+      ApiClient foriaApiClient = await obtainForiaApiClient();
+      _ticketApi = new TicketApi(foriaApiClient);
+    }
+
+    int ticketsActivated = 0;
+    for (Ticket ticket in tickets) {
+
+      if (ticket.status != 'ISSUED') {
+        continue;
+      }
+
+      ActivationResult result;
+      try {
+        result = await _ticketApi.activateTicket(ticket.id);
+      } on ApiException catch (ex) {
+        debugPrint("### FORIA SERVER ERROR: activateTicket ###");
+        debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+        throw new Exception(ex.message);
+      } catch (e) {
+        debugPrint("### NETWORK ERROR: activateTicket Msg: ${e.toString()} ###");
+        rethrow;
+      }
+
+      //Remove old ticket object and add new one containing updated status.
+      ticket.status = result.ticket.status;
+
+      ticketsActivated++;
+      final String ticketSecret = result.ticketSecret;
+      await _databaseUtils.storeTicketSecret(ticket.id, ticketSecret);
+    }
+
+    debugPrint('Activated $ticketsActivated tickets.');
   }
 
   ///
@@ -220,6 +245,25 @@ class TicketProvider extends ChangeNotifier {
 
     debugPrint('All tickets are ACTIVE and valid on this device.');
     return false;
+  }
+
+  ///
+  /// Create a list of unique events for the set of user tickets.
+  ///
+  Future<Set<Event>> _buildEventSet(Set<Ticket> tickets, bool forceRefresh) async {
+
+    Set<Event> events = Set<Event>();
+
+    Set<String> processedEventIdSet = new HashSet();
+    for (Ticket ticket in tickets) {
+      if (!processedEventIdSet.contains(ticket.eventId)) {
+        Event event = forceRefresh ? await fetchEventByIdViaNetwork(ticket.eventId) : await fetchEventByIdViaDatabase(ticket.eventId);
+        events.add(event);
+        processedEventIdSet.add(ticket.eventId);
+      }
+    }
+
+    return events;
   }
 
   ///

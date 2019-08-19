@@ -21,6 +21,7 @@ enum _LoadingState {
 
   EMAIL_VERIFY,
   LOAD_TICKETS,
+  DEVICE_CHECK,
   DONE
 }
 
@@ -28,14 +29,14 @@ enum _LoadingState {
 /// Contains simple state machine to handle three flows.
 /// Step 1: Tab opened. Nothing has been done. We need to display loading and check email verify.
 /// Step 2: Email is verified, display spinner and load tickets.
-/// Step 3: Display tickets results.
+/// Step 3: Check if tickets are active on this device. If not stop and show error.
+/// Step 4: Display tickets results.
 ///
 class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClientMixin<MyPassesTab> {
 
   _LoadingState _currentState;
   bool _isUserEmailCheckFinished;
   bool _isTicketsLoaded;
-
   bool _isUserEmailVerified;
 
   @override
@@ -82,7 +83,19 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
         }
         break;
 
+      case _LoadingState.DEVICE_CHECK:
+
+        TicketProvider ticketProvider = Provider.of<TicketProvider>(context);
+        if (!ticketProvider.ticketsActiveOnOtherDevice) {
+          setState(() {
+            _currentState = _LoadingState.DONE;
+          });
+        }
+
+        break;
+
       case _LoadingState.DONE:
+        //All checks passed. Show tickets to user.
         break;
     }
 
@@ -99,7 +112,10 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
     ticketProvider.loadUserDataFromNetwork().then((_) {
       setState(() {
         _isTicketsLoaded = true;
-        _currentState = _LoadingState.DONE;
+
+        //Check if tickets are active on this device only if online.
+        _currentState = _LoadingState.DEVICE_CHECK;
+
       });
     }).catchError((error) {
 
@@ -122,6 +138,14 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
     TicketProvider ticketProvider = Provider.of<TicketProvider>(context);
     try {
       await ticketProvider.loadUserDataFromNetwork();
+
+      if (ticketProvider.ticketsActiveOnOtherDevice) {
+        setState(() {
+          debugPrint('Determined tickets are active on other device during refresh.');
+          _currentState = _LoadingState.DEVICE_CHECK;
+        });
+      }
+
     } catch (ex) {
       print('getTickets network call failed during manual refresh. Loading from offline database.');
       showErrorAlert(context, ticketLoadingFailure);
@@ -144,7 +168,7 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
       return EmailVerificationConflict(this.emailVerifyCallback);
     }
 
-    if (eventData.ticketsActiveOnOtherDevice) {
+    if (_currentState == _LoadingState.DEVICE_CHECK) {
       return DeviceConflict();
     }
 
@@ -262,7 +286,16 @@ class EventCard extends StatelessWidget {
   }
 }
 
-class DeviceConflict extends StatelessWidget {
+class DeviceConflict extends StatefulWidget {
+
+  @override
+  _DeviceConflictState createState() => _DeviceConflictState();
+}
+
+class _DeviceConflictState extends State<DeviceConflict> {
+
+  bool _isTicketReactivationPending = false;
+
   @override
   Widget build(BuildContext context) {
     return PopUpCard(
@@ -286,11 +319,22 @@ class DeviceConflict extends StatelessWidget {
           ),
           PrimaryButton(
             text: relocateTickets,
-            onPress: () {},
+            onPress: () => _isTicketReactivationPending ? null : _deviceCheckCallback(context),
           ),
         ],
       ),
     );
+  }
+
+  ///
+  /// Disables button while reactivation is preformed.
+  ///
+  void _deviceCheckCallback(BuildContext context) async {
+
+    _isTicketReactivationPending = true;
+
+    final TicketProvider ticketProvider = Provider.of(context, listen: false);
+    ticketProvider.reactivateTickets().then((_) => _isTicketReactivationPending = true);
   }
 }
 
