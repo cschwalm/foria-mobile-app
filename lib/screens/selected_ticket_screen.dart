@@ -84,14 +84,22 @@ class _PassCardState extends State<PassCard> {
 
   final Duration _tick = Duration(seconds: 1);
   final Map<String, String> _barcodeTextMap = new Map<String, String>();
-  int _secondsRemaining = 0;
+  int _secondsRemaining = -1;
   Timer _timer;
-
 
   @override
   void initState() {
     super.initState();
     _timer = Timer.periodic(_tick, _refreshBarcodes);
+  }
+
+  @override
+  void didChangeDependencies() {
+
+    if (_secondsRemaining <= -1) {
+      _refreshBarcodes(_timer);
+    }
+    super.didChangeDependencies();
   }
 
   @override
@@ -105,10 +113,6 @@ class _PassCardState extends State<PassCard> {
   ///
   Future<void> _refreshBarcodes(Timer timer) async {
 
-    setState(() {
-      _secondsRemaining--;
-    });
-
     if (_secondsRemaining <= 0) {
 
       final SelectedTicketProvider selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: false);
@@ -121,7 +125,12 @@ class _PassCardState extends State<PassCard> {
         });
       }
       debugPrint('${selectedTicketProvider.eventTickets.length} tickets barcodes updated.');
+      return;
     }
+
+    setState(() {
+      _secondsRemaining--;
+    });
   }
 
   @override
