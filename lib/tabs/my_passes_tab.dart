@@ -334,7 +334,7 @@ class _DeviceConflictState extends State<DeviceConflict> {
     _isTicketReactivationPending = true;
 
     final TicketProvider ticketProvider = Provider.of(context, listen: false);
-    ticketProvider.reactivateTickets().then((_) => _isTicketReactivationPending = true);
+    ticketProvider.reactivateTickets().then((_) => _isTicketReactivationPending = false);
   }
 }
 
