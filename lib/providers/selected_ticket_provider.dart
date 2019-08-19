@@ -14,8 +14,6 @@ class SelectedTicketProvider extends ChangeNotifier {
 
   final int _refreshInterval = 30;
   final int _otpLength = 6;
-  final String _baseUrlAuthority = 'api.foriatickets.com';
-  final String _baseUrlPath = '/v1/ticket/redeem';
 
   SelectedTicketProvider(this._event, this._eventTickets);
 
@@ -25,7 +23,7 @@ class SelectedTicketProvider extends ChangeNotifier {
   ///
   /// Helper method to obtain the ticket secret for specified ticket object.
   ///
-  Future<String> getTicketUrl(Ticket ticket) async {
+  Future<String> getTicketString(Ticket ticket) async {
 
    if (ticket == null || ticket.id == null) {
      return null;
@@ -38,11 +36,10 @@ class SelectedTicketProvider extends ChangeNotifier {
    }
 
    final int otp = OTP.generateTOTPCode(ticketSecret, DateTime.now().millisecondsSinceEpoch, length: _otpLength, interval: _refreshInterval);
-   final Map<String, String> payload = {
-     'ticket_id': ticket.id,
-     'otp': otp.toString()
-   };
+   final redemptionRequest = new RedemptionRequest();
+   redemptionRequest.ticketId = ticket.id;
+   redemptionRequest.ticketOtp = otp.toString();
 
-   return Uri.https(_baseUrlAuthority, _baseUrlPath, payload).toString();
+   return redemptionRequest.toJson().toString();
   }
 }

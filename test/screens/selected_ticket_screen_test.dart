@@ -19,6 +19,7 @@ void main() {
     List<Ticket> tickets = _generateFakeTickets();
     when(selectedTicketProviderMock.eventTickets).thenReturn(UnmodifiableListView(tickets));
     when(selectedTicketProviderMock.event).thenReturn(_generateFakeEvents()[0]);
+    when(selectedTicketProviderMock.getTicketString(any)).thenAnswer((_) async => null);
   });
 
   testWidgets('selectedTicketScreen containes proper event name', (WidgetTester tester) async {
