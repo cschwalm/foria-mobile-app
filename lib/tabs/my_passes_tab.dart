@@ -314,7 +314,7 @@ class EventCard extends StatelessWidget {
 class DeviceConflict extends StatefulWidget {
 
   @override
-  _DeviceConflict createState() => _DeviceConflictState();
+  _DeviceConflictState createState() => _DeviceConflictState();
 }
 
 class _DeviceConflictState extends State<DeviceConflict> {
