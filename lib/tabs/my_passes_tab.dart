@@ -220,7 +220,7 @@ class EventCard extends StatelessWidget {
     final _eventData = Provider.of<TicketProvider>(context, listen: true);
 
     // A null URL means a test is being run. When true the CachedNetworkImage widget is avoided
-    bool isEventImageNull = _eventData.eventList[1].imageUrl == null ? true : false;
+    bool isEventImageNull = _eventData.eventList[1].imageUrl == null;
 
     return ListView.builder(
         itemCount: _eventData.eventList.length,
