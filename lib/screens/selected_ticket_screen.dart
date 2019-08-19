@@ -51,6 +51,8 @@ class PassBody extends StatelessWidget {
     final SelectedTicketProvider selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: false);
     final int passCount = selectedTicketProvider.eventTickets.length;
 
+    selectedTicketProvider.getTicketUrl(selectedTicketProvider.eventTickets.first).then((url) => debugPrint(url));
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: PageView.builder(
