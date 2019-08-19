@@ -168,7 +168,7 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
       return EmailVerificationConflict(this.emailVerifyCallback);
     }
 
-    if (_currentState == _LoadingState.DEVICE_CHECK) {
+    if (_currentState == _LoadingState.DEVICE_CHECK && eventData.ticketsActiveOnOtherDevice) {
       return DeviceConflict();
     }
 

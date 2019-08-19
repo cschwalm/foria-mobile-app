@@ -20,9 +20,11 @@ void main() {
 
   setUp(() {
 
-    List<Event> events = _generateFakeEvents();
+    final List<Event> events = _generateFakeEvents();
+
     when(ticketProviderMock.eventList).thenReturn(UnmodifiableListView(events));
-    when(ticketProviderMock.loadUserDataFromNetwork()).thenAnswer( (_) async { return; });
+    when(ticketProviderMock.ticketsActiveOnOtherDevice).thenReturn(false);
+    when(ticketProviderMock.loadUserDataFromNetwork()).thenAnswer((_) async => null);
 
     _channel.setMockMethodCallHandler((MethodCall methodCall) async {
 
@@ -34,9 +36,7 @@ void main() {
     });
   });
 
-  testWidgets('myPassesTab contains one event in list', (WidgetTester tester) async {
-
-    when(ticketProviderMock.ticketsActiveOnOtherDevice).thenReturn(false);
+  testWidgets('myPassesTab contains event cards', (WidgetTester tester) async {
 
     await tester.pumpWidget(MaterialApp(
       home: Tabs(ticketProviderMock),
@@ -44,15 +44,16 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.byType(Card), findsNWidgets(_generateFakeEvents().length));
     expect(find.byType(MissingTicket), findsNothing);
     expect(find.byType(EmailVerificationConflict), findsNothing);
+    expect(find.byType(DeviceConflict), findsNothing);
+    expect(find.byType(EventCard), findsOneWidget);
+    expect(find.byType(Card), findsNWidgets(_generateFakeEvents().length));
   });
 
   testWidgets('myPassesTab contains no events in list', (WidgetTester tester) async {
 
     when(ticketProviderMock.eventList).thenReturn(UnmodifiableListView(new List()));
-    when(ticketProviderMock.ticketsActiveOnOtherDevice).thenReturn(false);
 
     await tester.pumpWidget(MaterialApp(
       home: Tabs(ticketProviderMock),
