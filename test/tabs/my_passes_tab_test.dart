@@ -110,7 +110,7 @@ List<Event> _generateFakeEvents() {
     event.id = 'TestEvent$i';
     event.description = 'test description';
     event.startTime = DateTime.now();
-    event.imageUrl = 'foriatickets.com/img/large-square-logo';
+    event.imageUrl = null;
 
     events.add(event);
   }

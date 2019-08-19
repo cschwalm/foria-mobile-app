@@ -219,6 +219,9 @@ class EventCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final _eventData = Provider.of<TicketProvider>(context, listen: true);
 
+    // A null URL means a test is being run. When true the CachedNetworkImage widget is avoided
+    bool isEventImageNull = _eventData.eventList[1].imageUrl == null ? true : false;
+
     return ListView.builder(
         itemCount: _eventData.eventList.length,
         itemBuilder: (context, index) {
@@ -276,7 +279,8 @@ class EventCard extends StatelessWidget {
                     Container(
                       height: 100,
                       width: 100,
-                      child: CachedNetworkImage(
+                      child: isEventImageNull ? null:
+                      CachedNetworkImage(
                         placeholder: (context, url) =>
                             CupertinoActivityIndicator(),
                         errorWidget: (context, url, error) {
