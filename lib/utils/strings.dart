@@ -63,6 +63,8 @@ const String toAccessTickets = 'To access your tickets, you must deactivate them
 
 const String relocateTickets = 'Relocate Tickets';
 
+const String imageUnavailable = 'Image unavailable';
+
 const String ticketLoadingFailure = 'It looks like you\'re currently offline.\n\n'
     'Don\'t worry, we\'re using an offline copy of your tickets. As long as you haven\'t transferred or sold your tickets, they will be valid.';
 
