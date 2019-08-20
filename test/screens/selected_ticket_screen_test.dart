@@ -27,7 +27,7 @@ void main() {
     final List<Ticket> tickets = _generateFakeTickets();
 
     await tester.pumpWidget(MaterialApp(
-        home: SelectedTicketScreen(selectedTicketProvider: selectedTicketProviderMock)
+        home: SelectedTicketScreen(selectedTicketProviderMock)
     ));
     await tester.pumpAndSettle();
 

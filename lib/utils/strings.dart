@@ -77,3 +77,5 @@ const String passRefresh ='Your pass refreshes in  ';
 const String passOptions = 'Pass Options';
 
 const String directionsText = 'Directions';
+
+const String barcodeLoading = 'Barcode Loading...';

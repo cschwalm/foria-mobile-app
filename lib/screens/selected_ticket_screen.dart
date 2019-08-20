@@ -5,29 +5,29 @@ import 'package:foria/providers/selected_ticket_provider.dart';
 import 'package:foria/utils/static_images.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/primary_button.dart';
+import 'package:foria_flutter_client/api.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'register_and_transfer_screen.dart';
 
-class SelectedTicketScreen extends StatefulWidget {
+///
+/// Screen displays rotating barcodes for user to scan.
+/// Barcodes cannot be generated unless tickets are active and their secrets are stored.
+///
+class SelectedTicketScreen extends StatelessWidget {
 
   static const routeName = '/selected-ticket';
-  final SelectedTicketProvider selectedTicketProvider;
+  final SelectedTicketProvider _selectedTicketProvider;
 
-  SelectedTicketScreen({this.selectedTicketProvider});
-
-  @override
-  _SelectedTicketScreenState createState() => _SelectedTicketScreenState();
-}
-
-class _SelectedTicketScreenState extends State<SelectedTicketScreen> {
+  SelectedTicketScreen([this._selectedTicketProvider]);
 
   @override
   Widget build(BuildContext context) {
 
-    SelectedTicketProvider selectedTicketProvider = widget.selectedTicketProvider != null ?
-    widget.selectedTicketProvider : ModalRoute.of(context).settings.arguments as SelectedTicketProvider;
+    final SelectedTicketProvider selectedTicketProvider = _selectedTicketProvider != null ?
+    _selectedTicketProvider : ModalRoute.of(context).settings.arguments as SelectedTicketProvider;
 
     return Scaffold(
       appBar: AppBar(
@@ -65,17 +65,24 @@ class PassBody extends StatelessWidget {
   }
 }
 
+///
+/// Shows barcode with time remaining.
+///
 class PassCard extends StatelessWidget {
-  final int index;
-  final int passCount;
 
-  PassCard(this.index, this.passCount);
+  final int _index;
+  final int _passCount;
+
+  PassCard(this._index, this._passCount);
 
   @override
   Widget build(BuildContext context) {
 
-    final SelectedTicketProvider selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: false);
-    final passNumber = index + 1;
+    final SelectedTicketProvider selectedTicketProvider = Provider.of<SelectedTicketProvider>(context);
+
+    final passNumber = _index + 1;
+    final Ticket ticket = selectedTicketProvider.eventTickets.elementAt(_index);
+    final String barcodeText = selectedTicketProvider.getBarcodeText(ticket.id);
 
     return SafeArea(
       child: Card(
@@ -84,26 +91,30 @@ class PassCard extends StatelessWidget {
           child: Column(
             children: <Widget>[
               EventInfo(),
-              SizedBox(height: 5,),
+              SizedBox(height: 5),
               Directions(),
-              SizedBox(height: 30,),
+              SizedBox(height: 30),
               Text(
-                'Pass $passNumber of $passCount',
+                'Pass $passNumber of $_passCount',
                 style: Theme.of(context).textTheme.title,
               ),
-              SizedBox(height: 5,),
+              SizedBox(height: 5),
               Text(
-                selectedTicketProvider.eventTickets[index].ticketTypeConfig.name,
+                ticket.ticketTypeConfig.name,
                 style: Theme.of(context).textTheme.title,
               ),
               SizedBox(
                 height: 20,
               ),
-              Image.asset('assets/ui_elements/qr1.png'),
+              barcodeText == null ? Text(barcodeLoading) :
+              QrImage(
+                data: barcodeText,
+                size: 250,
+              ),
               SizedBox(
                 height: 10,
               ),
-              PassRefresh(),
+              PassRefresh(selectedTicketProvider.secondsRemaining),
               Expanded(child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
@@ -195,7 +206,7 @@ class Directions extends StatelessWidget {
             color: Theme.of(context).primaryColor,
           ),
           Text(
-            '' + directionsText,
+            directionsText,
             style: TextStyle(
                 fontSize: 18, color: Theme.of(context).primaryColor),
           ),
@@ -203,7 +214,7 @@ class Directions extends StatelessWidget {
       ),
       onTap: () async {
 
-        var url = googleMapsSearchUrl + Uri.encodeFull(addr.streetAddress + " " + addr.city + " " + addr.state + " " + addr.zip);
+        final String url = googleMapsSearchUrl + Uri.encodeFull(addr.streetAddress + " " + addr.city + " " + addr.state + " " + addr.zip);
 
         if (await canLaunch(url)) {
           await launch(url);
@@ -216,6 +227,11 @@ class Directions extends StatelessWidget {
 }
 
 class PassRefresh extends StatelessWidget {
+
+  final _secondsRemaining;
+
+  PassRefresh(this._secondsRemaining);
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -238,7 +254,7 @@ class PassRefresh extends StatelessWidget {
               width: 30,
               alignment: Alignment.center,
               child: Text(
-                "55",
+                _secondsRemaining.toString(),
                 style: Theme.of(context).textTheme.body2,
               ),
             ),
@@ -258,8 +274,7 @@ class PassOptions extends StatelessWidget {
           text: textTransfer,
           onPress: () {
             Navigator.of(context).pushNamed(
-              RegisterAndTransferScreen.routeName,
-              arguments: null,
+              RegisterAndTransferScreen.routeName
             );
           },
         ),
