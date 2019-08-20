@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/main.dart';
@@ -14,24 +12,22 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'register_and_transfer_screen.dart';
 
-class SelectedTicketScreen extends StatefulWidget {
+///
+/// Screen displays rotating barcodes for user to scan.
+/// Barcodes cannot be generated unless tickets are active and their secrets are stored.
+///
+class SelectedTicketScreen extends StatelessWidget {
 
   static const routeName = '/selected-ticket';
-  final SelectedTicketProvider selectedTicketProvider;
+  final SelectedTicketProvider _selectedTicketProvider;
 
-  SelectedTicketScreen({this.selectedTicketProvider});
-
-  @override
-  _SelectedTicketScreenState createState() => _SelectedTicketScreenState();
-}
-
-class _SelectedTicketScreenState extends State<SelectedTicketScreen> {
+  SelectedTicketScreen([this._selectedTicketProvider]);
 
   @override
   Widget build(BuildContext context) {
 
-    SelectedTicketProvider selectedTicketProvider = widget.selectedTicketProvider != null ?
-    widget.selectedTicketProvider : ModalRoute.of(context).settings.arguments as SelectedTicketProvider;
+    final SelectedTicketProvider selectedTicketProvider = _selectedTicketProvider != null ?
+    _selectedTicketProvider : ModalRoute.of(context).settings.arguments as SelectedTicketProvider;
 
     return Scaffold(
       appBar: AppBar(
@@ -69,77 +65,24 @@ class PassBody extends StatelessWidget {
   }
 }
 
-class PassCard extends StatefulWidget {
+///
+/// Shows barcode with time remaining.
+///
+class PassCard extends StatelessWidget {
 
-  final int index;
-  final int passCount;
+  final int _index;
+  final int _passCount;
 
-  PassCard(this.index, this.passCount);
-
-  @override
-  _PassCardState createState() => _PassCardState();
-}
-
-class _PassCardState extends State<PassCard> {
-
-  final Duration _tick = Duration(seconds: 1);
-  final Map<String, String> _barcodeTextMap = new Map<String, String>();
-  int _secondsRemaining = -1;
-  Timer _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _timer = Timer.periodic(_tick, _refreshBarcodes);
-  }
-
-  @override
-  void didChangeDependencies() {
-
-    if (_secondsRemaining <= -1) {
-      _refreshBarcodes(_timer);
-    }
-    super.didChangeDependencies();
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  ///
-  /// Every duration, the text is refreshed for the new OTP codes that are generated.
-  ///
-  Future<void> _refreshBarcodes(Timer timer) async {
-
-    if (_secondsRemaining <= 0) {
-
-      final SelectedTicketProvider selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: false);
-      for (final Ticket ticket in selectedTicketProvider.eventTickets) {
-
-        final String barcodeText = await selectedTicketProvider.getTicketString(ticket);
-        setState(() {
-          _barcodeTextMap[ticket.id] = barcodeText;
-          _secondsRemaining = 30;
-        });
-      }
-      debugPrint('${selectedTicketProvider.eventTickets.length} tickets barcodes updated.');
-      return;
-    }
-
-    setState(() {
-      _secondsRemaining--;
-    });
-  }
+  PassCard(this._index, this._passCount);
 
   @override
   Widget build(BuildContext context) {
 
-    final SelectedTicketProvider selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: false);
-    final passNumber = widget.index + 1;
-    final Ticket ticket = selectedTicketProvider.eventTickets.elementAt(widget.index);
-    final String barcodeText = _barcodeTextMap.containsKey(ticket.id) ? _barcodeTextMap[ticket.id] : null;
+    final SelectedTicketProvider selectedTicketProvider = Provider.of<SelectedTicketProvider>(context);
+
+    final passNumber = _index + 1;
+    final Ticket ticket = selectedTicketProvider.eventTickets.elementAt(_index);
+    final String barcodeText = selectedTicketProvider.getBarcodeText(ticket.id);
 
     return SafeArea(
       child: Card(
@@ -152,7 +95,7 @@ class _PassCardState extends State<PassCard> {
               Directions(),
               SizedBox(height: 30),
               Text(
-                'Pass $passNumber of ${widget.passCount}',
+                'Pass $passNumber of $_passCount',
                 style: Theme.of(context).textTheme.title,
               ),
               SizedBox(height: 5),
@@ -171,7 +114,7 @@ class _PassCardState extends State<PassCard> {
               SizedBox(
                 height: 10,
               ),
-              PassRefresh(_secondsRemaining),
+              PassRefresh(selectedTicketProvider.secondsRemaining),
               Expanded(child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
