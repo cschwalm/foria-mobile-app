@@ -52,7 +52,7 @@ const String supportEmailSubject = "Foria Support";
 const String noEvents = 'You don\'t have any \nupcoming events';
 
 const String noTickets = 'If you can\'t find your tickets, \nplease first check '
-    'your \nemail order confirmation.';
+    'your \nemail order confirmation \n pulldown to refresh your tickets.';
 
 const String otherwiseContact = 'Otherwise, Contact Us';
 
@@ -62,6 +62,8 @@ const String toAccessTickets = 'To access your tickets, you must deactivate them
     'from the other device and relocate your tickets';
 
 const String relocateTickets = 'Relocate Tickets';
+
+const String refreshTickets = 'Refresh';
 
 const String imageUnavailable = 'Image unavailable';
 

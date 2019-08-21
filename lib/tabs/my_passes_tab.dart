@@ -5,7 +5,6 @@ import 'package:foria/providers/selected_ticket_provider.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/strings.dart';
-import 'package:foria/widgets/contact_support.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria/widgets/primary_button.dart';
 import 'package:provider/provider.dart';
@@ -165,7 +164,7 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
     }
 
     if (_currentState == _LoadingState.EMAIL_VERIFY) {
-      return EmailVerificationConflict(this.emailVerifyCallback);
+      return EmailVerificationConflict(emailVerifyCallback);
     }
 
     if (_currentState == _LoadingState.DEVICE_CHECK && eventData.ticketsActiveOnOtherDevice) {
@@ -173,7 +172,18 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
     }
 
     if (eventData.eventList.length <= 0) {
-      return MissingTicket();
+      return RefreshIndicator(
+        onRefresh: _awaitTicketLoad,
+        child: SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(),
+          child: Container(
+            child: Center(
+              child: MissingTicket(),
+            ),
+            height: MediaQuery.of(context).size.height,
+          ),
+        ),
+      );
     }
 
     super.build(context);
@@ -183,7 +193,7 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
     );
   }
 
-  void emailVerifyCallback() async {
+  Future<void> emailVerifyCallback() async {
 
     await forceTokenRefresh();
     bool isEmailVerified = await isUserEmailVerified();
@@ -341,7 +351,8 @@ class _DeviceConflictState extends State<DeviceConflict> {
           ),
           PrimaryButton(
             text: relocateTickets,
-            onPress: () => _isTicketReactivationPending ? null : _deviceCheckCallback(context),
+            onPress: () => _deviceCheckCallback(context),
+            isLoading: _isTicketReactivationPending,
           ),
         ],
       ),
@@ -353,18 +364,32 @@ class _DeviceConflictState extends State<DeviceConflict> {
   ///
   void _deviceCheckCallback(BuildContext context) async {
 
-    _isTicketReactivationPending = true;
+    setState(() {
+      _isTicketReactivationPending = true;
+    });
 
     final TicketProvider ticketProvider = Provider.of(context, listen: false);
-    ticketProvider.reactivateTickets().then((_) => _isTicketReactivationPending = false);
+    ticketProvider.reactivateTickets().then((_) {
+      setState(() {
+        _isTicketReactivationPending = false;
+      });
+    });
   }
 }
 
-class EmailVerificationConflict extends StatelessWidget {
+class EmailVerificationConflict extends StatefulWidget {
 
   final Function _mainButtonCallback;
 
   EmailVerificationConflict(this._mainButtonCallback);
+
+  @override
+  _EmailVerificationConflictState createState() => _EmailVerificationConflictState();
+}
+
+class _EmailVerificationConflictState extends State<EmailVerificationConflict> {
+
+  bool _isCheckingVerification = false;
 
   @override
   Widget build(BuildContext context) {
@@ -390,8 +415,17 @@ class EmailVerificationConflict extends StatelessWidget {
           PrimaryButton(
             text: iveConfirmedEmail,
             isActive: true,
-            onPress: () {
-              _mainButtonCallback();
+            isLoading: _isCheckingVerification,
+            onPress: () async {
+              setState(() {
+                _isCheckingVerification = true;
+              });
+
+              await widget._mainButtonCallback();
+
+              setState(() {
+                _isCheckingVerification = false;
+              });
             },
           ),
         ],
@@ -419,16 +453,6 @@ class MissingTicket extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 25),
-          GestureDetector(
-            child: Text(contactUs,
-                style: TextStyle(
-                  color: Theme.of(context).primaryColor,
-                  fontSize: 18,
-                )),
-            onTap: () {
-              contactSupport();
-            },
-          ),
         ],
       ),
     );
