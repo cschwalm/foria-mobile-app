@@ -10,8 +10,6 @@ import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'register_and_transfer_screen.dart';
-
 ///
 /// Screen displays rotating barcodes for user to scan.
 /// Barcodes cannot be generated unless tickets are active and their secrets are stored.
@@ -273,12 +271,45 @@ class PassOptions extends StatelessWidget {
         PrimaryButton(
           text: textTransfer,
           onPress: () {
-            Navigator.of(context).pushNamed(
-              RegisterAndTransferScreen.routeName
-            );
+            transferPopUp(context);
           },
         ),
       ],
     );
   }
+}
+
+Future<void> transferPopUp(BuildContext context) async {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: true, // user must tap button!
+    builder: (BuildContext context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0))
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Text(
+              transferWarning,
+              textAlign: TextAlign.center,),
+            SizedBox(height: 30,),
+            PrimaryButton(
+              text: transferConfirm,
+              onPress: () {},
+            ),
+            SizedBox(height: 20,),
+            Center(
+              child: GestureDetector(
+                child: Text(textCancel),
+                onTap: () => Navigator.of(context).pop(),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }
