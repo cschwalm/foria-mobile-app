@@ -25,7 +25,7 @@ class PrimaryButton extends StatelessWidget {
       children: <Widget>[
         if (icon != null)
           Icon(icon),
-        if (icon != null || isLoading)
+        if (icon != null)
           SizedBox(
             width: 10,
           ),
@@ -52,7 +52,7 @@ class PrimaryButton extends StatelessWidget {
       minSize: minSize,
       padding: EdgeInsets.zero,
       color: isActive ? Theme.of(context).primaryColor : theme.shapeGreyColor,
-      onPressed: onPress,
+      onPressed: isLoading ? null : onPress,
       child: isLoading ? _loadingContent() : _buttonContent(context),
     );
   }

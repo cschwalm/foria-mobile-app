@@ -61,9 +61,7 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    final missingTicketFinder = find.descendant(of: find.byType(MissingTicket), matching: find.byType(GestureDetector));
-
-    expect(missingTicketFinder, findsOneWidget);
+    expect(find.byType(MissingTicket), findsOneWidget);
   });
 
   testWidgets('myPassesTab contains EmailVerificationConflict on not verified', (WidgetTester tester) async {
