@@ -22,6 +22,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
   AnimationController controller;
   Animation<double> animation;
+  final AuthUtils _authUtils = new AuthUtils();
 
   @override
   initState() {
@@ -40,9 +41,9 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
   Future<void> _determineNavigationRoute() async {
 
-    if (!await isUserLoggedIn(true)) {
+    if (!await _authUtils.isUserLoggedIn(true)) {
       navigatorKey.currentState.pushReplacementNamed(Login.routeName);
-    } else if (await doesUserHaveVenueAccess()) {
+    } else if (await _authUtils.doesUserHaveVenueAccess()) {
       navigatorKey.currentState.pushReplacementNamed(VenueScreen.routeName);
     } else {
       navigatorKey.currentState.pushReplacementNamed(Home.routeName);
