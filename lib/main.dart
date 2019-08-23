@@ -4,6 +4,7 @@ import 'package:flutter/services.dart' show DeviceOrientation, SystemChrome;
 import 'package:flutter/services.dart';
 import 'package:foria/screens/splash_screen.dart';
 import 'package:foria/screens/venue_screen.dart';
+import 'package:foria/utils/auth_utils.dart';
 
 import 'navigation/CustomNoTransition.dart';
 import 'screens/home.dart';
@@ -71,7 +72,7 @@ void main() async {
               break;
 
             default:
-              return CustomNoTransition(builder: (context)=> SplashScreen(), settings: settings);
+              return CustomNoTransition(builder: (context)=> SplashScreen(AuthUtils()), settings: settings);
               break;
           }
         }
