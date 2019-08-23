@@ -13,15 +13,15 @@ class MockAuthUtils extends Mock implements AuthUtils {}
 
 void main() {
 
-  final AuthUtils _authUtils = new MockAuthUtils();
+  final AuthUtils authUtils = new MockAuthUtils();
 
 
   testWidgets('navigates to login screen if user not logged in', (WidgetTester tester) async {
 
-    when(_authUtils.isUserLoggedIn(true)).thenAnswer((_) => Future.value(false));
+    when(authUtils.isUserLoggedIn(true)).thenAnswer((_) => Future.value(false));
 
     await tester.pumpWidget(MaterialApp(
-        home: SplashScreen(_authUtils),
+        home: SplashScreen(authUtils),
       navigatorKey: navigatorKey,
       routes: {
         Login.routeName: (context) => Login(),
@@ -37,11 +37,11 @@ void main() {
 
   testWidgets('navigates to venue screen if user logged in as a venue', (WidgetTester tester) async {
 
-    when(_authUtils.isUserLoggedIn(true)).thenAnswer((_) => Future.value(true));
-    when(_authUtils.doesUserHaveVenueAccess()).thenAnswer((_) => Future.value(true));
+    when(authUtils.isUserLoggedIn(true)).thenAnswer((_) => Future.value(true));
+    when(authUtils.doesUserHaveVenueAccess()).thenAnswer((_) => Future.value(true));
 
     await tester.pumpWidget(MaterialApp(
-      home: SplashScreen(_authUtils),
+      home: SplashScreen(authUtils),
       navigatorKey: navigatorKey,
       routes: {
         VenueScreen.routeName: (context) => VenueScreen(),
@@ -56,11 +56,11 @@ void main() {
 
   testWidgets('navigates to home if user logged in as a fan, not venue', (WidgetTester tester) async {
 
-    when(_authUtils.isUserLoggedIn(true)).thenAnswer((_) => Future.value(true));
-    when(_authUtils.doesUserHaveVenueAccess()).thenAnswer((_) => Future.value(false));
+    when(authUtils.isUserLoggedIn(true)).thenAnswer((_) => Future.value(true));
+    when(authUtils.doesUserHaveVenueAccess()).thenAnswer((_) => Future.value(false));
 
     await tester.pumpWidget(MaterialApp(
-      home: SplashScreen(_authUtils),
+      home: SplashScreen(authUtils),
       navigatorKey: navigatorKey,
       routes: {
         Home.routeName: (context) => Login(),
