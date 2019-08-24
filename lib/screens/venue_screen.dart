@@ -11,6 +11,8 @@ import '../utils/strings.dart';
 class VenueScreen extends StatelessWidget {
   static const routeName = '/venue-screen';
 
+  final AuthUtils _authUtils = new AuthUtils();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +44,7 @@ class VenueScreen extends StatelessWidget {
             labelTextStyle: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold,color: Theme.of(context).primaryColor),
             content: SettingsNavigationIndicator(),
             onPress: () {
-              logout(context);
+              _authUtils.logout(context);
             },
           ),
           SettingItemDivider(),

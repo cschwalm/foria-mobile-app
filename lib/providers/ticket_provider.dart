@@ -16,6 +16,8 @@ import 'package:foria_flutter_client/api.dart';
 class TicketProvider extends ChangeNotifier {
 
   DatabaseUtils _databaseUtils = new DatabaseUtils();
+  AuthUtils _authUtils = new AuthUtils();
+
   EventApi _eventApi;
   TicketApi _ticketApi;
   UserApi _userApi;
@@ -28,6 +30,10 @@ class TicketProvider extends ChangeNotifier {
   UnmodifiableListView<Event> get eventList => UnmodifiableListView(_eventSet);
   bool get ticketsActiveOnOtherDevice => _ticketsActiveOnOtherDevice;
   UnmodifiableListView<Ticket> get userTicketList => UnmodifiableListView(_ticketSet);
+
+  set authUtils(AuthUtils value) {
+    _authUtils = value;
+  }
 
   set databaseUtils(DatabaseUtils value) {
     _databaseUtils = value;
@@ -70,7 +76,7 @@ class TicketProvider extends ChangeNotifier {
   Future<void> loadUserDataFromNetwork() async {
 
     if (_userApi == null) {
-      ApiClient foriaApiClient = await obtainForiaApiClient();
+      ApiClient foriaApiClient = await _authUtils.obtainForiaApiClient();
       _userApi = new UserApi(foriaApiClient);
     }
 
@@ -129,7 +135,7 @@ class TicketProvider extends ChangeNotifier {
   Future<void> reactivateTickets() async {
 
     if (_ticketApi == null) {
-      ApiClient foriaApiClient = await obtainForiaApiClient();
+      ApiClient foriaApiClient = await _authUtils.obtainForiaApiClient();
       _ticketApi = new TicketApi(foriaApiClient);
     }
 
@@ -179,7 +185,7 @@ class TicketProvider extends ChangeNotifier {
   Future<void> _activateAllIssuedTickets(final Set<Ticket> tickets) async {
 
     if (_ticketApi == null) {
-      ApiClient foriaApiClient = await obtainForiaApiClient();
+      ApiClient foriaApiClient = await _authUtils.obtainForiaApiClient();
       _ticketApi = new TicketApi(foriaApiClient);
     }
 
@@ -280,7 +286,7 @@ class TicketProvider extends ChangeNotifier {
     }
 
     if (_eventApi == null) {
-      ApiClient foriaApiClient = await obtainForiaApiClient();
+      ApiClient foriaApiClient = await _authUtils.obtainForiaApiClient();
       _eventApi = new EventApi(foriaApiClient);
     }
 

@@ -13,6 +13,9 @@ import 'login.dart';
 class SplashScreen extends StatefulWidget {
 
   static const routeName = '/splash-screen';
+  final AuthUtils _authUtils;
+
+  SplashScreen(this._authUtils);
 
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -39,10 +42,9 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   }
 
   Future<void> _determineNavigationRoute() async {
-
-    if (!await isUserLoggedIn(true)) {
-      navigatorKey.currentState.pushReplacementNamed(Login.routeName);
-    } else if (await doesUserHaveVenueAccess()) {
+    if (!await widget._authUtils.isUserLoggedIn(true)) {
+    navigatorKey.currentState.pushReplacementNamed(Login.routeName);
+    } else if (await  widget._authUtils.doesUserHaveVenueAccess()) {
       navigatorKey.currentState.pushReplacementNamed(VenueScreen.routeName);
     } else {
       navigatorKey.currentState.pushReplacementNamed(Home.routeName);
