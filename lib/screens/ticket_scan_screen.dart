@@ -7,6 +7,7 @@ import 'package:flutter_camera_ml_vision/flutter_camera_ml_vision.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria_flutter_client/api.dart';
+import 'package:wakelock/wakelock.dart';
 
 ///
 /// Screen is shown in venue flow to redeem user tickets. Scanning is enabled as soon as
@@ -35,11 +36,15 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
       _resetTimer.cancel();
       _resetTimer = null;
     }
+    Wakelock.disable();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+
+    // The following line will enable the Android and iOS wakelock.
+    Wakelock.enable();
 
     List<Widget> children = new List<Widget>();
 
@@ -74,7 +79,7 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey,
       appBar: AppBar(
         title: Text(scanToRedeemTitle),
         backgroundColor: Theme
@@ -174,15 +179,8 @@ class TickScanResultWidget extends StatelessWidget {
 
     List<TableRow> rows = new List<TableRow>();
 
-    TableRow ticketIdRow, ticketTypeNameRow, scanResultRow;
+    TableRow ticketTypeNameRow, scanResultRow;
     if (scanResult != ScanResult.ERROR) {
-
-      ticketIdRow = new TableRow(
-        children: [
-          Text('Ticket ID:'),
-          Text(ticketId)
-        ]
-      );
 
       ticketTypeNameRow = new TableRow(
           children: [
@@ -198,7 +196,6 @@ class TickScanResultWidget extends StatelessWidget {
           ]
       );
 
-      rows.add(ticketIdRow);
       rows.add(ticketTypeNameRow);
       rows.add(scanResultRow);
     } else {
@@ -212,14 +209,20 @@ class TickScanResultWidget extends StatelessWidget {
     }
 
     return Padding(
-      padding: EdgeInsets.only(top: 20.0, bottom: 20.0),
+      padding: EdgeInsets.fromLTRB(5.0, 20.0, 5.0, 20.0),
         child: Container(
           decoration: BoxDecoration(
             border: new Border.all(color: Colors.black),
             color: scanResult == ScanResult.ALLOW ? Colors.green : Colors.red,
           ),
-          child: Table(
-            children: rows,
+          child: DefaultTextStyle(
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold
+            ),
+            child: Table(
+              children: rows,
+            ),
           )
       )
     );
