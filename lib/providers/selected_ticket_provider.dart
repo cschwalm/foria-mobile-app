@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:foria/utils/database_utils.dart';
@@ -82,7 +83,7 @@ class SelectedTicketProvider extends ChangeNotifier {
    redemptionRequest.ticketId = ticket.id;
    redemptionRequest.ticketOtp = otp.toString();
 
-   return redemptionRequest.toJson().toString();
+   return jsonEncode(redemptionRequest.toJson());
   }
 
   ///

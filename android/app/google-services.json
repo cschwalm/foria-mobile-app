@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "286411844647",
+    "firebase_url": "https://foria-tickets.firebaseio.com",
+    "project_id": "foria-tickets",
+    "storage_bucket": "foria-tickets.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:286411844647:android:ca83ec512dff393d",
+        "android_client_info": {
+          "package_name": "com.foriatickets.foria"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "286411844647-iqp690kojrdi4an267qb0mi2mjoavnb0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.foriatickets.foria",
+            "certificate_hash": "b69b0735e0319d363a5d63809572ad828ca6cacc"
+          }
+        },
+        {
+          "client_id": "286411844647-t9e7brmo5ji4dj28gt79hcsp6edtq95m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMOrvjtgkfuAqZldyoV6hBqTUvTHRtKB8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "286411844647-t9e7brmo5ji4dj28gt79hcsp6edtq95m.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "286411844647-9mf2j3ag3gm0pj2k07u66tldm1ej13ms.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.foriatickets.foria-tickets",
+                "app_store_id": "1475421513"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -170,6 +170,39 @@ class TicketProvider extends ChangeNotifier {
   }
 
   ///
+  /// Redeems the user ticket for an authenticated venue device.
+  /// The result will be passed back to the UI to display to ticket scanner.
+  ///
+  /// If ALLOW is returned, the ticket has been redeemed in the backend system.
+  ///
+  Future<RedemptionResult> redeemTicket(final RedemptionRequest redemptionRequest) async {
+
+    if (redemptionRequest == null) {
+      return null;
+    }
+
+    if (_ticketApi == null) {
+      ApiClient foriaApiClient = await obtainForiaApiClient();
+      _ticketApi = new TicketApi(foriaApiClient);
+    }
+
+    RedemptionResult result;
+    try {
+     result = await _ticketApi.redeemTicket(redemptionRequest);
+    } on ApiException catch (ex) {
+      debugPrint("### FORIA SERVER ERROR: redeemTicket ###");
+      debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      throw new Exception(ex.message);
+    } catch (e) {
+      debugPrint("### NETWORK ERROR: redeemTicket Msg: ${e.toString()} ###");
+      rethrow;
+    }
+
+    debugPrint("TicketId: ${redemptionRequest.ticketId} reedeemed with result: ${result.status}");
+    return result;
+  }
+
+  ///
   /// Checks the ticket set for tickets that are in ISSUED status.
   /// If tickets are in ISSUED status, tickets are activated and ticket secret
   /// is stored in local database.

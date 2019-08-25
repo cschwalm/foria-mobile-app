@@ -21,6 +21,8 @@ const String venueAccount = 'Venue Account';
 
 const String scanTickets = 'Scan Tickets';
 
+const String scanToRedeemTitle = 'Ready To Scan';
+
 // Auth0 strings. //
 
 const String loginRegister = 'Sign Up / Sign In';

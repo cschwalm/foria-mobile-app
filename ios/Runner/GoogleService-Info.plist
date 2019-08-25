@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>286411844647-9mf2j3ag3gm0pj2k07u66tldm1ej13ms.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.286411844647-9mf2j3ag3gm0pj2k07u66tldm1ej13ms</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>286411844647-u7he469vkp4ji5dk7tm7sr0joiif3acb.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAG_E1IjM67UMmXABO_JH2WAVQt8t0MY_0</string>
+	<key>GCM_SENDER_ID</key>
+	<string>286411844647</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.foriatickets.foria-tickets</string>
+	<key>PROJECT_ID</key>
+	<string>foria-tickets</string>
+	<key>STORAGE_BUCKET</key>
+	<string>foria-tickets.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:286411844647:ios:9d2fbf971e729d5b</string>
+	<key>DATABASE_URL</key>
+	<string>https://foria-tickets.firebaseio.com</string>
+</dict>
+</plist>
