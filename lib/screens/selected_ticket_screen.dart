@@ -33,8 +33,8 @@ class SelectedTicketScreen extends StatelessWidget {
         backgroundColor: Theme.of(context).primaryColorDark,
       ),
       backgroundColor: settingsBackgroundColor,
-      body: ChangeNotifierProvider(
-        builder: (context) => (selectedTicketProvider),
+      body: ChangeNotifierProvider.value(
+        value: selectedTicketProvider,
         child: PassBody(),
       )
     );

@@ -59,6 +59,12 @@ target 'Runner' do
     File.symlink(p[:path], symlink)
     pod p[:name], :path => File.join(symlink, 'ios')
   }
+
+  # Manual Firebase Pods
+
+  pod 'Firebase/Analytics'
+  pod 'Firebase/MLVisionBarcodeModel'
+
 end
 
 post_install do |installer|

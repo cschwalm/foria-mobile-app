@@ -57,5 +57,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+    <string>Camera permission is required to verify your identity and scan event tickets.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Camera and microphone permission is required to scan ticket barcodes.</string>
 </dict>
 </plist>

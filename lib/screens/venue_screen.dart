@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/main.dart';
+import 'package:foria/screens/ticket_scan_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/widgets/contact_support.dart';
 import 'package:foria/widgets/primary_button.dart';
@@ -56,7 +57,9 @@ class VenueScreen extends StatelessWidget {
                   padding: EdgeInsets.fromLTRB(16, 0, 16, 40),
                   child: PrimaryButton(
                     text: scanTickets,
-                    onPress: () {},
+                    onPress: () {
+                      Navigator.pushNamed(context, TicketScanScreen.routeName);
+                    },
                   ),
                 ),
               ],

@@ -11,7 +11,7 @@ description: Ticketing app that generates one time use QR codes.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+version: 0.0.1+1
 
 environment:
   sdk: ">=2.2.2 <3.0.0"
@@ -24,6 +24,8 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cached_network_image: ^1.1.1
   cupertino_icons: ^0.1.2
+  firebase_analytics: ^5.0.0
+  flutter_camera_ml_vision: ^2.2.1
   flutter_secure_storage: 3.2.1
   font_awesome_flutter: ^8.0.1
   jose: ^0.1.2
@@ -31,8 +33,8 @@ dependencies:
   otp: 1.0.3
   provider: ^3.0.0+1
   flutter_email_sender: ^2.0.3
-  image_picker: ^0.6.0+15
   url_launcher: ^5.1.2
+  wakelock: ^0.1.2+8
 
   # used for date management
   intl: ^0.15.8
