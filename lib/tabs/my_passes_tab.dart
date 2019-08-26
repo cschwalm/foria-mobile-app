@@ -13,6 +13,11 @@ import '../screens/selected_ticket_screen.dart';
 
 class MyPassesTab extends StatefulWidget {
 
+  final AuthUtils _authUtils;
+  final TicketProvider _ticketProvider;
+
+  MyPassesTab(this._authUtils, this._ticketProvider);
+
   @override
   _MyPassesTabState createState() => _MyPassesTabState();
 }
@@ -34,15 +39,16 @@ enum _LoadingState {
 ///
 class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClientMixin<MyPassesTab> {
 
+  AuthUtils _authUtils;
   _LoadingState _currentState;
   bool _isUserEmailCheckFinished;
   bool _isTicketsLoaded;
   bool _isUserEmailVerified;
-  final AuthUtils _authUtils = new AuthUtils();
 
   @override
   void initState() {
 
+    _authUtils = widget._authUtils;
     _currentState = _LoadingState.EMAIL_VERIFY;
     _isUserEmailCheckFinished = false;
     _isTicketsLoaded = false;
@@ -54,24 +60,26 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
   @override
   void didChangeDependencies() {
 
+    TicketProvider ticketProvider = widget._ticketProvider;
     switch (_currentState) {
 
       case _LoadingState.EMAIL_VERIFY:
 
         if (!_isUserEmailCheckFinished) {
-          _authUtils.isUserEmailVerified().then((isEmailVerified) {
+          Future<bool> result = _authUtils.isUserEmailVerified();
+          result.then((isEmailVerified) {
             setState(() {
               _isUserEmailCheckFinished = true;
               _isUserEmailVerified = isEmailVerified;
-
-              //If email is verified, set next state and start the initial load.
-              if (_isUserEmailVerified) {
-                _isTicketsLoaded = false;
-                _currentState = _LoadingState.LOAD_TICKETS;
-
-                _loadTicketsAndSetState();
-              }
             });
+
+            //If email is verified, set next state and start the initial load.
+            if (_isUserEmailVerified) {
+              _isTicketsLoaded = false;
+              _currentState = _LoadingState.LOAD_TICKETS;
+
+              _loadTicketsAndSetState();
+            }
           });
         }
 
@@ -86,7 +94,6 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
 
       case _LoadingState.DEVICE_CHECK:
 
-        TicketProvider ticketProvider = Provider.of<TicketProvider>(context);
         if (!ticketProvider.ticketsActiveOnOtherDevice) {
           setState(() {
             _currentState = _LoadingState.DONE;
@@ -109,13 +116,18 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
   Future<void> _loadTicketsAndSetState() async {
 
     //Email is verified. Load tickets and stop spinner when completed.
-    TicketProvider ticketProvider = Provider.of<TicketProvider>(context);
-    ticketProvider.loadUserDataFromNetwork().then((_) {
+    TicketProvider ticketProvider = widget._ticketProvider;
+    Future<void> result = ticketProvider.loadUserDataFromNetwork();
+    result.then((_) {
       setState(() {
         _isTicketsLoaded = true;
 
         //Check if tickets are active on this device only if online.
-        _currentState = _LoadingState.DEVICE_CHECK;
+        if (!ticketProvider.ticketsActiveOnOtherDevice) {
+          _currentState = _LoadingState.DONE;
+        } else {
+          _currentState = _LoadingState.DEVICE_CHECK;
+        }
 
       });
     }).catchError((error) {
@@ -135,7 +147,7 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
   ///
   Future<void> _awaitTicketLoad() async {
 
-    TicketProvider ticketProvider = Provider.of<TicketProvider>(context);
+    TicketProvider ticketProvider = widget._ticketProvider;
     try {
       await ticketProvider.loadUserDataFromNetwork();
 
@@ -156,8 +168,9 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
   @override
   Widget build(BuildContext context) {
 
-    final eventData = Provider.of<TicketProvider>(context, listen: false);
+    super.build(context);
 
+    TicketProvider ticketProvider = widget._ticketProvider;
     if ( (_currentState == _LoadingState.EMAIL_VERIFY && !_isUserEmailCheckFinished) || _currentState == _LoadingState.LOAD_TICKETS) {
       return CupertinoActivityIndicator(
         radius: 15,
@@ -168,11 +181,11 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
       return EmailVerificationConflict(emailVerifyCallback);
     }
 
-    if (_currentState == _LoadingState.DEVICE_CHECK && eventData.ticketsActiveOnOtherDevice) {
+    if (_currentState == _LoadingState.DEVICE_CHECK && ticketProvider.ticketsActiveOnOtherDevice) {
       return DeviceConflict();
     }
 
-    if (eventData.eventList.length <= 0) {
+    if (ticketProvider.eventList.length <= 0) {
       return RefreshIndicator(
         onRefresh: _awaitTicketLoad,
         child: SingleChildScrollView(
@@ -187,10 +200,12 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
       );
     }
 
-    super.build(context);
-    return RefreshIndicator(
-        onRefresh: _awaitTicketLoad,
-        child: EventCard()
+    return ChangeNotifierProvider.value(
+        value: ticketProvider,
+        child: RefreshIndicator(
+          onRefresh: _awaitTicketLoad,
+          child: EventCard()
+        )
     );
   }
 

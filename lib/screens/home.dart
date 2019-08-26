@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:foria/providers/ticket_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:foria/utils/auth_utils.dart';
 
 import '../tabs/account_tab.dart';
 import '../tabs/my_passes_tab.dart';
@@ -13,7 +13,7 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Tabs(TicketProvider());
+    return new Tabs();
   }
 }
 
@@ -51,9 +51,6 @@ class FromRightToLeft<T> extends MaterialPageRoute<T> {
 }
 
 class Tabs extends StatefulWidget {
-  
-  final TicketProvider _ticketProvider;
-  Tabs(this._ticketProvider);
 
   @override
   TabsState createState() => new TabsState();
@@ -71,7 +68,7 @@ class TabsState extends State<Tabs> {
   @override
   void initState() {
     _tabController = new PageController();
-    _myPassesTab = new MyPassesTab();
+    _myPassesTab = new MyPassesTab(AuthUtils(), TicketProvider());
     _accountTab = new AccountTab();
 
     this._titleApp = TabItems[0].title;
@@ -106,15 +103,13 @@ class TabsState extends State<Tabs> {
       ),
 
       //Content of tabs
-      body: new ChangeNotifierProvider(
-          builder: (context) => (widget._ticketProvider),
-          child: new PageView(
+      body: PageView(
               controller: _tabController,
               onPageChanged: onTabChanged,
               children: <Widget>[
                 _myPassesTab,
                 _accountTab
-              ])),
+              ]),
       bottomNavigationBar: Theme
           .of(context)
           .platform == TargetPlatform.iOS
