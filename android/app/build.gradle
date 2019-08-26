@@ -6,6 +6,13 @@ if (localPropertiesFile.exists()) {
     }
 }
 
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    println 'Loading signing config from key.properties.'
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 def flutterRoot = localProperties.getProperty('flutter.sdk')
 if (flutterRoot == null) {
     throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
@@ -41,27 +48,13 @@ android {
     }
 
     signingConfigs {
-        release {
-
-            def keystoreProperties = new Properties()
-            def keystorePropertiesFile = rootProject.file('key.properties')
-            if (keystorePropertiesFile.exists()) {
-                keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-
-                keyAlias keystoreProperties['keyAlias']
-                keyPassword keystoreProperties['keyPassword']
-                storeFile file(keystoreProperties['storeFile'])
-                storePassword keystoreProperties['storePassword']
-            }
-        }
+        release
     }
 
     buildTypes {
         release {
-            def keystorePropertiesFile = rootProject.file('key.properties')
-            if (keystorePropertiesFile.exists()) {
-                signingConfig signingConfigs.release
-            }
+
+            signingConfig signingConfigs.release
 
             minifyEnabled true
             useProguard true
@@ -69,6 +62,17 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+}
+
+if (keystoreProperties['keyAlias'] != null) {
+
+    android.signingConfigs.release.keyAlias keystoreProperties['keyAlias']
+    android.signingConfigs.release.keyPassword keystoreProperties['keyPassword']
+    android.signingConfigs.release.storeFile file(keystoreProperties['storeFile'])
+    android.signingConfigs.release.storePassword keystoreProperties['storePassword']
+} else {
+    println 'Signing config not found in key.properties. Signing skipped...'
+    android.buildTypes.release.signingConfig = null
 }
 
 flutter {
