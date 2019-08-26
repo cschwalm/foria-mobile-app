@@ -46,6 +46,10 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
     // The following line will enable the Android and iOS wakelock.
     Wakelock.enable();
 
+    final BarcodeDetectorOptions opts = BarcodeDetectorOptions(
+      barcodeFormats: BarcodeFormat.qrCode
+    );
+
     List<Widget> children = new List<Widget>();
 
     Widget cameraWidget = SizedBox(
@@ -54,10 +58,12 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
           .size
           .width,
       child: CameraMlVision<List<Barcode>>(
-        detector: FirebaseVision.instance
-            .barcodeDetector()
+        detector: FirebaseVision
+            .instance
+            .barcodeDetector(opts)
             .detectInImage,
         onResult: (List<Barcode> barcodes) {
+
           if (!mounted || _imageCaptured || barcodes.isEmpty) {
             return;
           }
@@ -102,29 +108,38 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
   /// A ticket can only be redeemed once. The next attempt will result in DENY.
   ///
   Future<void> _redeemTicket(final Barcode barcode) async {
+
     final String barcodeText = barcode.displayValue;
     debugPrint('Scanned barcode text: $barcodeText');
     _imageCaptured = true;
 
     if (barcodeText == null) {
+      setState(() {
+        _imageCaptured = false;
+        return;
+      });
+    }
+
+    RedemptionRequest request;
+    try {
+      final Map<String, dynamic> jsonMap = jsonDecode(barcodeText);
+      request = RedemptionRequest.fromJson(jsonMap);
+    } catch (ex) {
+      debugPrint('Failed to parse encoded barcode model.');
+      _setErrorState();
       return;
     }
 
-    final Map<String, dynamic> jsonMap = jsonDecode(barcodeText);
-    final RedemptionRequest request = RedemptionRequest.fromJson(jsonMap);
+    if (request == null || request.ticketId == null || request.ticketOtp == null) {
+      _setErrorState();
+      return;
+    }
 
     RedemptionResult redemptionResult;
     try {
       redemptionResult = await _ticketProvider.redeemTicket(request);
     } catch (ex) {
-      setState(() {
-        _scanResult = ScanResult.ERROR;
-        _ticketId = null;
-        _ticketTypeName = null;
-      });
-
-      debugPrint('Failed to process barcode.');
-      _resetTimer = Timer.periodic(_clearDuration, _resetView);
+      _setErrorState();
       return;
     }
 
@@ -158,6 +173,22 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
     });
     debugPrint('Ticket scan data cleared.');
     timer.cancel();
+  }
+
+  ///
+  /// Sets error widget and starts reset timer if invalid data was scanned.
+  ///
+  void _setErrorState() {
+
+    setState(() {
+      _imageCaptured = false;
+      _scanResult = ScanResult.ERROR;
+      _ticketId = null;
+      _ticketTypeName = null;
+    });
+
+    debugPrint('Failed to parse barcode.');
+    _resetTimer = Timer.periodic(_clearDuration, _resetView);
   }
 }
 

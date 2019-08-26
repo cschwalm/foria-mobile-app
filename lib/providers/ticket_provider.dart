@@ -188,7 +188,7 @@ class TicketProvider extends ChangeNotifier {
     }
 
     if (_ticketApi == null) {
-      ApiClient foriaApiClient = await obtainForiaApiClient();
+      ApiClient foriaApiClient = await _authUtils.obtainForiaApiClient();
       _ticketApi = new TicketApi(foriaApiClient);
     }
 
