@@ -6,6 +6,7 @@ import 'package:foria/widgets/primary_button.dart';
 
 class Login extends StatelessWidget {
   static const routeName = '/login';
+  final AuthUtils _authUtils = new AuthUtils();
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +25,7 @@ class Login extends StatelessWidget {
                 text: loginRegister,
                 minSize: 70,
                 onPress: () {
-                  webLogin(context);
+                  _authUtils.webLogin(context);
                 },
               ),
             ],

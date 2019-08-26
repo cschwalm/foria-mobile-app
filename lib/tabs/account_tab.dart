@@ -10,6 +10,9 @@ import '../widgets/contact_support.dart';
 import '../widgets/settings_item.dart';
 
 class AccountTab extends StatelessWidget {
+
+  final AuthUtils _authUtils = new AuthUtils();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -49,7 +52,7 @@ class AccountTab extends StatelessWidget {
                   child: PrimaryButton(
                     text: textLogout,
                     onPress: () {
-                      logout(context);
+                      _authUtils.logout(context);
                     },
                   ),
                 ),

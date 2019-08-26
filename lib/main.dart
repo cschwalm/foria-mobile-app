@@ -7,11 +7,11 @@ import 'package:flutter/services.dart';
 import 'package:foria/screens/splash_screen.dart';
 import 'package:foria/screens/ticket_scan_screen.dart';
 import 'package:foria/screens/venue_screen.dart';
+import 'package:foria/utils/auth_utils.dart';
 
 import 'navigation/CustomNoTransition.dart';
 import 'screens/home.dart';
 import 'screens/login.dart';
-import 'screens/register_and_transfer_screen.dart';
 import 'screens/selected_ticket_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -68,10 +68,6 @@ void main() async {
               return MaterialPageRoute(builder: (context)=> SelectedTicketScreen(), settings: settings);
               break;
 
-            case RegisterAndTransferScreen.routeName:
-              return MaterialPageRoute(builder: (context)=> RegisterAndTransferScreen(), settings: settings);
-              break;
-
             case TicketScanScreen.routeName:
               return MaterialPageRoute(builder: (context)=> TicketScanScreen(), settings: settings);
               break;
@@ -81,7 +77,7 @@ void main() async {
               break;
 
             default:
-              return CustomNoTransition(builder: (context)=> SplashScreen(), settings: settings);
+              return CustomNoTransition(builder: (context)=> SplashScreen(AuthUtils()), settings: settings);
               break;
           }
         }

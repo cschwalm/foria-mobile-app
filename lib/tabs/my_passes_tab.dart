@@ -38,6 +38,7 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
   bool _isUserEmailCheckFinished;
   bool _isTicketsLoaded;
   bool _isUserEmailVerified;
+  final AuthUtils _authUtils = new AuthUtils();
 
   @override
   void initState() {
@@ -58,7 +59,7 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
       case _LoadingState.EMAIL_VERIFY:
 
         if (!_isUserEmailCheckFinished) {
-          isUserEmailVerified().then((isEmailVerified) {
+          _authUtils.isUserEmailVerified().then((isEmailVerified) {
             setState(() {
               _isUserEmailCheckFinished = true;
               _isUserEmailVerified = isEmailVerified;
@@ -195,8 +196,8 @@ class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClient
 
   Future<void> emailVerifyCallback() async {
 
-    await forceTokenRefresh();
-    bool isEmailVerified = await isUserEmailVerified();
+    await _authUtils.forceTokenRefresh();
+    bool isEmailVerified = await _authUtils.isUserEmailVerified();
 
       if (isEmailVerified) {
         setState(() {

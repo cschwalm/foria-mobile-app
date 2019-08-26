@@ -15,6 +15,8 @@ const String textLogout = 'Logout';
 
 const String googleMapsSearchUrl = 'https://www.google.com/maps/search/?api=1&query=';
 
+const String textCancel = 'Cancel';
+
 // Venue related strings. //
 
 const String venueAccount = 'Venue Account';
@@ -83,3 +85,7 @@ const String passOptions = 'Pass Options';
 const String directionsText = 'Directions';
 
 const String barcodeLoading = 'Barcode Loading...';
+
+const String transferConfirm = 'Confirm Transfer';
+
+const String transferWarning = 'Transfers are non-reversible and processed immediately if the transferee has a Foria account. Otherwise, they are processed once the transferee creates an account.';
