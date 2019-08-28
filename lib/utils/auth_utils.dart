@@ -21,7 +21,7 @@ class AuthUtils {
   static final String auth0Audience = "api.foriatickets.com";
 
   /// Domain to send Auth0 requests.
-  static final String auth0Domain = "auth.foriatickets.com";
+  static final String auth0BaseUrl = "https://auth.foriatickets.com";
 
   /// Domain to send Auth0 requests.
   static final String jwtIssuer = "https://auth.foriatickets.com/";
@@ -35,8 +35,7 @@ class AuthUtils {
   /// Key name for the refresh token used in secure storage plugin.
   static final String refreshTokenKey = "OAUTH2_REFRESH_TOKEN";
 
-  static final Auth0 _auth = new Auth0(clientId: auth0ClientKey, domain: auth0Domain);
-  static final WebAuth _web = new WebAuth(clientId: auth0ClientKey, domain: auth0Domain);
+  static final Auth0 _auth = new Auth0(clientId: auth0ClientKey, baseUrl: auth0BaseUrl);
 
   static final _storage = new FlutterSecureStorage();
 
@@ -151,7 +150,7 @@ class AuthUtils {
 
     debugPrint("Logout called. Secrets deleted.");
 
-    _web.clearSession();
+    _auth.webAuth.clearSession();
     Navigator.pushReplacementNamed(context, '/login');
   }
 
@@ -163,11 +162,13 @@ class AuthUtils {
   /// On error, a pop-up will be displayed showing a generic error message.
   ///
   void webLogin(BuildContext context) async {
-    await _web.authorize(
 
-      audience: auth0Audience,
-      scope: 'openid profile email offline_access write:venue_redeem',
-    ).then((authInfo) async {
+    Map<String, dynamic> options = new Map<String, dynamic>();
+    options['audience'] = auth0Audience;
+    options['scope'] = 'openid profile email offline_access write:venue_redeem';
+
+    await _auth.webAuth.authorize(options).then((authInfo) async {
+
       if (authInfo == null || authInfo['access_token'] == null) {
         debugPrint("Account Blocked. Tokens empty.");
         showErrorAlert(context, loginError);
@@ -305,7 +306,7 @@ class AuthUtils {
 
     var auth0Result;
     try {
-      auth0Result = await _auth.refreshToken(refreshToken: refreshToken);
+      auth0Result = await _auth.auth.refreshToken(refreshToken);
       debugPrint("Refresh Response received: $auth0Result");
     } catch (ex) {
       print("ERROR: Refresh failed on Auth0 side.");

@@ -49,7 +49,7 @@ packages:
       name: built_value
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.7.0"
+    version: "6.7.1"
   cached_network_image:
     dependency: "direct main"
     description:
@@ -126,14 +126,14 @@ packages:
       name: firebase_analytics
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.0.0"
+    version: "5.0.1"
   firebase_core:
     dependency: "direct main"
     description:
       name: firebase_core
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.0+3"
+    version: "0.4.0+9"
   firebase_ml_vision:
     dependency: transitive
     description:
@@ -156,12 +156,10 @@ packages:
   flutter_auth0:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: fcd3650597e699fb3ba2b0e9eb19855806358d20
-      url: "https://github.com/devdennysegura/flutter-auth0"
-    source: git
-    version: "0.2.1"
+      name: flutter_auth0
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.5.0"
   flutter_cache_manager:
     dependency: transitive
     description:
@@ -336,7 +334,7 @@ packages:
       name: sembast
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.1+2"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -355,7 +353,7 @@ packages:
       name: sqflite
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.6+3"
+    version: "1.1.6+4"
   stack_trace:
     dependency: transitive
     description:
