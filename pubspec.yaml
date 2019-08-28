@@ -26,6 +26,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   firebase_core: ^0.4.0+3
   firebase_analytics: ^5.0.0
+  flutter_auth0: ^0.5.0
   flutter_camera_ml_vision: ^2.2.1
   flutter_secure_storage: 3.2.1
   font_awesome_flutter: ^8.0.1
@@ -47,9 +48,6 @@ dependencies:
   path_provider: ^1.1.0
   sembast: ^2.0.1
 
-  flutter_auth0:
-    git:
-      url: https://github.com/devdennysegura/flutter-auth0
   foria_flutter_client:
     git:
       url: ssh://git@bitbucket.org/foriatickets/foria-flutter-client.git
