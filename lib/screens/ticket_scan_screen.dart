@@ -23,13 +23,14 @@ class TicketScanScreen extends StatefulWidget {
 class _TicketScanScreenState extends State<TicketScanScreen> {
   final TicketProvider _ticketProvider = new TicketProvider();
   final Duration _clearDuration = Duration(seconds: 6);
+  final Duration _snackBarDuration = Duration(seconds: 10);
 
   bool _imageCaptured = false;
   String _ticketTypeName;
   ScanResult _scanResult;
   Timer _resetTimer;
 
-  BuildContext scaffoldContext;
+  BuildContext _scaffoldContext;
 
   @override
   void dispose() {
@@ -54,7 +55,7 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
     );
 
     if (_scanResult != null) {
-      Scaffold.of(scaffoldContext).removeCurrentSnackBar();
+      Scaffold.of(_scaffoldContext).removeCurrentSnackBar();
       if (_scanResult == ScanResult.ALLOW){
         isBarcodeValid = true;
         snackBarContent = Text(_ticketTypeName);
@@ -78,7 +79,7 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
       ),
       body: Builder(
         builder: (BuildContext context) {
-          scaffoldContext = context;
+          _scaffoldContext = context;
           return SafeArea(
               child: Column(
                 children: <Widget>[
@@ -129,8 +130,8 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
   /// allows the new scan result to pop up immediately.
   ///
   void _showSnackBar(bool isValid, Widget content) {
-    Scaffold.of(scaffoldContext).showSnackBar(SnackBar(
-      duration: Duration(seconds: 10),
+    Scaffold.of(_scaffoldContext).showSnackBar(SnackBar(
+      duration: _snackBarDuration,
       behavior: SnackBarBehavior.fixed,
       backgroundColor: Colors.transparent,
       elevation: 0,
