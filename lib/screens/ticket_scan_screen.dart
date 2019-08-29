@@ -165,11 +165,13 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
     } catch (ex) {
       debugPrint('Failed to parse encoded barcode model.');
       _setErrorState();
+      _resetTimer = Timer.periodic(_clearDuration, _resetView);
       return;
     }
 
     if (request == null || request.ticketId == null || request.ticketOtp == null) {
       _setErrorState();
+      _resetTimer = Timer.periodic(_clearDuration, _resetView);
       return;
     }
 
@@ -178,6 +180,7 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
       redemptionResult = await _ticketProvider.redeemTicket(request);
     } catch (ex) {
       _setErrorState();
+      _resetTimer = Timer.periodic(_clearDuration, _resetView);
       return;
     }
 
@@ -216,7 +219,6 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
       _scanResult = ScanResult.ERROR;
     });
     debugPrint('Failed to parse barcode.');
-    _resetTimer = Timer.periodic(_clearDuration, _resetView);
   }
 }
 
