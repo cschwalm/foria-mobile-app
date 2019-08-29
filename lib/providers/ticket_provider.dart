@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/database_utils.dart';
 import 'package:foria_flutter_client/api.dart';
@@ -15,8 +16,11 @@ import 'package:foria_flutter_client/api.dart';
 ///
 class TicketProvider extends ChangeNotifier {
 
+  final String _fcmTokenKey = 'FCM_TOKEN';
+
   DatabaseUtils _databaseUtils = new DatabaseUtils();
   AuthUtils _authUtils = new AuthUtils();
+  FlutterSecureStorage _secureStorage = new FlutterSecureStorage();
 
   EventApi _eventApi;
   TicketApi _ticketApi;
@@ -206,6 +210,43 @@ class TicketProvider extends ChangeNotifier {
 
     debugPrint("TicketId: ${redemptionRequest.ticketId} reedeemed with result: ${result.status}");
     return result;
+  }
+
+  ///
+  /// Stores the FCM token in Foria database. This should only be called for new tokens.
+  ///
+  void registerDeviceToken(final String token) async {
+
+    if (token == null) {
+      return;
+    }
+
+    final String savedToken = await _secureStorage.read(key: _fcmTokenKey);
+    if (token == savedToken) {
+      return;
+    }
+
+    if (_userApi == null) {
+      ApiClient foriaApiClient = await _authUtils.obtainForiaApiClient();
+      _userApi = new UserApi(foriaApiClient);
+    }
+
+    DeviceToken deviceToken = new DeviceToken();
+    deviceToken.token = token;
+
+    try {
+      await _userApi.registerToken(deviceToken);
+    } on ApiException catch (ex) {
+      debugPrint("### FORIA SERVER ERROR: registerToken ###");
+      debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      return;
+    } catch (e) {
+      debugPrint("### NETWORK ERROR: registerToken Msg: ${e.toString()} ###");
+      return;
+    }
+
+    await _secureStorage.write(key: _fcmTokenKey, value: token);
+    debugPrint("FCM token sucessfully registered on server: $token");
   }
 
   ///
