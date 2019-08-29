@@ -89,3 +89,13 @@ const String barcodeLoading = 'Barcode Loading...';
 const String transferConfirm = 'Confirm Transfer';
 
 const String transferWarning = 'Transfers are non-reversible and processed immediately if the transferee has a Foria account. Otherwise, they are processed once the transferee creates an account.';
+
+// ticket_scan_screen Strings. //
+
+const String passInvalid = 'Invalid Pass';
+
+const String passInvalidInfo = 'Pass already redeemed or transferred';
+
+const String barcodeInvalid = 'Invalid Barcode';
+
+const String barcodeInvalidInfo = 'Not a foria pass';
