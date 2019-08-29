@@ -213,7 +213,7 @@ SPEC CHECKSUMS:
   device_info: 3ebad48f726348f69abd802f3334a8d1ed795fbd
   Firebase: 291d7b0a7b393f252358083b5d224884126fa46d
   firebase_analytics: 7c660d7721c20a83c13b33361111c5dba94b1853
-  firebase_core: ae55ea92448ec8675d325da4db22cf3b4d58a54d
+  firebase_core: ce5006bb48508ee4e71e0f429a3f519bb8ee2961
   firebase_ml_vision: af45e6730db9be6b6fa2a50292899f65ecfa8777
   FirebaseAnalytics: 843c7f64a8f9c79f0d03281197ebe7bb1d58d477
   FirebaseCore: 32b48f41c84a56fbde73b35ed01a830b3b6dc048

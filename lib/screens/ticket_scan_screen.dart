@@ -22,13 +22,14 @@ class TicketScanScreen extends StatefulWidget {
 
 class _TicketScanScreenState extends State<TicketScanScreen> {
   final TicketProvider _ticketProvider = new TicketProvider();
-  final Duration _clearDuration = Duration(seconds: 3);
+  final Duration _clearDuration = Duration(seconds: 6);
 
   bool _imageCaptured = false;
-  String _ticketId;
   String _ticketTypeName;
   ScanResult _scanResult;
   Timer _resetTimer;
+
+  BuildContext scaffoldContext;
 
   @override
   void dispose() {
@@ -42,6 +43,8 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isBarcodeValid;
+    Widget snackBarContent;
 
     // The following line will enable the Android and iOS wakelock.
     Wakelock.enable();
@@ -50,55 +53,89 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
       barcodeFormats: BarcodeFormat.qrCode
     );
 
-    List<Widget> children = new List<Widget>();
-
-    Widget cameraWidget = SizedBox(
-      width: MediaQuery
-          .of(context)
-          .size
-          .width,
-      child: CameraMlVision<List<Barcode>>(
-        detector: FirebaseVision
-            .instance
-            .barcodeDetector(opts)
-            .detectInImage,
-        onResult: (List<Barcode> barcodes) {
-
-          if (!mounted || _imageCaptured || barcodes.isEmpty) {
-            return;
-          }
-
-          _redeemTicket(barcodes.first);
-        },
-      ),
-    );
-    children.add(cameraWidget);
-
     if (_scanResult != null) {
-      Widget resultWidget =
-      TickScanResultWidget(
-          _ticketId,
-          _ticketTypeName,
-          _scanResult
-      );
-      children.add(resultWidget);
+      Scaffold.of(scaffoldContext).removeCurrentSnackBar();
+      if (_scanResult == ScanResult.ALLOW){
+        isBarcodeValid = true;
+        snackBarContent = Text(_ticketTypeName);
+      } else if (_scanResult == ScanResult.DENY){
+        isBarcodeValid = false;
+        snackBarContent = _snackBarContent(passInvalid, passInvalidInfo);
+      } else {
+        isBarcodeValid = false;
+        snackBarContent = _snackBarContent(barcodeInvalid, barcodeInvalidInfo);
+      }
+      _showSnackBar(isBarcodeValid,snackBarContent);
     }
 
     return Scaffold(
-      backgroundColor: Colors.grey,
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: Text(scanToRedeemTitle),
         backgroundColor: Theme
             .of(context)
             .primaryColorDark,
       ),
-      body: SafeArea(
-
-          child: Column(
-              children: children
-          )
+      body: Builder(
+        builder: (BuildContext context) {
+          scaffoldContext = context;
+          return SafeArea(
+              child: Column(
+                children: <Widget>[
+                  Expanded(
+                      child: CameraMlVision<List<Barcode>>(
+                        detector: FirebaseVision
+                            .instance
+                            .barcodeDetector(opts)
+                            .detectInImage,
+                        onResult: (List<Barcode> barcodes) {
+                          if (!mounted || _imageCaptured || barcodes.isEmpty) {
+                            return;
+                          }
+                          _redeemTicket(barcodes.first);
+                        },
+                      ),
+                  ),
+                ],
+              ),
+          );
+        },
       ),
     );
+  }
+
+  Widget _snackBarContent(String title, String subtitle) {
+    return Column(
+      children: <Widget>[
+        Text(title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        SizedBox(height: 3,),
+        Text(subtitle)
+      ],
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+    );
+  }
+
+  ///
+  /// Prompts a snackbar to pop up upon a scan. It will show for 10 seconds or until
+  /// removeCurrentSnackBar() is called.
+  ///
+  /// Upon a scan, removeCurrentSnackBar() should be called before _showSnackBar(). This
+  /// allows the new scan result to pop up immediately.
+  ///
+  void _showSnackBar(bool isValid, Widget content) {
+    Scaffold.of(scaffoldContext).showSnackBar(SnackBar(
+      duration: Duration(seconds: 10),
+      behavior: SnackBarBehavior.fixed,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      content: ScannerSnackBar(isValid: isValid, content: content),
+    ));
   }
 
   ///
@@ -127,11 +164,13 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
     } catch (ex) {
       debugPrint('Failed to parse encoded barcode model.');
       _setErrorState();
+      _resetTimer = Timer.periodic(_clearDuration, _resetView);
       return;
     }
 
     if (request == null || request.ticketId == null || request.ticketOtp == null) {
       _setErrorState();
+      _resetTimer = Timer.periodic(_clearDuration, _resetView);
       return;
     }
 
@@ -140,18 +179,15 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
       redemptionResult = await _ticketProvider.redeemTicket(request);
     } catch (ex) {
       _setErrorState();
+      _resetTimer = Timer.periodic(_clearDuration, _resetView);
       return;
     }
 
     setState(() {
-
+      _ticketTypeName = redemptionResult.ticket.ticketTypeConfig.name;
       if (redemptionResult.status == 'ALLOW') {
-        _ticketId = redemptionResult.ticket.id;
-        _ticketTypeName = redemptionResult.ticket.ticketTypeConfig.name;
         _scanResult = ScanResult.ALLOW;
       } else {
-        _ticketId = redemptionResult.ticket.id;
-        _ticketTypeName = redemptionResult.ticket.ticketTypeConfig.name;
         _scanResult = ScanResult.DENY;
       }
     });
@@ -168,7 +204,6 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
     setState(() {
       _imageCaptured = false;
       _scanResult = null;
-      _ticketId = null;
       _ticketTypeName = null;
     });
     debugPrint('Ticket scan data cleared.');
@@ -179,83 +214,49 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
   /// Sets error widget and starts reset timer if invalid data was scanned.
   ///
   void _setErrorState() {
-
     setState(() {
-      _imageCaptured = false;
       _scanResult = ScanResult.ERROR;
-      _ticketId = null;
-      _ticketTypeName = null;
     });
-
     debugPrint('Failed to parse barcode.');
-    _resetTimer = Timer.periodic(_clearDuration, _resetView);
   }
 }
 
 enum ScanResult { ALLOW, DENY, ERROR }
 
 ///
-/// Displays scan results from server.
+/// The snack bar pop up action is managed by _showSnackBar(). This provides the
+/// content for the popup.
 ///
-class TickScanResultWidget extends StatelessWidget {
+class ScannerSnackBar extends StatelessWidget {
 
-  final String ticketId;
-  final String ticketTypeName;
-  final ScanResult scanResult;
+  final bool isValid;
+  final Widget content;
 
-  TickScanResultWidget(this.ticketId, this.ticketTypeName, this.scanResult);
+  ScannerSnackBar({
+    @required this.isValid,
+    @required this.content
+  });
 
   @override
   Widget build(BuildContext context) {
-
-    List<TableRow> rows = new List<TableRow>();
-
-    TableRow ticketTypeNameRow, scanResultRow;
-    if (scanResult != ScanResult.ERROR) {
-
-      ticketTypeNameRow = new TableRow(
-          children: [
-            Text('Ticket Type:'),
-            Text(ticketTypeName)
-          ]
-      );
-
-      scanResultRow = new TableRow(
-          children: [
-            Text('Status'),
-            Text(scanResult.toString())
-          ]
-      );
-
-      rows.add(ticketTypeNameRow);
-      rows.add(scanResultRow);
-    } else {
-
-      TableRow errorRow = new TableRow(
-        children: [
-          Text('Error Reading Ticket - Scan Again'),
-        ]
-      );
-      rows.add(errorRow);
-    }
-
-    return Padding(
-      padding: EdgeInsets.fromLTRB(5.0, 20.0, 5.0, 20.0),
-        child: Container(
-          decoration: BoxDecoration(
-            border: new Border.all(color: Colors.black),
-            color: scanResult == ScanResult.ALLOW ? Colors.green : Colors.red,
+    return Container(
+      color: isValid ? Colors.green : Colors.red,
+      width: double.infinity,
+      height: 100,
+      child: Row(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Icon(
+              isValid ? Icons.check : Icons.close,
+              size: 40,
+            ),
           ),
-          child: DefaultTextStyle(
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold
-            ),
-            child: Table(
-              children: rows,
-            ),
+          Expanded(
+            child: content,
           )
-      )
+        ],
+      ),
     );
   }
 }
