@@ -367,7 +367,7 @@ class _DeviceConflictState extends State<DeviceConflict> {
           ),
           PrimaryButton(
             text: relocateTickets,
-            onPress: () => _deviceCheckCallback(context),
+            onPress: _isTicketReactivationPending ? null : () => _deviceCheckCallback(context),
             isLoading: _isTicketReactivationPending,
           ),
         ],
@@ -430,9 +430,9 @@ class _EmailVerificationConflictState extends State<EmailVerificationConflict> {
           ),
           PrimaryButton(
             text: iveConfirmedEmail,
-            isActive: true,
             isLoading: _isCheckingVerification,
-            onPress: () async {
+            onPress: _isCheckingVerification ? null :
+                () async {
               setState(() {
                 _isCheckingVerification = true;
               });
