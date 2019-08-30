@@ -61,8 +61,6 @@ target 'Runner' do
   }
 
   # Manual Firebase Pods
-
-  pod 'Firebase/Analytics'
   pod 'Firebase/MLVisionBarcodeModel'
 
 end
