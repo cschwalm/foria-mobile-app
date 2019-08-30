@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -10,10 +11,68 @@ import '../tabs/my_passes_tab.dart';
 class Home extends StatelessWidget {
 
   static const routeName = '/home';
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  final TicketProvider _ticketProvider = new TicketProvider();
 
   @override
   Widget build(BuildContext context) {
+
+    _setupCloudMessaging(context);
     return new Tabs();
+  }
+
+  ///
+  /// Prompts for permission once per app install.
+  /// Shows snackbar if push is received while the app is opened.
+  /// Obtains token and uploads it to server.
+  ///
+  void _setupCloudMessaging(BuildContext context) {
+
+    _firebaseMessaging.requestNotificationPermissions();
+
+    _firebaseMessaging.onTokenRefresh.listen((token) => _ticketProvider.registerDeviceToken(token));
+
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+
+        String title, body;
+        if (message['notification'] != null) {
+
+          title = message['notification']['title'];
+          body = message['notification']['body'];
+
+        } else if (message['aps'] != null) {
+
+          title = message['aps']['alert']['title'];
+          body = message['aps']['alert']['body'];
+
+        } else {
+          debugPrint('ERROR: Failed to parse notification');
+          return;
+        }
+
+        print("Received push notification: $message");
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(title),
+            content: Text(body),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Ok'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+        );
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        //Do nothing.
+      },
+      onResume: (Map<String, dynamic> message) async {
+        //Do nothing.
+      },
+    );
   }
 }
 
