@@ -3,8 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foria/providers/selected_ticket_provider.dart';
-import 'package:foria/screens/selected_ticket_screen.dart';
-import 'package:foria/widgets/primary_button.dart';
+import 'package:foria/screens/selected_event_screen.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:mockito/mockito.dart';
 
@@ -21,13 +20,13 @@ void main() {
     when(selectedTicketProviderMock.event).thenReturn(_generateFakeEvents()[0]);
   });
 
-  testWidgets('selectedTicketScreen containes proper event name', (WidgetTester tester) async {
+  testWidgets('selectedEventScreen containes proper event name', (WidgetTester tester) async {
 
     final List<Event> events = _generateFakeEvents();
     final List<Ticket> tickets = _generateFakeTickets();
 
     await tester.pumpWidget(MaterialApp(
-        home: SelectedTicketScreen(selectedTicketProviderMock)
+        home: SelectedEventScreen(selectedTicketProviderMock)
     ));
     await tester.pumpAndSettle();
 
@@ -38,7 +37,6 @@ void main() {
     expect(find.byType(PassBody), findsOneWidget);
     expect(find.text(nameOfFirstEventCardExpected), findsNWidgets(2)); //Currently set to 2 because partial of the next card is on screen.
     expect(find.text(typeOfPassExpected), findsOneWidget);
-    expect(find.byType(PrimaryButton), findsNWidgets(2));
     expect(find.text(venueAddrName), findsNWidgets(2));
   });
 }

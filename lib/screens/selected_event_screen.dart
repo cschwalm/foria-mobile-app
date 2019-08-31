@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:foria/main.dart';
 import 'package:foria/providers/selected_ticket_provider.dart';
 import 'package:foria/utils/static_images.dart';
 import 'package:foria/utils/strings.dart';
@@ -14,12 +13,12 @@ import 'package:url_launcher/url_launcher.dart';
 /// Screen displays rotating barcodes for user to scan.
 /// Barcodes cannot be generated unless tickets are active and their secrets are stored.
 ///
-class SelectedTicketScreen extends StatelessWidget {
+class SelectedEventScreen extends StatelessWidget {
 
   static const routeName = '/selected-ticket';
   final SelectedTicketProvider _selectedTicketProvider;
 
-  SelectedTicketScreen([this._selectedTicketProvider]);
+  SelectedEventScreen([this._selectedTicketProvider]);
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +27,7 @@ class SelectedTicketScreen extends StatelessWidget {
     _selectedTicketProvider : ModalRoute.of(context).settings.arguments as SelectedTicketProvider;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(foriaPass),
-        backgroundColor: Theme.of(context).primaryColorDark,
-      ),
-      backgroundColor: settingsBackgroundColor,
+      backgroundColor: Colors.black,
       body: ChangeNotifierProvider.value(
         value: selectedTicketProvider,
         child: PassBody(),
@@ -46,18 +41,43 @@ class PassBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    final double viewportFraction = 0.9;
+    final double width = MediaQuery.of(context).size.width;
+    final double closeButtonPadding = (1-viewportFraction) * width / 2;
+    final double verticalPadding = 7;
+
     final SelectedTicketProvider selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: false);
     final int passCount = selectedTicketProvider.eventTickets.length;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: PageView.builder(
-        // store this controller in a State to save the carousel scroll position
-        controller: PageController(viewportFraction: .9),
-        itemCount: passCount,
-        itemBuilder: (BuildContext context, int itemIndex) {
-          return PassCard(itemIndex, passCount);
-        },
+    return SafeArea(
+      child: Column(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: closeButtonPadding, vertical: verticalPadding),
+            child: Row(
+              children: <Widget>[
+                GestureDetector(
+                  child: Icon(
+                    Icons.close,
+                    color: Colors.white,
+                  ),
+                  onTap: () => Navigator.maybePop(context),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: PageView.builder(
+              // store this controller in a State to save the carousel scroll position
+              controller: PageController(viewportFraction: viewportFraction),
+              itemCount: passCount,
+              itemBuilder: (BuildContext context, int itemIndex) {
+                return PassCard(itemIndex, passCount);
+              },
+            ),
+          ),
+          SizedBox(height: verticalPadding,)
+        ],
       ),
     );
   }
@@ -82,43 +102,47 @@ class PassCard extends StatelessWidget {
     final Ticket ticket = selectedTicketProvider.eventTickets.elementAt(_index);
     final String barcodeText = selectedTicketProvider.getBarcodeText(ticket.id);
 
-    return SafeArea(
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: <Widget>[
-              EventInfo(),
-              SizedBox(height: 5),
-              Directions(),
-              Expanded(child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    'Pass $passNumber of $_passCount',
-                    style: Theme.of(context).textTheme.title,
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    ticket.ticketTypeConfig.name,
-                    style: Theme.of(context).textTheme.title,
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  barcodeText == null ? Text(barcodeLoading) :
-                  QrImage(
-                    data: barcodeText,
-                    size: 220,
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  PassRefresh(selectedTicketProvider.secondsRemaining),
-                ],
-              )),
-            ],
-          ),
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: <Widget>[
+            EventInfo(),
+            SizedBox(height: 5),
+            Directions(),
+            Expanded(child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  'Pass $passNumber of $_passCount',
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .title,
+                ),
+                SizedBox(height: 5),
+                Text(
+                  ticket.ticketTypeConfig.name,
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .title,
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                barcodeText == null ? Text(barcodeLoading) :
+                QrImage(
+                  data: barcodeText,
+                  size: 220,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                PassRefresh(selectedTicketProvider.secondsRemaining),
+              ],
+            )),
+          ],
         ),
       ),
     );

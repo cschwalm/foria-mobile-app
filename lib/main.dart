@@ -8,13 +8,12 @@ import 'package:foria/screens/splash_screen.dart';
 import 'package:foria/screens/ticket_scan_screen.dart';
 import 'package:foria/screens/venue_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
-import 'package:foria/utils/strings.dart' as prefix0;
 import 'package:foria/utils/strings.dart';
 
 import 'navigation/CustomNoTransition.dart';
 import 'screens/home.dart';
 import 'screens/login.dart';
-import 'screens/selected_ticket_screen.dart';
+import 'screens/selected_event_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final FirebaseAnalytics analytics = FirebaseAnalytics();
@@ -66,8 +65,8 @@ void main() async {
               return CustomNoTransition(builder: (context)=> Login(), settings: settings);
               break;
 
-            case SelectedTicketScreen.routeName:
-              return MaterialPageRoute(builder: (context)=> SelectedTicketScreen(), settings: settings);
+            case SelectedEventScreen.routeName:
+              return MaterialPageRoute(builder: (context)=> SelectedEventScreen(), settings: settings);
               break;
 
             case TicketScanScreen.routeName:
