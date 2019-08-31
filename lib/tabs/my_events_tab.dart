@@ -9,17 +9,17 @@ import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria/widgets/primary_button.dart';
 import 'package:provider/provider.dart';
 
-import '../screens/selected_ticket_screen.dart';
+import '../screens/selected_event_screen.dart';
 
-class MyPassesTab extends StatefulWidget {
+class MyEventsTab extends StatefulWidget {
 
   final AuthUtils _authUtils;
   final TicketProvider _ticketProvider;
 
-  MyPassesTab(this._authUtils, this._ticketProvider);
+  MyEventsTab(this._authUtils, this._ticketProvider);
 
   @override
-  _MyPassesTabState createState() => _MyPassesTabState();
+  _MyEventsTabState createState() => _MyEventsTabState();
 }
 
 enum _LoadingState {
@@ -37,7 +37,7 @@ enum _LoadingState {
 /// Step 3: Check if tickets are active on this device. If not stop and show error.
 /// Step 4: Display tickets results.
 ///
-class _MyPassesTabState extends State<MyPassesTab> with AutomaticKeepAliveClientMixin<MyPassesTab> {
+class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClientMixin<MyEventsTab> {
 
   AuthUtils _authUtils;
   _LoadingState _currentState;
@@ -254,7 +254,7 @@ class EventCard extends StatelessWidget {
               key: Key(_eventData.eventList[index].id),
               onTap: () {
                 Navigator.of(context).pushNamed(
-                  SelectedTicketScreen.routeName,
+                  SelectedEventScreen.routeName,
                   arguments: SelectedTicketProvider(
                       _eventData.eventList[index],
                       _eventData.getTicketsForEventId(_eventData.eventList[index].id)

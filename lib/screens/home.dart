@@ -6,7 +6,7 @@ import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/auth_utils.dart';
 
 import '../tabs/account_tab.dart';
-import '../tabs/my_passes_tab.dart';
+import '../tabs/my_events_tab.dart';
 
 class Home extends StatelessWidget {
 
@@ -118,7 +118,7 @@ class Tabs extends StatefulWidget {
 class TabsState extends State<Tabs> {
 
   PageController _tabController;
-  MyPassesTab _myPassesTab;
+  MyEventsTab _myPassesTab;
   AccountTab _accountTab;
 
   String _titleApp;
@@ -127,7 +127,7 @@ class TabsState extends State<Tabs> {
   @override
   void initState() {
     _tabController = new PageController();
-    _myPassesTab = new MyPassesTab(AuthUtils(), TicketProvider());
+    _myPassesTab = new MyEventsTab(AuthUtils(), TicketProvider());
     _accountTab = new AccountTab();
 
     this._titleApp = TabItems[0].title;
@@ -239,7 +239,7 @@ class TabItem {
 
 const List<TabItem> TabItems = const <TabItem>[
   const TabItem(
-    title: 'My Passes',
+    title: 'My Events',
     icon: IconData(
       0xe900,
       fontFamily: 'ticket',

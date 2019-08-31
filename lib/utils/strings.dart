@@ -1,5 +1,12 @@
 import 'package:intl/intl.dart';
 
+// Theme formatting. //
+
+final int primaryColor = 0xFFFF0266;
+
+final int primaryColorDark = 0xFFC5003C;
+
+final int textGrey = 0xFF7E7E7E;
 
 // Date string formatting. //
 

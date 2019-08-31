@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foria/providers/ticket_provider.dart';
-import 'package:foria/tabs/my_passes_tab.dart';
+import 'package:foria/tabs/my_events_tab.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:mockito/mockito.dart';
@@ -31,7 +31,7 @@ void main() {
   testWidgets('myPassesTab contains event cards', (WidgetTester tester) async {
 
     await tester.pumpWidget(MaterialApp(
-      home: MyPassesTab(authUtils, ticketProviderMock),
+      home: MyEventsTab(authUtils, ticketProviderMock),
     ));
 
     await tester.pumpAndSettle();
@@ -48,7 +48,7 @@ void main() {
     when(ticketProviderMock.eventList).thenReturn(UnmodifiableListView(new List()));
 
     await tester.pumpWidget(MaterialApp(
-      home: MyPassesTab(authUtils, ticketProviderMock),
+      home: MyEventsTab(authUtils, ticketProviderMock),
     ));
 
     await tester.pumpAndSettle();
@@ -62,7 +62,7 @@ void main() {
     when(ticketProviderMock.eventList).thenReturn(UnmodifiableListView(new List()));
 
     await tester.pumpWidget(MaterialApp(
-      home: MyPassesTab(authUtils, ticketProviderMock),
+      home: MyEventsTab(authUtils, ticketProviderMock),
     ));
 
     await tester.pumpAndSettle();
