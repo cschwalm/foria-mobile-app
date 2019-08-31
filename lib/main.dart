@@ -8,6 +8,8 @@ import 'package:foria/screens/splash_screen.dart';
 import 'package:foria/screens/ticket_scan_screen.dart';
 import 'package:foria/screens/venue_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
+import 'package:foria/utils/strings.dart' as prefix0;
+import 'package:foria/utils/strings.dart';
 
 import 'navigation/CustomNoTransition.dart';
 import 'screens/home.dart';
@@ -35,16 +37,16 @@ void main() async {
         theme: new ThemeData(
             backgroundColor: Colors.white,
             appBarTheme: AppBarTheme(
-              color: Color(0xFFC5003C),
+              color: Color(primaryColorDark),
             ),
-            primaryColor: Color(0xFFFF0266),
-            primaryColorDark: Color(0xFFC5003C),
+            primaryColor: Color(primaryColor),
+            primaryColorDark: Color(primaryColorDark),
             fontFamily: 'Rubik',
             textTheme: TextTheme(
               title: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
               button: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white),
-              body1: TextStyle(fontSize: 18.0, color: Color(0xFF7E7E7E)),
-              body2: TextStyle(fontSize: 14.0, color: Color(0xFF7E7E7E)),
+              body1: TextStyle(fontSize: 18.0, color: Color(textGrey)),
+              body2: TextStyle(fontSize: 14.0, color: Color(textGrey)),
               display1: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.black),
               headline: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.black,fontFamily: 'Rubik',),
             ),
