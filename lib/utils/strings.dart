@@ -99,6 +99,8 @@ const String transferWarning = 'Transfers are non-reversible and processed immed
 
 // ticket_scan_screen Strings. //
 
+const String passValid = 'Valid Pass';
+
 const String passInvalid = 'Invalid Pass';
 
 const String passInvalidInfo = 'Pass already redeemed or transferred';

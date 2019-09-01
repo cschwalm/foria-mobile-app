@@ -9,6 +9,56 @@ import 'package:foria/utils/strings.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:wakelock/wakelock.dart';
 
+class Scanner extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+
+    final BarcodeDetectorOptions opts = BarcodeDetectorOptions(
+        barcodeFormats: BarcodeFormat.qrCode
+    );
+
+    BuildContext _scaffoldContext;
+
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: Text(scanToRedeemTitle),
+        backgroundColor: Theme
+            .of(context)
+            .primaryColorDark,
+      ),
+      body: Builder(
+        builder: (BuildContext context) {
+          _scaffoldContext = context;
+          return SafeArea(
+            child: Column(
+              children: <Widget>[
+                Expanded(
+                  child: CameraMlVision<List<Barcode>>(
+                    detector: FirebaseVision
+                        .instance
+                        .barcodeDetector(opts)
+                        .detectInImage,
+                    onResult: (List<Barcode> barcodes) {
+                      if (!mounted || _imageCaptured || barcodes.isEmpty) {
+                        return;
+                      }
+                      _redeemTicket(barcodes.first);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+
+
 ///
 /// Screen is shown in venue flow to redeem user tickets. Scanning is enabled as soon as
 /// this widget is mounted.
@@ -45,7 +95,8 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
   @override
   Widget build(BuildContext context) {
     bool isBarcodeValid;
-    Widget snackBarContent;
+    String title;
+    String subtitle;
 
     // The following line will enable the Android and iOS wakelock.
     Wakelock.enable();
@@ -58,15 +109,18 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
       Scaffold.of(_scaffoldContext).removeCurrentSnackBar();
       if (_scanResult == ScanResult.ALLOW){
         isBarcodeValid = true;
-        snackBarContent = Text(_ticketTypeName);
+        title = _ticketTypeName;
+        subtitle = passValid;
       } else if (_scanResult == ScanResult.DENY){
         isBarcodeValid = false;
-        snackBarContent = _snackBarContent(passInvalid, passInvalidInfo);
+        title = passInvalid;
+        subtitle = passInvalidInfo;
       } else {
         isBarcodeValid = false;
-        snackBarContent = _snackBarContent(barcodeInvalid, barcodeInvalidInfo);
+        title = barcodeInvalid;
+        subtitle = barcodeInvalidInfo;
       }
-      _showSnackBar(isBarcodeValid,snackBarContent);
+      _showSnackBar(isBarcodeValid,title,subtitle);
     }
 
     return Scaffold(
@@ -105,23 +159,6 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
     );
   }
 
-  Widget _snackBarContent(String title, String subtitle) {
-    return Column(
-      children: <Widget>[
-        Text(title,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        SizedBox(height: 3,),
-        Text(subtitle)
-      ],
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
-    );
-  }
-
   ///
   /// Prompts a snackbar to pop up upon a scan. It will show for 10 seconds or until
   /// removeCurrentSnackBar() is called.
@@ -129,13 +166,13 @@ class _TicketScanScreenState extends State<TicketScanScreen> {
   /// Upon a scan, removeCurrentSnackBar() should be called before _showSnackBar(). This
   /// allows the new scan result to pop up immediately.
   ///
-  void _showSnackBar(bool isValid, Widget content) {
+  void _showSnackBar(bool isValid, String title, String subtitle) {
     Scaffold.of(_scaffoldContext).showSnackBar(SnackBar(
       duration: _snackBarDuration,
       behavior: SnackBarBehavior.fixed,
       backgroundColor: Colors.transparent,
       elevation: 0,
-      content: ScannerSnackBar(isValid: isValid, content: content),
+      content: ScannerSnackBar(isValid: isValid, title: title, subtitle: subtitle),
     ));
   }
 
@@ -231,11 +268,14 @@ enum ScanResult { ALLOW, DENY, ERROR }
 class ScannerSnackBar extends StatelessWidget {
 
   final bool isValid;
-  final Widget content;
+  final String title;
+  final String subtitle;
+
 
   ScannerSnackBar({
     @required this.isValid,
-    @required this.content
+    @required this.title,
+    @required this.subtitle,
   });
 
   @override
@@ -254,7 +294,20 @@ class ScannerSnackBar extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: content,
+            child: Column(
+              children: <Widget>[
+                Text(title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                SizedBox(height: 3,),
+                Text(subtitle)
+              ],
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+            ),
           )
         ],
       ),
