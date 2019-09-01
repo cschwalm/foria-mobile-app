@@ -142,17 +142,22 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
     try {
       await ticketProvider.loadUserDataFromNetwork();
 
-      if (ticketProvider.ticketsActiveOnOtherDevice) {
-        setState(() {
-          debugPrint('Determined tickets are active on other device during refresh.');
-          _currentState = _LoadingState.DEVICE_CHECK;
-        });
-      }
+      setState(() {
+        if (ticketProvider.ticketsActiveOnOtherDevice) {
+            debugPrint('Determined tickets are active on other device during refresh.');
+            _currentState = _LoadingState.DEVICE_CHECK;
+        } else {
+          _currentState = _LoadingState.DONE;
+        }
+      });
 
     } catch (ex) {
       print('getTickets network call failed during manual refresh. Loading from offline database.');
       showErrorAlert(context, ticketLoadingFailure);
       await ticketProvider.loadUserDataFromLocalDatabase();
+      setState(() {
+        _currentState = _LoadingState.DONE;
+      });
     }
   }
 
