@@ -304,9 +304,12 @@ class AuthUtils {
       throw new Exception("Refresh token is null when attempting refresh!");
     }
 
+    final params = {
+      'refreshToken': refreshToken
+    };
     var auth0Result;
     try {
-      auth0Result = await _auth.auth.refreshToken(refreshToken);
+      auth0Result = await _auth.auth.refreshToken(params);
       debugPrint("Refresh Response received: $auth0Result");
     } catch (ex) {
       print("ERROR: Refresh failed on Auth0 side.");
