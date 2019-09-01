@@ -44,7 +44,7 @@ class _SelectedEventScreenState extends State<SelectedEventScreen> {
 
     return Scaffold(
       backgroundColor: Colors.black,
-      body: ChangeNotifierProvider.value(
+      body: ChangeNotifierProvider<SelectedTicketProvider>.value(
         value: _selectedTicketProvider,
         child: PassBody(),
       )

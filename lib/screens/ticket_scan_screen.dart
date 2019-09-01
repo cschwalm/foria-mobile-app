@@ -1,25 +1,16 @@
-import 'dart:async';
-import 'dart:convert';
-
 import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_camera_ml_vision/flutter_camera_ml_vision.dart';
-import 'package:foria/providers/ticket_provider.dart';
+import 'package:foria/providers/scan_processor.dart';
 import 'package:foria/utils/strings.dart';
-import 'package:foria_flutter_client/api.dart';
 import 'package:wakelock/wakelock.dart';
 
-class Scanner extends StatelessWidget {
+class TicketScanScreen extends StatelessWidget {
+
+  static const routeName = '/venue-scan-screen';
+
   @override
   Widget build(BuildContext context) {
-
-    final BarcodeDetectorOptions opts = BarcodeDetectorOptions(
-        barcodeFormats: BarcodeFormat.qrCode
-    );
-
-    BuildContext _scaffoldContext;
-
-
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -30,23 +21,11 @@ class Scanner extends StatelessWidget {
       ),
       body: Builder(
         builder: (BuildContext context) {
-          _scaffoldContext = context;
           return SafeArea(
             child: Column(
               children: <Widget>[
                 Expanded(
-                  child: CameraMlVision<List<Barcode>>(
-                    detector: FirebaseVision
-                        .instance
-                        .barcodeDetector(opts)
-                        .detectInImage,
-                    onResult: (List<Barcode> barcodes) {
-                      if (!mounted || _imageCaptured || barcodes.isEmpty) {
-                        return;
-                      }
-                      _redeemTicket(barcodes.first);
-                    },
-                  ),
+                  child: CameraWidget(context),
                 ),
               ],
             ),
@@ -57,209 +36,72 @@ class Scanner extends StatelessWidget {
   }
 }
 
+class CameraWidget extends StatefulWidget {
 
+  final BuildContext scaffoldContext;
 
-///
-/// Screen is shown in venue flow to redeem user tickets. Scanning is enabled as soon as
-/// this widget is mounted.
-///
-class TicketScanScreen extends StatefulWidget {
-  static const routeName = '/venue-scan-screen';
+  CameraWidget(this.scaffoldContext);
 
   @override
-  _TicketScanScreenState createState() => _TicketScanScreenState();
+  _CameraWidgetState createState() => _CameraWidgetState();
 }
 
-class _TicketScanScreenState extends State<TicketScanScreen> {
-  final TicketProvider _ticketProvider = new TicketProvider();
-  final Duration _clearDuration = Duration(seconds: 6);
+class _CameraWidgetState extends State<CameraWidget> {
+
   final Duration _snackBarDuration = Duration(seconds: 10);
 
-  bool _imageCaptured = false;
-  String _ticketTypeName;
-  ScanResult _scanResult;
-  Timer _resetTimer;
+  ScanProcessor _scanProcessor;
+  BarcodeDetectorOptions _opts;
 
-  BuildContext _scaffoldContext;
+  @override
+  void initState() {
+    _scanProcessor = new ScanProcessor();
+    _opts = BarcodeDetectorOptions(
+        barcodeFormats: BarcodeFormat.qrCode
+    );
+
+    // The following line will enable the Android and iOS wakelock.
+    Wakelock.enable();
+    super.initState();
+  }
 
   @override
   void dispose() {
-    if (_resetTimer != null) {
-      _resetTimer.cancel();
-      _resetTimer = null;
-    }
     Wakelock.disable();
     super.dispose();
+    _scanProcessor.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    bool isBarcodeValid;
-    String title;
-    String subtitle;
-
-    // The following line will enable the Android and iOS wakelock.
-    Wakelock.enable();
-
-    final BarcodeDetectorOptions opts = BarcodeDetectorOptions(
-      barcodeFormats: BarcodeFormat.qrCode
-    );
-
-    if (_scanResult != null) {
-      Scaffold.of(_scaffoldContext).removeCurrentSnackBar();
-      if (_scanResult == ScanResult.ALLOW){
-        isBarcodeValid = true;
-        title = _ticketTypeName;
-        subtitle = passValid;
-      } else if (_scanResult == ScanResult.DENY){
-        isBarcodeValid = false;
-        title = passInvalid;
-        subtitle = passInvalidInfo;
-      } else {
-        isBarcodeValid = false;
-        title = barcodeInvalid;
-        subtitle = barcodeInvalidInfo;
-      }
-      _showSnackBar(isBarcodeValid,title,subtitle);
-    }
-
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        title: Text(scanToRedeemTitle),
-        backgroundColor: Theme
-            .of(context)
-            .primaryColorDark,
-      ),
-      body: Builder(
-        builder: (BuildContext context) {
-          _scaffoldContext = context;
-          return SafeArea(
-              child: Column(
-                children: <Widget>[
-                  Expanded(
-                      child: CameraMlVision<List<Barcode>>(
-                        detector: FirebaseVision
-                            .instance
-                            .barcodeDetector(opts)
-                            .detectInImage,
-                        onResult: (List<Barcode> barcodes) {
-                          if (!mounted || _imageCaptured || barcodes.isEmpty) {
-                            return;
-                          }
-                          _redeemTicket(barcodes.first);
-                        },
-                      ),
-                  ),
-                ],
-              ),
+    return CameraMlVision<List<Barcode>>(
+      detector: FirebaseVision
+          .instance
+          .barcodeDetector(_opts)
+          .detectInImage,
+      onResult: (List<Barcode> barcodes) {
+        if (!mounted) {
+          return;
+        }
+        _scanProcessor.ticketCheck(barcodes).then((result) {
+          if (result == null) {
+            return;
+          }
+          Scaffold.of(widget.scaffoldContext).removeCurrentSnackBar();
+          Scaffold.of(widget.scaffoldContext).showSnackBar(
+              SnackBar(
+                duration: _snackBarDuration,
+                behavior: SnackBarBehavior.fixed,
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                content: ScannerSnackBar(isValid: result.isValid, title: result.title, subtitle: result.subtitle),
+              )
           );
-        },
-      ),
+        });
+      },
     );
-  }
-
-  ///
-  /// Prompts a snackbar to pop up upon a scan. It will show for 10 seconds or until
-  /// removeCurrentSnackBar() is called.
-  ///
-  /// Upon a scan, removeCurrentSnackBar() should be called before _showSnackBar(). This
-  /// allows the new scan result to pop up immediately.
-  ///
-  void _showSnackBar(bool isValid, String title, String subtitle) {
-    Scaffold.of(_scaffoldContext).showSnackBar(SnackBar(
-      duration: _snackBarDuration,
-      behavior: SnackBarBehavior.fixed,
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      content: ScannerSnackBar(isValid: isValid, title: title, subtitle: subtitle),
-    ));
-  }
-
-  ///
-  /// Attempts to redeem the user ticket and resets for scanning.
-  /// The three UI flows that can happen are ticket ALLOW, DENY, or ERROR.
-  ///
-  /// A ticket can only be redeemed once. The next attempt will result in DENY.
-  ///
-  Future<void> _redeemTicket(final Barcode barcode) async {
-
-    final String barcodeText = barcode.displayValue;
-    debugPrint('Scanned barcode text: $barcodeText');
-    _imageCaptured = true;
-
-    if (barcodeText == null) {
-      setState(() {
-        _imageCaptured = false;
-        return;
-      });
-    }
-
-    RedemptionRequest request;
-    try {
-      final Map<String, dynamic> jsonMap = jsonDecode(barcodeText);
-      request = RedemptionRequest.fromJson(jsonMap);
-    } catch (ex) {
-      debugPrint('Failed to parse encoded barcode model.');
-      _setErrorState();
-      _resetTimer = Timer.periodic(_clearDuration, _resetView);
-      return;
-    }
-
-    if (request == null || request.ticketId == null || request.ticketOtp == null) {
-      _setErrorState();
-      _resetTimer = Timer.periodic(_clearDuration, _resetView);
-      return;
-    }
-
-    RedemptionResult redemptionResult;
-    try {
-      redemptionResult = await _ticketProvider.redeemTicket(request);
-    } catch (ex) {
-      _setErrorState();
-      _resetTimer = Timer.periodic(_clearDuration, _resetView);
-      return;
-    }
-
-    setState(() {
-      _ticketTypeName = redemptionResult.ticket.ticketTypeConfig.name;
-      if (redemptionResult.status == 'ALLOW') {
-        _scanResult = ScanResult.ALLOW;
-      } else {
-        _scanResult = ScanResult.DENY;
-      }
-    });
-
-    debugPrint('Barcode processed.');
-    _resetTimer = Timer.periodic(_clearDuration, _resetView);
-  }
-
-  ///
-  /// Clears ticket ticket after set amount of time.
-  ///
-  void _resetView(Timer timer) async {
-
-    setState(() {
-      _imageCaptured = false;
-      _scanResult = null;
-      _ticketTypeName = null;
-    });
-    debugPrint('Ticket scan data cleared.');
-    timer.cancel();
-  }
-
-  ///
-  /// Sets error widget and starts reset timer if invalid data was scanned.
-  ///
-  void _setErrorState() {
-    setState(() {
-      _scanResult = ScanResult.ERROR;
-    });
-    debugPrint('Failed to parse barcode.');
   }
 }
-
-enum ScanResult { ALLOW, DENY, ERROR }
 
 ///
 /// The snack bar pop up action is managed by _showSnackBar(). This provides the
