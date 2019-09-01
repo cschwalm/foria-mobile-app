@@ -31,6 +31,7 @@ dependencies:
   flutter_camera_ml_vision: ^2.2.1
   flutter_secure_storage: 3.2.1
   font_awesome_flutter: ^8.0.1
+  intl: ^0.16.0
   jose: ^0.1.2
   qr_flutter: ^2.1.0+55
   otp: 1.0.3
@@ -38,9 +39,6 @@ dependencies:
   flutter_email_sender: ^2.0.3
   url_launcher: ^5.1.2
   wakelock: ^0.1.2+8
-
-  # used for date management
-  intl: ^0.15.8
 
   #Used for local file storage
   encrypt: '>=3.1.0'

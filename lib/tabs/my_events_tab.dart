@@ -256,23 +256,28 @@ class EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _eventData = Provider.of<TicketProvider>(context, listen: true);
+    final eventData = Provider.of<TicketProvider>(context, listen: true);
+    final Duration timezoneOffset = DateTime.now().timeZoneOffset;
+    final Duration timeDiff = new Duration(hours: timezoneOffset.inHours, minutes: timezoneOffset.inMinutes % 60);
 
     return RefreshIndicator(
         onRefresh: _refreshFunction,
         child: ListView.builder(
-            itemCount: _eventData.eventList.length,
+            itemCount: eventData.eventList.length,
             itemBuilder: (context, index) {
+              DateTime serverStartTime = eventData.eventList[index].startTime;
+              DateTime localStartTime = serverStartTime.add(timeDiff);
+
               return Padding(
                 padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
                 child: GestureDetector(
-                  key: Key(_eventData.eventList[index].id),
+                  key: Key(eventData.eventList[index].id),
                   onTap: () {
                     Navigator.of(context).pushNamed(
                       SelectedEventScreen.routeName,
                       arguments: {
-                        'event': _eventData.eventList[index],
-                        'tickets': _eventData.getTicketsForEventId(_eventData.eventList[index].id)
+                        'event': eventData.eventList[index],
+                        'tickets': eventData.getTicketsForEventId(eventData.eventList[index].id)
                       },
                     );
                   },
@@ -289,18 +294,12 @@ class EventCard extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               Text(
-                                dateFormatShortMonth.format(_eventData.eventList[index].startTime),
-                                style: Theme
-                                    .of(context)
-                                    .textTheme
-                                    .title,
+                                dateFormatShortMonth.format(localStartTime),
+                                style: Theme.of(context).textTheme.title,
                               ),
                               Text(
-                                _eventData.eventList[index].startTime.day.toString(),
-                                style: Theme
-                                    .of(context)
-                                    .textTheme
-                                    .title,
+                                localStartTime.day.toString(),
+                                style: Theme.of(context).textTheme.title,
                               ),
                             ],
                           ),
@@ -310,18 +309,12 @@ class EventCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Text(
-                                _eventData.eventList[index].name,
-                                style: Theme
-                                    .of(context)
-                                    .textTheme
-                                    .title,
+                                eventData.eventList[index].name,
+                                style: Theme.of(context).textTheme.title,
                               ),
                               Text(
-                                dateFormatTime.format(_eventData.eventList[index].startTime),
-                                style: Theme
-                                    .of(context)
-                                    .textTheme
-                                    .body1,
+                                dateFormatTime.format(localStartTime),
+                                style: Theme.of(context).textTheme.body1,
                               ),
                             ],
                           ),
@@ -329,14 +322,14 @@ class EventCard extends StatelessWidget {
                         Container(
                           height: 100,
                           width: 100,
-                          child: _eventData.eventList[index].imageUrl == null ? null :
+                          child: eventData.eventList[index].imageUrl == null ? null :
                           CachedNetworkImage(
                             placeholder: (context, url) =>
                                 CupertinoActivityIndicator(),
                             errorWidget: (context, url, error) {
                               return _imageUnavailableWidget();
                             },
-                            imageUrl: _eventData.eventList[index].imageUrl,
+                            imageUrl: eventData.eventList[index].imageUrl,
                             imageBuilder: (context, imageProvider) =>
                                 Container(
                                   decoration: BoxDecoration(

@@ -181,10 +181,15 @@ class EventInfo extends StatelessWidget {
 
     final SelectedTicketProvider selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: false);
 
-    DateTime startDateTime = selectedTicketProvider.event.startTime;
-    String month = dateFormatShortMonth.format(startDateTime);
-    String day = startDateTime.day.toString();
-    String startClockTime = dateFormatTime.format(startDateTime);
+    DateTime serverStartTime = selectedTicketProvider.event.startTime;
+    DateTime localDateTime = DateTime.now();
+    Duration timezoneOffset = localDateTime.timeZoneOffset;
+    Duration timeDiff = new Duration(hours: timezoneOffset.inHours, minutes: timezoneOffset.inMinutes % 60);
+    DateTime localStartTime = serverStartTime.add(timeDiff);
+
+    String month = dateFormatShortMonth.format(localStartTime);
+    String day = localStartTime.day.toString();
+    String startClockTime = dateFormatTime.format(localStartTime);
 
     return Container(
       color: Colors.white,
