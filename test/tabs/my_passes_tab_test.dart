@@ -69,6 +69,7 @@ void main() {
 
     expect(find.byType(EventCard), findsNothing);
     expect(find.byType(DeviceConflict), findsNothing);
+    expect(find.byType(MissingTicket), findsNothing);
     expect(find.byType(EmailVerificationConflict), findsOneWidget);
   });
 }

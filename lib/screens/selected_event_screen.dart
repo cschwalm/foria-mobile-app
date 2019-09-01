@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:foria/providers/selected_ticket_provider.dart';
 import 'package:foria/utils/static_images.dart';
 import 'package:foria/utils/strings.dart';
-import 'package:foria/widgets/primary_button.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:wakelock/wakelock.dart';
 
 ///
 /// Screen displays rotating barcodes for user to scan.
 /// Barcodes cannot be generated unless tickets are active and their secrets are stored.
 ///
-class SelectedEventScreen extends StatelessWidget {
+class SelectedEventScreen extends StatefulWidget {
 
   static const routeName = '/selected-ticket';
   final SelectedTicketProvider _selectedTicketProvider;
@@ -21,18 +21,41 @@ class SelectedEventScreen extends StatelessWidget {
   SelectedEventScreen([this._selectedTicketProvider]);
 
   @override
+  _SelectedEventScreenState createState() => _SelectedEventScreenState();
+}
+
+class _SelectedEventScreenState extends State<SelectedEventScreen> {
+
+  SelectedTicketProvider _selectedTicketProvider;
+
+  @override
   Widget build(BuildContext context) {
 
-    final SelectedTicketProvider selectedTicketProvider = _selectedTicketProvider != null ?
-    _selectedTicketProvider : ModalRoute.of(context).settings.arguments as SelectedTicketProvider;
+    Wakelock.enable();
+    final Map<String, dynamic> args = ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
+
+    if (_selectedTicketProvider == null) {
+      if (args == null || args['event'] == null || args['tickets'] == null) {
+        _selectedTicketProvider = widget._selectedTicketProvider;
+      } else {
+        _selectedTicketProvider = new SelectedTicketProvider(args['event'], args['tickets']);
+      }
+    }
 
     return Scaffold(
       backgroundColor: Colors.black,
       body: ChangeNotifierProvider.value(
-        value: selectedTicketProvider,
+        value: _selectedTicketProvider,
         child: PassBody(),
       )
     );
+  }
+
+  @override
+  void dispose() {
+    _selectedTicketProvider.dispose();
+    Wakelock.disable();
+    super.dispose();
   }
 }
 
@@ -46,8 +69,8 @@ class PassBody extends StatelessWidget {
     final double closeButtonPadding = (1-viewportFraction) * width / 2;
     final double verticalPadding = 7;
 
-    final SelectedTicketProvider selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: false);
-    final int passCount = selectedTicketProvider.eventTickets.length;
+    final SelectedTicketProvider _selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: false);
+    final int _passCount = _selectedTicketProvider.eventTickets.length;
 
     return SafeArea(
       child: Column(
@@ -61,7 +84,9 @@ class PassBody extends StatelessWidget {
                     Icons.close,
                     color: Colors.white,
                   ),
-                  onTap: () => Navigator.maybePop(context),
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
                 ),
               ],
             ),
@@ -70,9 +95,9 @@ class PassBody extends StatelessWidget {
             child: PageView.builder(
               // store this controller in a State to save the carousel scroll position
               controller: PageController(viewportFraction: viewportFraction),
-              itemCount: passCount,
+              itemCount: _passCount,
               itemBuilder: (BuildContext context, int itemIndex) {
-                return PassCard(itemIndex, passCount);
+                return PassCard(itemIndex, _passCount);
               },
             ),
           ),
@@ -283,55 +308,4 @@ class PassRefresh extends StatelessWidget {
       ],
     );
   }
-}
-
-class PassOptions extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        PrimaryButton(
-          text: textTransfer,
-          onPress: () {
-            transferPopUp(context);
-          },
-        ),
-      ],
-    );
-  }
-}
-
-Future<void> transferPopUp(BuildContext context) async {
-  return showDialog<void>(
-    context: context,
-    barrierDismissible: true, // user must tap button!
-    builder: (BuildContext context) {
-      return AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0))
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Text(
-              transferWarning,
-              textAlign: TextAlign.center,),
-            SizedBox(height: 30,),
-            PrimaryButton(
-              text: transferConfirm,
-              onPress: () {},
-            ),
-            SizedBox(height: 20,),
-            Center(
-              child: GestureDetector(
-                child: Text(textCancel),
-                onTap: () => Navigator.of(context).pop(),
-              ),
-            ),
-          ],
-        ),
-      );
-    },
-  );
 }

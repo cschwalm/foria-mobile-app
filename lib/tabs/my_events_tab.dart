@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:foria/providers/selected_ticket_provider.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/strings.dart';
@@ -43,22 +42,30 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
   _LoadingState _currentState;
   bool _isUserEmailCheckFinished;
   bool _isTicketsLoaded;
-  bool _isUserEmailVerified;
+  bool _isTicketsReactivateLoading;
 
   @override
   void initState() {
 
     _authUtils = widget._authUtils;
     _currentState = _LoadingState.EMAIL_VERIFY;
+
     _isUserEmailCheckFinished = false;
     _isTicketsLoaded = false;
+    _isTicketsReactivateLoading = false;
 
-    _isUserEmailVerified = false;
     super.initState();
   }
 
+  ///
+  /// Build method preforms two key actions.
+  /// 1) Determines the new state to be resolved to.
+  /// 2) Builds the correct widget based on new state.
+  ///
   @override
-  void didChangeDependencies() {
+  Widget build(BuildContext context) {
+
+    super.build(context);
 
     TicketProvider ticketProvider = widget._ticketProvider;
     switch (_currentState) {
@@ -66,54 +73,37 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
       case _LoadingState.EMAIL_VERIFY:
 
         if (!_isUserEmailCheckFinished) {
-          Future<bool> result = _authUtils.isUserEmailVerified();
-          result.then((isEmailVerified) {
-            setState(() {
-              _isUserEmailCheckFinished = true;
-              _isUserEmailVerified = isEmailVerified;
-            });
-
-            //If email is verified, set next state and start the initial load.
-            if (_isUserEmailVerified) {
-              _isTicketsLoaded = false;
-              _currentState = _LoadingState.LOAD_TICKETS;
-
-              _loadTicketsAndSetState();
-            }
-          });
+          _preformUserEmailCheck();
         }
 
         break;
 
       case _LoadingState.LOAD_TICKETS:
+      case _LoadingState.DEVICE_CHECK:
 
         if (!_isTicketsLoaded) {
           _loadTicketsAndSetState();
         }
         break;
 
-      case _LoadingState.DEVICE_CHECK:
-
-        if (!ticketProvider.ticketsActiveOnOtherDevice) {
-          setState(() {
-            _currentState = _LoadingState.DONE;
-          });
-        }
-
-        break;
-
       case _LoadingState.DONE:
-        //All checks passed. Show tickets to user.
+      //All checks passed. Show tickets to user.
         break;
     }
 
-    super.didChangeDependencies();
+    return ChangeNotifierProvider.value(
+        value: ticketProvider,
+        child: determineFinalWidget()
+    );
   }
 
   ///
   /// Triggers ticket load and resets spinner.
   ///
   Future<void> _loadTicketsAndSetState() async {
+
+    _isTicketsLoaded = false;
+    _currentState = _LoadingState.LOAD_TICKETS;
 
     //Email is verified. Load tickets and stop spinner when completed.
     TicketProvider ticketProvider = widget._ticketProvider;
@@ -131,6 +121,7 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
 
       });
     }).catchError((error) {
+
       print('getTickets network call failed. Loading from offline database.');
       showErrorAlert(context, ticketLoadingFailure);
       ticketProvider.loadUserDataFromLocalDatabase().then((_) {
@@ -151,62 +142,41 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
     try {
       await ticketProvider.loadUserDataFromNetwork();
 
-      if (ticketProvider.ticketsActiveOnOtherDevice) {
-        setState(() {
-          debugPrint('Determined tickets are active on other device during refresh.');
-          _currentState = _LoadingState.DEVICE_CHECK;
-        });
-      }
+      setState(() {
+        if (ticketProvider.ticketsActiveOnOtherDevice) {
+            debugPrint('Determined tickets are active on other device during refresh.');
+            _currentState = _LoadingState.DEVICE_CHECK;
+        } else {
+          _currentState = _LoadingState.DONE;
+        }
+      });
 
     } catch (ex) {
       print('getTickets network call failed during manual refresh. Loading from offline database.');
       showErrorAlert(context, ticketLoadingFailure);
       await ticketProvider.loadUserDataFromLocalDatabase();
+      setState(() {
+        _currentState = _LoadingState.DONE;
+      });
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
+  ///
+  /// Preforms check to see if the user is email verified by refreshing ID token.
+  ///
+  void _preformUserEmailCheck() {
 
-    super.build(context);
+    Future<bool> isUserEmailVerified = _authUtils.isUserEmailVerified();
+    isUserEmailVerified.then((isEmailVerified) {
+      setState(() {
+        _isUserEmailCheckFinished = true;
 
-    TicketProvider ticketProvider = widget._ticketProvider;
-    if ( (_currentState == _LoadingState.EMAIL_VERIFY && !_isUserEmailCheckFinished) || _currentState == _LoadingState.LOAD_TICKETS) {
-      return CupertinoActivityIndicator(
-        radius: 15,
-      );
-    }
-
-    if (_currentState == _LoadingState.EMAIL_VERIFY) {
-      return EmailVerificationConflict(emailVerifyCallback);
-    }
-
-    if (_currentState == _LoadingState.DEVICE_CHECK && ticketProvider.ticketsActiveOnOtherDevice) {
-      return DeviceConflict();
-    }
-
-    if (ticketProvider.eventList.length <= 0) {
-      return RefreshIndicator(
-        onRefresh: _awaitTicketLoad,
-        child: SingleChildScrollView(
-          physics: AlwaysScrollableScrollPhysics(),
-          child: Container(
-            child: Center(
-              child: MissingTicket(),
-            ),
-            height: MediaQuery.of(context).size.height,
-          ),
-        ),
-      );
-    }
-
-    return ChangeNotifierProvider.value(
-        value: ticketProvider,
-        child: RefreshIndicator(
-          onRefresh: _awaitTicketLoad,
-          child: EventCard()
-        )
-    );
+        //If email is verified, set next state and start the initial load.
+        if (isEmailVerified) {
+          _currentState = _LoadingState.LOAD_TICKETS;
+        }
+      });
+    });
   }
 
   Future<void> emailVerifyCallback() async {
@@ -215,21 +185,64 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
     bool isEmailVerified = await _authUtils.isUserEmailVerified();
 
       if (isEmailVerified) {
-        setState(() {
-          _isUserEmailCheckFinished = true;
-          _isUserEmailVerified = true;
-          _currentState = _LoadingState.LOAD_TICKETS;
-
-          _loadTicketsAndSetState();
-        });
+        _loadTicketsAndSetState();
       }
+  }
+
+  ///
+  /// Disables button while reactivation is preformed.
+  ///
+  void _deviceCheckCallback() async {
+
+    setState(() {
+      _isTicketsReactivateLoading = true;
+    });
+
+    widget._ticketProvider.reactivateTickets().then((_) {
+      setState(() {
+        _isTicketsReactivateLoading = false;
+        _currentState = _LoadingState.DONE;
+      });
+    });
+  }
+
+  ///
+  /// Determines the correct widget to show after state processing has been preformed.
+  ///
+  Widget determineFinalWidget() {
+
+    if ( (_currentState == _LoadingState.EMAIL_VERIFY && !_isUserEmailCheckFinished) ||
+        (_currentState == _LoadingState.LOAD_TICKETS && !_isTicketsLoaded) ) {
+      return CupertinoActivityIndicator(
+        radius: 15,
+      );
+    }
+
+    Widget finalStateWidget;
+    if (_currentState == _LoadingState.EMAIL_VERIFY) {
+      finalStateWidget = EmailVerificationConflict(emailVerifyCallback);
+    } else if (_currentState == _LoadingState.DEVICE_CHECK) {
+      finalStateWidget = DeviceConflict(_isTicketsReactivateLoading, _deviceCheckCallback);
+    } else if (widget._ticketProvider.eventList.length <= 0) {
+      finalStateWidget = MissingTicket(_awaitTicketLoad);
+    } else {
+      finalStateWidget = EventCard(_awaitTicketLoad);
+    }
+
+    return finalStateWidget;
   }
 
   @override
   bool get wantKeepAlive => true;
 }
 
+///
+/// Displays a list of event cards. Pressing allows user to navigate to selected event screen.
+///
 class EventCard extends StatelessWidget {
+
+  final Function _refreshFunction;
+  EventCard(this._refreshFunction);
 
   Widget _imageUnavailableWidget() {
     return Column(
@@ -245,104 +258,120 @@ class EventCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final _eventData = Provider.of<TicketProvider>(context, listen: true);
 
-    return ListView.builder(
-        itemCount: _eventData.eventList.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
-            child: GestureDetector(
-              key: Key(_eventData.eventList[index].id),
-              onTap: () {
-                Navigator.of(context).pushNamed(
-                  SelectedEventScreen.routeName,
-                  arguments: SelectedTicketProvider(
-                      _eventData.eventList[index],
-                      _eventData.getTicketsForEventId(_eventData.eventList[index].id)
-                  ),
-                );
-              },
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                elevation: 3,
-                child: Row(
-                  children: <Widget>[
-                    Container(
-                      width: 60,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text(
-                            dateFormatShortMonth.format(_eventData.eventList[index].startTime),
-                            style: Theme.of(context).textTheme.title,
-                          ),
-                          Text(
-                            _eventData.eventList[index].startTime.day.toString(),
-                            style: Theme.of(context).textTheme.title,
-                          ),
-                        ],
-                      ),
+    return RefreshIndicator(
+        onRefresh: _refreshFunction,
+        child: ListView.builder(
+            itemCount: _eventData.eventList.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+                child: GestureDetector(
+                  key: Key(_eventData.eventList[index].id),
+                  onTap: () {
+                    Navigator.of(context).pushNamed(
+                      SelectedEventScreen.routeName,
+                      arguments: {
+                        'event': _eventData.eventList[index],
+                        'tickets': _eventData.getTicketsForEventId(_eventData.eventList[index].id)
+                      },
+                    );
+                  },
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            _eventData.eventList[index].name,
-                            style: Theme.of(context).textTheme.title,
-                          ),
-                          Text(
-                            dateFormatTime.format(_eventData.eventList[index].startTime),
-                            style: Theme.of(context).textTheme.body1,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      height: 100,
-                      width: 100,
-                      child: _eventData.eventList[index].imageUrl == null ? null:
-                      CachedNetworkImage(
-                        placeholder: (context, url) =>
-                            CupertinoActivityIndicator(),
-                        errorWidget: (context, url, error) {
-                          return _imageUnavailableWidget();
-                        },
-                        imageUrl: _eventData.eventList[index].imageUrl,
-                        imageBuilder: (context, imageProvider) =>
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.only(
-                                  topRight: Radius.circular(10),
-                                  bottomRight: Radius.circular(10),
-                                ),
-                                image: DecorationImage(
-                                  image: imageProvider,
-                                  fit: BoxFit.cover,
-                                ),
+                    elevation: 3,
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                          width: 60,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Text(
+                                dateFormatShortMonth.format(_eventData.eventList[index].startTime),
+                                style: Theme
+                                    .of(context)
+                                    .textTheme
+                                    .title,
                               ),
-                            ),
-                      ),
+                              Text(
+                                _eventData.eventList[index].startTime.day.toString(),
+                                style: Theme
+                                    .of(context)
+                                    .textTheme
+                                    .title,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                _eventData.eventList[index].name,
+                                style: Theme
+                                    .of(context)
+                                    .textTheme
+                                    .title,
+                              ),
+                              Text(
+                                dateFormatTime.format(_eventData.eventList[index].startTime),
+                                style: Theme
+                                    .of(context)
+                                    .textTheme
+                                    .body1,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          height: 100,
+                          width: 100,
+                          child: _eventData.eventList[index].imageUrl == null ? null :
+                          CachedNetworkImage(
+                            placeholder: (context, url) =>
+                                CupertinoActivityIndicator(),
+                            errorWidget: (context, url, error) {
+                              return _imageUnavailableWidget();
+                            },
+                            imageUrl: _eventData.eventList[index].imageUrl,
+                            imageBuilder: (context, imageProvider) =>
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(10),
+                                      bottomRight: Radius.circular(10),
+                                    ),
+                                    image: DecorationImage(
+                                      image: imageProvider,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          );
-        });
+              );
+            })
+    );
   }
 }
 
-class DeviceConflict extends StatefulWidget {
+///
+/// Shown to user when tickets are active on a different device.
+/// Button allows for ticket secret refresh.
+///
+class DeviceConflict extends StatelessWidget {
 
-  @override
-  _DeviceConflictState createState() => _DeviceConflictState();
-}
+  final bool _isTicketReactivatePending;
+  final Function _deviceConflictCallback;
 
-class _DeviceConflictState extends State<DeviceConflict> {
-
-  bool _isTicketReactivationPending = false;
+  DeviceConflict(this._isTicketReactivatePending, this._deviceConflictCallback);
 
   @override
   Widget build(BuildContext context) {
@@ -367,29 +396,12 @@ class _DeviceConflictState extends State<DeviceConflict> {
           ),
           PrimaryButton(
             text: relocateTickets,
-            onPress: _isTicketReactivationPending ? null : () => _deviceCheckCallback(context),
-            isLoading: _isTicketReactivationPending,
+            onPress: _isTicketReactivatePending ? null : _deviceConflictCallback,
+            isLoading: _isTicketReactivatePending,
           ),
         ],
       ),
     );
-  }
-
-  ///
-  /// Disables button while reactivation is preformed.
-  ///
-  void _deviceCheckCallback(BuildContext context) async {
-
-    setState(() {
-      _isTicketReactivationPending = true;
-    });
-
-    final TicketProvider ticketProvider = Provider.of(context, listen: false);
-    ticketProvider.reactivateTickets().then((_) {
-      setState(() {
-        _isTicketReactivationPending = false;
-      });
-    });
   }
 }
 
@@ -450,26 +462,45 @@ class _EmailVerificationConflictState extends State<EmailVerificationConflict> {
   }
 }
 
+///
+/// Widget shows that the user has no tickets and allows swipe to refresh to load again.
+///
 class MissingTicket extends StatelessWidget {
+
+  final Function _onRefreshFunctionCallback;
+
+  MissingTicket(this._onRefreshFunctionCallback);
 
   @override
   Widget build(BuildContext context) {
-    return PopUpCard(
-      content: Column(
-        children: <Widget>[
-          Text(
-            noEvents,
-            style: Theme.of(context).textTheme.title,
-            textAlign: TextAlign.center,
+
+    return RefreshIndicator(
+      onRefresh: _onRefreshFunctionCallback,
+      child: SingleChildScrollView(
+        physics: AlwaysScrollableScrollPhysics(),
+        child: Container(
+          child: Center(
+            child: PopUpCard(
+              content: Column(
+                children: <Widget>[
+                  Text(
+                    noEvents,
+                    style: Theme.of(context).textTheme.title,
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 25),
+                  Text(
+                    noTickets,
+                    style: Theme.of(context).textTheme.body1,
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 25),
+                ],
+              ),
+            ),
           ),
-          SizedBox(height: 25),
-          Text(
-            noTickets,
-            style: Theme.of(context).textTheme.body1,
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 25),
-        ],
+          height: MediaQuery.of(context).size.height,
+        ),
       ),
     );
   }
