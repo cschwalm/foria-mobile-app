@@ -24,8 +24,12 @@ class ScanUIResult {
 ///
 class ScanProcessor {
 
-  final TicketProvider _ticketProvider = new TicketProvider();
   final Duration _clearDuration = Duration(seconds: 6);
+  TicketProvider _ticketProvider = new TicketProvider();
+
+  set ticketProvider(TicketProvider value) {
+    _ticketProvider = value;
+  }
 
   bool _imageCaptured = false;
   String _ticketTypeName;
