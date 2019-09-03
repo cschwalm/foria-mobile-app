@@ -22,7 +22,7 @@ const Color textGreyColor = Color(0xFFC7C7C7);
 const Color shapeGreyColor = Color(0xFFC7C7C7);
 const Color settingsBackgroundColor = Color(0xffEEEEEE);
 
-void main() {
+void mainDelegate() {
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,

@@ -12,19 +12,9 @@ import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:jose/jose.dart';
 
+import 'configuration.dart';
+
 class AuthUtils {
-
-  /// Identify for the Auth0 application.
-  static final auth0ClientKey = "V1jhyoo97eyJCswxErzMb-DWD98DVgZi";
-
-  /// Audience to request access tokens for. Should be API.
-  static final String auth0Audience = "api.foriatickets.com";
-
-  /// Domain to send Auth0 requests.
-  static final String auth0BaseUrl = "https://auth.foriatickets.com";
-
-  /// Domain to send Auth0 requests.
-  static final String jwtIssuer = "https://auth.foriatickets.com/";
 
   /// Key name for the access token used in secure storage plugin.
   static final String accessTokenKey = "OAUTH2_ACCESS_TOKEN";
@@ -35,7 +25,7 @@ class AuthUtils {
   /// Key name for the refresh token used in secure storage plugin.
   static final String refreshTokenKey = "OAUTH2_REFRESH_TOKEN";
 
-  static final Auth0 _auth = new Auth0(clientId: auth0ClientKey, baseUrl: auth0BaseUrl);
+  static final Auth0 _auth = new Auth0(clientId: Configuration.auth0ClientKey, baseUrl: Configuration.auth0BaseUrl);
 
   static final _storage = new FlutterSecureStorage();
 
@@ -60,7 +50,7 @@ class AuthUtils {
     }
 
     ApiClient apiClient =
-    new ApiClient(accessToken: accessToken.toCompactSerialization());
+    new ApiClient(basePath: Configuration.apiBasePath,accessToken: accessToken.toCompactSerialization());
 
     return apiClient;
   }
@@ -78,8 +68,8 @@ class AuthUtils {
       throw new Exception("Returned tokens are null. Skipping secure storage.");
     }
 
-    bool isIdTokenValid = await _validateJwt(idToken, auth0ClientKey);
-    bool isAuthTokenValid = await _validateJwt(authToken, auth0Audience);
+    bool isIdTokenValid = await _validateJwt(idToken, Configuration.auth0ClientKey);
+    bool isAuthTokenValid = await _validateJwt(authToken, Configuration.auth0Audience);
 
     if (refreshToken != null) {
       _storage.write(key: refreshTokenKey, value: refreshToken);
@@ -112,7 +102,7 @@ class AuthUtils {
     }
 
     //Validate token
-    final String keyStr = await rootBundle.loadString("assets/jwks.json");
+    final String keyStr = await rootBundle.loadString(Configuration.jwksPath);
     final jwks = json.decode(keyStr);
 
     var keyStore = new JsonWebKeyStore()
@@ -129,7 +119,7 @@ class AuthUtils {
     debugPrint("JWT Claims: " + claims.toString());
 
     Iterable<Exception> violations =
-    claims.validate(issuer: Uri.parse(jwtIssuer), clientId: audience);
+    claims.validate(issuer: Uri.parse(Configuration.jwtIssuer), clientId: audience);
 
     if (violations.isNotEmpty) {
       debugPrint("JWT Claim Violations: $violations");
@@ -164,7 +154,7 @@ class AuthUtils {
   void webLogin(BuildContext context) async {
 
     Map<String, dynamic> options = new Map<String, dynamic>();
-    options['audience'] = auth0Audience;
+    options['audience'] = Configuration.auth0Audience;
     options['scope'] = 'openid profile email offline_access write:venue_redeem';
 
     await _auth.webAuth.authorize(options).then((authInfo) async {
