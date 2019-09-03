@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foria/providers/ticket_provider.dart';
-import 'package:foria/providers/scan_processor.dart';
+import 'package:foria/utils/scan_processor.dart';
 import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria_flutter_client/api.dart';
