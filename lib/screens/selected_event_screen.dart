@@ -87,7 +87,7 @@ class PassBody extends StatelessWidget {
                     ),
                   ),
                   onTap: () {
-                    Navigator.pop(context);
+                    Navigator.maybePop(context);
                   },
                 ),
               ],

@@ -99,6 +99,20 @@ class _CameraWidgetState extends State<CameraWidget> {
           );
         });
       },
+      errorBuilder: (context, cameraError) {
+        return AlertDialog(
+          title: Text('Camera permission required'),
+          content: Text('Please go to your phone\'s settings and allow the Foria app to access your camera'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).maybePop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

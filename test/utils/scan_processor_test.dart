@@ -1,7 +1,6 @@
 
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/scan_processor.dart';
@@ -30,7 +29,7 @@ void main() {
     barcodes.add(mockBarcode);
   });
 
-  testWidgets('Non-foria QR scan test', (WidgetTester tester) async {
+  test('Non-foria QR scan test', () async {
 
     final ScanProcessor scanProcessor = new ScanProcessor();
 
@@ -45,13 +44,9 @@ void main() {
     expect(actual.isValid,equals(expected.isValid));
     expect(actual.title, equals(expected.title));
     expect(actual.subtitle, equals(expected.subtitle));
-
-
   });
 
-  testWidgets('Expired Foria OTP scan test', (WidgetTester tester) async {
-
-    debugPrint(ticket.toString());
+  test('Expired Foria OTP scan test', () async {
 
     final ScanProcessor scanProcessor = new ScanProcessor();
     final MockRedemptionResult redemptionResult = new MockRedemptionResult();
@@ -78,12 +73,9 @@ void main() {
     expect(actual.isValid,equals(expected.isValid));
     expect(actual.title, equals(expected.title));
     expect(actual.subtitle, equals(expected.subtitle));
-
   });
 
-  testWidgets('Valid Foria pass scan test', (WidgetTester tester) async {
-
-    debugPrint(ticket.toString());
+  test('Valid Foria pass scan test', () async {
 
     final ScanProcessor scanProcessor = new ScanProcessor();
     final MockRedemptionResult redemptionResult = new MockRedemptionResult();
@@ -110,7 +102,6 @@ void main() {
     expect(actual.isValid,equals(expected.isValid));
     expect(actual.title, equals(expected.title));
     expect(actual.subtitle, equals(expected.subtitle));
-
   });
 
 }
