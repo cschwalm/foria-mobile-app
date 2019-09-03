@@ -75,14 +75,16 @@ class PassBody extends StatelessWidget {
     return SafeArea(
       child: Column(
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: closeButtonPadding, vertical: verticalPadding),
-            child: Row(
+          Row(
               children: <Widget>[
                 GestureDetector(
-                  child: Icon(
-                    Icons.close,
-                    color: Colors.white,
+                  behavior: HitTestBehavior.translucent,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: closeButtonPadding, vertical: verticalPadding),
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.white,
+                    ),
                   ),
                   onTap: () {
                     Navigator.pop(context);
@@ -90,7 +92,6 @@ class PassBody extends StatelessWidget {
                 ),
               ],
             ),
-          ),
           Expanded(
             child: PageView.builder(
               // store this controller in a State to save the carousel scroll position
