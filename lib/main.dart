@@ -23,7 +23,6 @@ const Color shapeGreyColor = Color(0xFFC7C7C7);
 const Color settingsBackgroundColor = Color(0xffEEEEEE);
 
 void main() {
-
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -31,9 +30,16 @@ void main() {
 
   runApp(
       new MaterialApp(
-        title: 'Foria',
-        navigatorKey: navigatorKey,
-        theme: new ThemeData(
+          // Text scaling for accessibility mode turned off with 1.0 scale factor
+          builder: (context, child) {
+            return MediaQuery(
+              child: child,
+              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+            );
+          },
+          title: 'Foria',
+          navigatorKey: navigatorKey,
+          theme: new ThemeData(
             backgroundColor: Colors.white,
             appBarTheme: AppBarTheme(
               color: Color(primaryColorDark),
@@ -47,41 +53,40 @@ void main() {
               body1: TextStyle(fontSize: 18.0, color: Color(textGrey)),
               body2: TextStyle(fontSize: 14.0, color: Color(textGrey)),
               display1: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.black),
-              headline: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.black,fontFamily: 'Rubik',),
+              headline: TextStyle(
+                fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.black, fontFamily: 'Rubik',),
             ),
-        ),
-        navigatorObservers: [
-          FirebaseAnalyticsObserver(analytics: analytics),
-        ],
-        onGenerateRoute: (RouteSettings settings) {
+          ),
+          navigatorObservers: [
+            FirebaseAnalyticsObserver(analytics: analytics),
+          ],
+          onGenerateRoute: (RouteSettings settings) {
+            switch (settings.name) {
+              case Home.routeName:
+                return MaterialPageRoute(builder: (context) => Home(), settings: settings);
+                break;
 
-          switch (settings.name) {
+              case Login.routeName:
+                return CustomNoTransition(builder: (context) => Login(), settings: settings);
+                break;
 
-            case Home.routeName:
-              return MaterialPageRoute(builder: (context)=> Home(), settings: settings);
-              break;
+              case SelectedEventScreen.routeName:
+                return MaterialPageRoute(builder: (context) => SelectedEventScreen(), settings: settings);
+                break;
 
-            case Login.routeName:
-              return CustomNoTransition(builder: (context)=> Login(), settings: settings);
-              break;
+              case TicketScanScreen.routeName:
+                return MaterialPageRoute(builder: (context) => TicketScanScreen(), settings: settings);
+                break;
 
-            case SelectedEventScreen.routeName:
-              return MaterialPageRoute(builder: (context)=> SelectedEventScreen(), settings: settings);
-              break;
+              case VenueScreen.routeName:
+                return MaterialPageRoute(builder: (context) => VenueScreen(), settings: settings);
+                break;
 
-            case TicketScanScreen.routeName:
-              return MaterialPageRoute(builder: (context)=> TicketScanScreen(), settings: settings);
-              break;
-
-            case VenueScreen.routeName:
-              return MaterialPageRoute(builder: (context)=> VenueScreen(), settings: settings);
-              break;
-
-            default:
-              return CustomNoTransition(builder: (context)=> SplashScreen(AuthUtils()), settings: settings);
-              break;
+              default:
+                return CustomNoTransition(builder: (context) => SplashScreen(AuthUtils()), settings: settings);
+                break;
+            }
           }
-        }
-    )
+      )
   );
 }
