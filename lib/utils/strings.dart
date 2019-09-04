@@ -52,7 +52,7 @@ const String contactUs = 'Contact Us';
 
 const String FAQ = 'FAQ';
 
-const String FAQUrl = "https://foriatickets.zendesk.com/hc/en-us";
+const String FAQUrl = "https://foriatickets.com/contact-us.html";
 
 const String supportEmailAddress = "support@foriatickets.com";
 

@@ -93,7 +93,6 @@ class ScanProcessor {
   Future<void> _redeemTicket(final Barcode barcode) async {
 
     final String barcodeText = barcode.displayValue;
-    debugPrint('Scanned barcode text: $barcodeText');
     _imageCaptured = true;
 
     if (barcodeText == null) {

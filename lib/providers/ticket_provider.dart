@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
@@ -90,7 +91,14 @@ class TicketProvider extends ChangeNotifier {
     } on ApiException catch (ex) {
       print("### FORIA SERVER ERROR: getTickets ###");
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
-      throw new Exception(ex.message);
+
+      if (ex.code == HttpStatus.unauthorized || ex.code == HttpStatus.forbidden) {
+        debugPrint('Logging user out due to bad token.');
+        await _authUtils.logout();
+        return;
+      }
+      rethrow;
+
     } catch (e) {
       print("### UNKNOWN ERROR: getTickets Msg: ${e.toString()} ###");
       rethrow;
@@ -223,6 +231,10 @@ class TicketProvider extends ChangeNotifier {
 
     final String savedToken = await _secureStorage.read(key: _fcmTokenKey);
     if (token == savedToken) {
+      return;
+    }
+
+    if (! await _authUtils.isUserLoggedIn(true)) {
       return;
     }
 

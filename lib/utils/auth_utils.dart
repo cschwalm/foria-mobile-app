@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_auth0/flutter_auth0.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:foria/main.dart';
 import 'package:foria/screens/home.dart';
+import 'package:foria/screens/login.dart';
 import 'package:foria/screens/venue_screen.dart';
 import 'package:foria/utils/database_utils.dart';
 import 'package:foria/utils/strings.dart';
@@ -116,7 +118,6 @@ class AuthUtils {
 
     //Validate Claims
     JsonWebTokenClaims claims = jwt.claims;
-    debugPrint("JWT Claims: " + claims.toString());
 
     Iterable<Exception> violations =
     claims.validate(issuer: Uri.parse(Configuration.jwtIssuer), clientId: audience);
@@ -134,14 +135,14 @@ class AuthUtils {
   ///
   /// WARNING: This deletes all data in the secure storage.
   ///
-  void logout(BuildContext context) {
+  Future<void> logout() async {
     DatabaseUtils.deleteDatabase();
-    _storage.deleteAll();
+    await _storage.deleteAll();
 
     debugPrint("Logout called. Secrets deleted.");
 
-    _auth.webAuth.clearSession();
-    Navigator.pushReplacementNamed(context, '/login');
+    await _auth.webAuth.clearSession();
+    await navigatorKey.currentState.pushNamedAndRemoveUntil(Login.routeName, ModalRoute.withName('/'));
   }
 
   ///
@@ -222,7 +223,6 @@ class AuthUtils {
       return false;
     }
 
-    debugPrint("Email verified: ${claims["email_verified"]}");
     return claims["email_verified"];
   }
 
@@ -251,8 +251,6 @@ class AuthUtils {
       }
     }
 
-    debugPrint("JWT Claims: ${jwt.claims}");
-    debugPrint("User is logged in with a valid token.");
     return true;
   }
 
@@ -300,7 +298,6 @@ class AuthUtils {
     var auth0Result;
     try {
       auth0Result = await _auth.auth.refreshToken(params);
-      debugPrint("Refresh Response received: $auth0Result");
     } catch (ex) {
       print("ERROR: Refresh failed on Auth0 side.");
       throw ex;

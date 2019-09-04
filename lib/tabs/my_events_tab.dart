@@ -153,7 +153,11 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
 
     } catch (ex) {
       print('getTickets network call failed during manual refresh. Loading from offline database.');
-      showErrorAlert(context, ticketLoadingFailure);
+
+      if (context != null) {
+        showErrorAlert(context, ticketLoadingFailure);
+      }
+
       await ticketProvider.loadUserDataFromLocalDatabase();
       setState(() {
         _currentState = _LoadingState.DONE;
