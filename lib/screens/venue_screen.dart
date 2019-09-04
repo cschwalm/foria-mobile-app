@@ -45,7 +45,7 @@ class VenueScreen extends StatelessWidget {
             labelTextStyle: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold,color: Theme.of(context).primaryColor),
             content: SettingsNavigationIndicator(),
             onPress: () {
-              _authUtils.logout(context);
+              _authUtils.logout();
             },
           ),
           SettingItemDivider(),

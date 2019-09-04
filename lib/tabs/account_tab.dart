@@ -52,7 +52,7 @@ class AccountTab extends StatelessWidget {
                   child: PrimaryButton(
                     text: textLogout,
                     onPress: () {
-                      _authUtils.logout(context);
+                      _authUtils.logout();
                     },
                   ),
                 ),
