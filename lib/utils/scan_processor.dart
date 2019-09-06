@@ -24,7 +24,7 @@ class ScanUIResult {
 ///
 class ScanProcessor {
 
-  final Duration _clearDuration = Duration(seconds: 6);
+  final Duration _clearDuration = Duration(seconds: 3);
   TicketProvider _ticketProvider = new TicketProvider();
 
   set ticketProvider(TicketProvider value) {

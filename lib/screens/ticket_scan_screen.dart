@@ -2,6 +2,7 @@ import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_camera_ml_vision/flutter_camera_ml_vision.dart';
 import 'package:foria/utils/scan_processor.dart';
+import 'package:foria/utils/static_images.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:wakelock/wakelock.dart';
 
@@ -24,9 +25,13 @@ class TicketScanScreen extends StatelessWidget {
           return SafeArea(
             child: Column(
               children: <Widget>[
-                Expanded(
-                  child: CameraWidget(context),
-                ),
+                Stack(
+                    children: <Widget>[
+                      Image.asset(calendarImage),
+                      Expanded(child: CameraWidget(context)),
+                    ],
+                  ),
+
               ],
             ),
           );
@@ -48,7 +53,7 @@ class CameraWidget extends StatefulWidget {
 
 class _CameraWidgetState extends State<CameraWidget> {
 
-  final Duration _snackBarDuration = Duration(seconds: 10);
+  final Duration _snackBarDuration = Duration(seconds: 6);
 
   ScanProcessor _scanProcessor;
   BarcodeDetectorOptions _opts;
