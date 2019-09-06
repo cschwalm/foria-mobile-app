@@ -40,9 +40,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Camera permission is required to verify your identity and scan event tickets.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Camera and microphone permission is required to scan ticket barcodes.</string>
+	<string>Camera permission is required to scan event tickets.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
