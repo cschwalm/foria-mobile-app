@@ -140,7 +140,7 @@ class ScanProcessor {
   ///
   /// Clears ticket ticket after set amount of time.
   ///
-  void _resetView(Timer timer) async {
+  void _resetView(Timer timer) {
 
     _imageCaptured = false;
     _scanResult = null;
