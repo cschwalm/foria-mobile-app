@@ -9,6 +9,7 @@ import 'package:foria/screens/ticket_scan_screen.dart';
 import 'package:foria/screens/venue_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/strings.dart';
+import 'package:get_it/get_it.dart';
 
 import 'navigation/CustomNoTransition.dart';
 import 'screens/home.dart';
@@ -28,6 +29,7 @@ void mainDelegate() {
     DeviceOrientation.portraitDown,
   ]);
 
+  GetIt.instance.registerSingleton<AuthUtils>(new AuthUtils());
   runApp(
       new MaterialApp(
           // Text scaling for accessibility mode turned off with 1.0 scale factor
@@ -83,7 +85,7 @@ void mainDelegate() {
                 break;
 
               default:
-                return CustomNoTransition(builder: (context) => SplashScreen(AuthUtils()), settings: settings);
+                return CustomNoTransition(builder: (context) => SplashScreen(), settings: settings);
                 break;
             }
           }

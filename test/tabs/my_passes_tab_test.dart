@@ -6,6 +6,7 @@ import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/tabs/my_events_tab.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria_flutter_client/api.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 
 class MockAuthUtils extends Mock implements AuthUtils {}
@@ -17,6 +18,9 @@ void main() {
 
   final AuthUtils authUtils = new MockAuthUtils();
   final TicketProvider ticketProviderMock = new MockTicketProvider();
+
+  GetIt.instance.registerSingleton<AuthUtils>(authUtils);
+  GetIt.instance.registerSingleton<TicketProvider>(ticketProviderMock);
 
   setUp(() {
 
@@ -31,7 +35,7 @@ void main() {
   testWidgets('myPassesTab contains event cards', (WidgetTester tester) async {
 
     await tester.pumpWidget(MaterialApp(
-      home: MyEventsTab(authUtils, ticketProviderMock),
+      home: MyEventsTab(),
     ));
 
     await tester.pumpAndSettle();
@@ -48,7 +52,7 @@ void main() {
     when(ticketProviderMock.eventList).thenReturn(UnmodifiableListView(new List()));
 
     await tester.pumpWidget(MaterialApp(
-      home: MyEventsTab(authUtils, ticketProviderMock),
+      home: MyEventsTab(),
     ));
 
     await tester.pumpAndSettle();
@@ -62,7 +66,7 @@ void main() {
     when(ticketProviderMock.eventList).thenReturn(UnmodifiableListView(new List()));
 
     await tester.pumpWidget(MaterialApp(
-      home: MyEventsTab(authUtils, ticketProviderMock),
+      home: MyEventsTab(),
     ));
 
     await tester.pumpAndSettle();

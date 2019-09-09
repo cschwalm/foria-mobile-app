@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:foria/main.dart';
 import 'package:foria/screens/venue_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
+import 'package:get_it/get_it.dart';
 
 import 'home.dart';
 import 'login.dart';
@@ -13,9 +14,6 @@ import 'login.dart';
 class SplashScreen extends StatefulWidget {
 
   static const routeName = '/splash-screen';
-  final AuthUtils _authUtils;
-
-  SplashScreen(this._authUtils);
 
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -42,9 +40,12 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   }
 
   Future<void> _determineNavigationRoute() async {
-    if (!await widget._authUtils.isUserLoggedIn(true)) {
+
+    final AuthUtils authUtils = GetIt.instance<AuthUtils>();
+
+    if (!await authUtils.isUserLoggedIn(true)) {
     navigatorKey.currentState.pushReplacementNamed(Login.routeName);
-    } else if (await  widget._authUtils.doesUserHaveVenueAccess()) {
+    } else if (await authUtils.doesUserHaveVenueAccess()) {
       navigatorKey.currentState.pushReplacementNamed(VenueScreen.routeName);
     } else {
       navigatorKey.currentState.pushReplacementNamed(Home.routeName);

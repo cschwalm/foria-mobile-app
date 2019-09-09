@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria_flutter_client/api.dart';
+import 'package:get_it/get_it.dart';
 
 enum ScanResult { ALLOW, DENY, ERROR }
 
@@ -25,11 +26,7 @@ class ScanUIResult {
 class ScanProcessor {
 
   final Duration _duplicateBarcodeDuration = Duration(seconds: 6);
-  TicketProvider _ticketProvider = new TicketProvider();
-
-  set ticketProvider(TicketProvider value) {
-    _ticketProvider = value;
-  }
+  final TicketProvider _ticketProvider = GetIt.instance<TicketProvider>();
 
   bool _isScannerShutdown = false;
   bool _isDuplicateBarcodeTimerRunning = false;
