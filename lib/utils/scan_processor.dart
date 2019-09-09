@@ -33,10 +33,13 @@ class ScanProcessor {
 
   bool _isScannerShutdown = false;
   bool _isInvalidResultDisabled = false;
+  bool _isDuplicateBarcodeTimerRunning = false;
   String _ticketTypeName;
+  String _previousBarcodeText;
   ScanResult _scanResult;
   Timer _scannerShutdownTimer;
   Timer _invalidResultDisabledTimer;
+  Timer _duplicateBarcodeTimer;
 
   void dispose() {
 
@@ -47,6 +50,10 @@ class ScanProcessor {
     if (_invalidResultDisabledTimer != null) {
       _invalidResultDisabledTimer.cancel();
       _invalidResultDisabledTimer = null;
+    }
+    if (_duplicateBarcodeTimer != null) {
+      _duplicateBarcodeTimer.cancel();
+      _duplicateBarcodeTimer = null;
     }
   }
 
@@ -114,6 +121,16 @@ class ScanProcessor {
       return;
     }
 
+    if(barcodeText == _previousBarcodeText && _isDuplicateBarcodeTimerRunning) {
+      _isScannerShutdown = false;
+      return;
+    } else if(barcodeText == _previousBarcodeText){
+      _isDuplicateBarcodeTimerRunning = true;
+      _duplicateBarcodeTimer = Timer.periodic(_invalidResultDisabledDuration, _clearPreviousBarcodeText);
+      _isScannerShutdown = false;
+      return;
+    }
+
     RedemptionRequest request;
     try {
       final Map<String, dynamic> jsonMap = jsonDecode(barcodeText);
@@ -144,6 +161,7 @@ class ScanProcessor {
       _scanResult = ScanResult.DENY;
     }
 
+    _previousBarcodeText = barcodeText;
     debugPrint('Barcode processed.');
   }
 
@@ -168,6 +186,17 @@ class ScanProcessor {
     _isInvalidResultDisabled = false;
 
     debugPrint('ticket_scan_screen UI can now show invalid results.');
+    timer.cancel();
+  }
+
+  ///
+  /// Allows the UI to show invalid ticket result.
+  ///
+  void _clearPreviousBarcodeText (Timer timer) {
+
+    _previousBarcodeText = null;
+    _isDuplicateBarcodeTimerRunning = false;
+    debugPrint('Previous barcode text cleared.');
     timer.cancel();
   }
 
