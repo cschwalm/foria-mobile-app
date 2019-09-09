@@ -24,23 +24,30 @@ class ScanUIResult {
 ///
 class ScanProcessor {
 
-  final Duration _clearDuration = Duration(seconds: 6);
+  final Duration _duplicateBarcodeDuration = Duration(seconds: 6);
   TicketProvider _ticketProvider = new TicketProvider();
 
   set ticketProvider(TicketProvider value) {
     _ticketProvider = value;
   }
 
-  bool _imageCaptured = false;
+  bool _isScannerShutdown = false;
+  bool _isDuplicateBarcodeTimerRunning = false;
   String _ticketTypeName;
+  String _previousBarcodeText;
   ScanResult _scanResult;
-  Timer _resetTimer;
+  Timer _scannerShutdownTimer;
+  Timer _duplicateBarcodeTimer;
 
   void dispose() {
 
-    if (_resetTimer != null) {
-      _resetTimer.cancel();
-      _resetTimer = null;
+    if (_scannerShutdownTimer != null) {
+      _scannerShutdownTimer.cancel();
+      _scannerShutdownTimer = null;
+    }
+    if (_duplicateBarcodeTimer != null) {
+      _duplicateBarcodeTimer.cancel();
+      _duplicateBarcodeTimer = null;
     }
   }
 
@@ -49,6 +56,8 @@ class ScanProcessor {
     if (_scanResult == null) {
       return null;
     }
+
+    _scannerShutdownTimer = Timer.periodic(scannerShutdownDuration, _restartScanner);
 
     bool isValid;
     String title;
@@ -76,7 +85,7 @@ class ScanProcessor {
   ///
   Future<ScanUIResult> ticketCheck (final List<Barcode> barcodes) async {
 
-    if (_imageCaptured || barcodes.isEmpty) {
+    if (_isScannerShutdown || barcodes.isEmpty) {
       return null;
     }
 
@@ -93,10 +102,20 @@ class ScanProcessor {
   Future<void> _redeemTicket(final Barcode barcode) async {
 
     final String barcodeText = barcode.displayValue;
-    _imageCaptured = true;
+    _isScannerShutdown = true;
 
     if (barcodeText == null) {
-      _imageCaptured = false;
+      _isScannerShutdown = false;
+      return;
+    }
+
+    if(barcodeText == _previousBarcodeText && _isDuplicateBarcodeTimerRunning) {
+      _isScannerShutdown = false;
+      return;
+    } else if(barcodeText == _previousBarcodeText){
+      _isDuplicateBarcodeTimerRunning = true;
+      _duplicateBarcodeTimer = Timer.periodic(_duplicateBarcodeDuration, _clearPreviousBarcodeText);
+      _isScannerShutdown = false;
       return;
     }
 
@@ -107,13 +126,11 @@ class ScanProcessor {
     } catch (ex) {
       debugPrint('Failed to parse encoded barcode model.');
       _setErrorState();
-      _resetTimer = Timer.periodic(_clearDuration, _resetView);
       return;
     }
 
     if (request == null || request.ticketId == null || request.ticketOtp == null) {
       _setErrorState();
-      _resetTimer = Timer.periodic(_clearDuration, _resetView);
       return;
     }
 
@@ -122,7 +139,6 @@ class ScanProcessor {
       redemptionResult = await _ticketProvider.redeemTicket(request);
     } catch (ex) {
       _setErrorState();
-      _resetTimer = Timer.periodic(_clearDuration, _resetView);
       return;
     }
 
@@ -133,20 +149,34 @@ class ScanProcessor {
       _scanResult = ScanResult.DENY;
     }
 
+    _previousBarcodeText = barcodeText;
     debugPrint('Barcode processed.');
-    _resetTimer = Timer.periodic(_clearDuration, _resetView);
   }
 
   ///
-  /// Clears ticket ticket after set amount of time.
+  /// Clears scan result and enables camera after set amount of time.
   ///
-  void _resetView(Timer timer) async {
+  void _restartScanner(Timer timer) {
 
-    _imageCaptured = false;
+    _isScannerShutdown = false;
     _scanResult = null;
     _ticketTypeName = null;
 
     debugPrint('Ticket scan data cleared.');
+    timer.cancel();
+  }
+
+  ///
+  /// If a barcode is scanned multiple times, the UI should not continually
+  /// update until the duplicatedBarcodeTimer is completed. Once the timer is complete,
+  /// this enables the UI to show a new result for the same barcode
+  ///
+  ///
+  void _clearPreviousBarcodeText (Timer timer) {
+
+    _previousBarcodeText = null;
+    _isDuplicateBarcodeTimerRunning = false;
+    debugPrint('Previous barcode text cleared.');
     timer.cancel();
   }
 

@@ -8,6 +8,10 @@ final int primaryColorDark = 0xFFC5003C;
 
 final int textGrey = 0xFF7E7E7E;
 
+// Scanner constants. //
+
+const Duration scannerShutdownDuration = Duration(seconds: 1);
+
 // Date string formatting. //
 
 final dateFormatShortMonth = DateFormat('MMM');
