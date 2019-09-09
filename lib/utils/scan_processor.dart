@@ -24,7 +24,7 @@ class ScanUIResult {
 ///
 class ScanProcessor {
 
-  final Duration _invalidResultDisabledDuration = Duration(seconds: 6);
+  final Duration _duplicateBarcodeDuration = Duration(seconds: 6);
   TicketProvider _ticketProvider = new TicketProvider();
 
   set ticketProvider(TicketProvider value) {
@@ -32,13 +32,11 @@ class ScanProcessor {
   }
 
   bool _isScannerShutdown = false;
-  bool _isInvalidResultDisabled = false;
   bool _isDuplicateBarcodeTimerRunning = false;
   String _ticketTypeName;
   String _previousBarcodeText;
   ScanResult _scanResult;
   Timer _scannerShutdownTimer;
-  Timer _invalidResultDisabledTimer;
   Timer _duplicateBarcodeTimer;
 
   void dispose() {
@@ -46,10 +44,6 @@ class ScanProcessor {
     if (_scannerShutdownTimer != null) {
       _scannerShutdownTimer.cancel();
       _scannerShutdownTimer = null;
-    }
-    if (_invalidResultDisabledTimer != null) {
-      _invalidResultDisabledTimer.cancel();
-      _invalidResultDisabledTimer = null;
     }
     if (_duplicateBarcodeTimer != null) {
       _duplicateBarcodeTimer.cancel();
@@ -73,20 +67,14 @@ class ScanProcessor {
       isValid = true;
       title = _ticketTypeName;
       subtitle = passValid;
-    } else if (_isInvalidResultDisabled){
-      return null;
     } else if (_scanResult == ScanResult.DENY){
       isValid = false;
       title = passInvalid;
       subtitle = passInvalidInfo;
-      _isInvalidResultDisabled = true;
-      _invalidResultDisabledTimer = Timer.periodic(_invalidResultDisabledDuration, _enableInvalidResultUI);
     } else {
       isValid = false;
       title = barcodeInvalid;
       subtitle = barcodeInvalidInfo;
-      _isInvalidResultDisabled = true;
-      _invalidResultDisabledTimer = Timer.periodic(_invalidResultDisabledDuration, _enableInvalidResultUI);
     }
 
     return ScanUIResult(isValid: isValid, title: title, subtitle: subtitle);
@@ -126,7 +114,7 @@ class ScanProcessor {
       return;
     } else if(barcodeText == _previousBarcodeText){
       _isDuplicateBarcodeTimerRunning = true;
-      _duplicateBarcodeTimer = Timer.periodic(_invalidResultDisabledDuration, _clearPreviousBarcodeText);
+      _duplicateBarcodeTimer = Timer.periodic(_duplicateBarcodeDuration, _clearPreviousBarcodeText);
       _isScannerShutdown = false;
       return;
     }
@@ -179,18 +167,10 @@ class ScanProcessor {
   }
 
   ///
-  /// Allows the UI to show invalid ticket result.
+  /// If a barcode is scanned multiple times, the UI should not continually
+  /// update until the duplicatedBarcodeTimer is completed. Once the timer is complete,
+  /// this enables the UI to show a new result for the same barcode
   ///
-  void _enableInvalidResultUI (Timer timer) {
-
-    _isInvalidResultDisabled = false;
-
-    debugPrint('ticket_scan_screen UI can now show invalid results.');
-    timer.cancel();
-  }
-
-  ///
-  /// Allows the UI to show invalid ticket result.
   ///
   void _clearPreviousBarcodeText (Timer timer) {
 
