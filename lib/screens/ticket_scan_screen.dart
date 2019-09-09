@@ -52,7 +52,6 @@ class CameraWidget extends StatefulWidget {
 class _CameraWidgetState extends State<CameraWidget> {
 
   final Duration _snackBarDuration = Duration(seconds: 6);
-  final Duration _colorFlashDuration = Duration(seconds: 1);
 
   ScanProcessor _scanProcessor;
   BarcodeDetectorOptions _opts;
@@ -111,17 +110,17 @@ class _CameraWidgetState extends State<CameraWidget> {
                     if (result == null) {
                       return;
                     }
-                    if (result.isValid) {
+                    else if (result.isValid) {
                       setState(() {
                         scannerSquare = greenScannerSquare;
                       });
                     }
-                    if (!result.isValid) {
+                    else if (!result.isValid) {
                       setState(() {
                         scannerSquare = redScannerSquare;
                       });
                     }
-                    _colorFlashTimer = Timer.periodic(_colorFlashDuration, _colorFlashReset);
+                    _colorFlashTimer = Timer.periodic(scannerShutdownDuration, _colorFlashReset);
                     Scaffold.of(widget.scaffoldContext).removeCurrentSnackBar();
                     Scaffold.of(widget.scaffoldContext).showSnackBar(
                         SnackBar(

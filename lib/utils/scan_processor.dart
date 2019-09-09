@@ -24,23 +24,29 @@ class ScanUIResult {
 ///
 class ScanProcessor {
 
-  final Duration _clearDuration = Duration(seconds: 3);
+  final Duration _invalidResultDisabledDuration = Duration(seconds: 6);
   TicketProvider _ticketProvider = new TicketProvider();
 
   set ticketProvider(TicketProvider value) {
     _ticketProvider = value;
   }
 
-  bool _imageCaptured = false;
+  bool _isScannerShutdown = false;
+  bool _isInvalidResultDisabled = false;
   String _ticketTypeName;
   ScanResult _scanResult;
-  Timer _resetTimer;
+  Timer _scannerShutdownTimer;
+  Timer _invalidResultDisabledTimer;
 
   void dispose() {
 
-    if (_resetTimer != null) {
-      _resetTimer.cancel();
-      _resetTimer = null;
+    if (_scannerShutdownTimer != null) {
+      _scannerShutdownTimer.cancel();
+      _scannerShutdownTimer = null;
+    }
+    if (_invalidResultDisabledTimer != null) {
+      _invalidResultDisabledTimer.cancel();
+      _invalidResultDisabledTimer = null;
     }
   }
 
@@ -50,6 +56,8 @@ class ScanProcessor {
       return null;
     }
 
+    _scannerShutdownTimer = Timer.periodic(scannerShutdownDuration, _restartScanner);
+
     bool isValid;
     String title;
     String subtitle;
@@ -58,14 +66,20 @@ class ScanProcessor {
       isValid = true;
       title = _ticketTypeName;
       subtitle = passValid;
+    } else if (_isInvalidResultDisabled){
+      return null;
     } else if (_scanResult == ScanResult.DENY){
       isValid = false;
       title = passInvalid;
       subtitle = passInvalidInfo;
+      _isInvalidResultDisabled = true;
+      _invalidResultDisabledTimer = Timer.periodic(_invalidResultDisabledDuration, _enableInvalidResultUI);
     } else {
       isValid = false;
       title = barcodeInvalid;
       subtitle = barcodeInvalidInfo;
+      _isInvalidResultDisabled = true;
+      _invalidResultDisabledTimer = Timer.periodic(_invalidResultDisabledDuration, _enableInvalidResultUI);
     }
 
     return ScanUIResult(isValid: isValid, title: title, subtitle: subtitle);
@@ -76,7 +90,7 @@ class ScanProcessor {
   ///
   Future<ScanUIResult> ticketCheck (final List<Barcode> barcodes) async {
 
-    if (_imageCaptured || barcodes.isEmpty) {
+    if (_isScannerShutdown || barcodes.isEmpty) {
       return null;
     }
 
@@ -93,10 +107,10 @@ class ScanProcessor {
   Future<void> _redeemTicket(final Barcode barcode) async {
 
     final String barcodeText = barcode.displayValue;
-    _imageCaptured = true;
+    _isScannerShutdown = true;
 
     if (barcodeText == null) {
-      _imageCaptured = false;
+      _isScannerShutdown = false;
       return;
     }
 
@@ -107,13 +121,11 @@ class ScanProcessor {
     } catch (ex) {
       debugPrint('Failed to parse encoded barcode model.');
       _setErrorState();
-      _resetTimer = Timer.periodic(_clearDuration, _resetView);
       return;
     }
 
     if (request == null || request.ticketId == null || request.ticketOtp == null) {
       _setErrorState();
-      _resetTimer = Timer.periodic(_clearDuration, _resetView);
       return;
     }
 
@@ -122,7 +134,6 @@ class ScanProcessor {
       redemptionResult = await _ticketProvider.redeemTicket(request);
     } catch (ex) {
       _setErrorState();
-      _resetTimer = Timer.periodic(_clearDuration, _resetView);
       return;
     }
 
@@ -134,19 +145,29 @@ class ScanProcessor {
     }
 
     debugPrint('Barcode processed.');
-    _resetTimer = Timer.periodic(_clearDuration, _resetView);
   }
 
   ///
-  /// Clears ticket ticket after set amount of time.
+  /// Clears scan result and enables camera after set amount of time.
   ///
-  void _resetView(Timer timer) {
+  void _restartScanner(Timer timer) {
 
-    _imageCaptured = false;
+    _isScannerShutdown = false;
     _scanResult = null;
     _ticketTypeName = null;
 
     debugPrint('Ticket scan data cleared.');
+    timer.cancel();
+  }
+
+  ///
+  /// Allows the UI to show invalid ticket result.
+  ///
+  void _enableInvalidResultUI (Timer timer) {
+
+    _isInvalidResultDisabled = false;
+
+    debugPrint('ticket_scan_screen UI can now show invalid results.');
     timer.cancel();
   }
 
