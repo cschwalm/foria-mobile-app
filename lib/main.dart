@@ -6,6 +6,7 @@ import 'package:flutter/services.dart' show DeviceOrientation, SystemChrome;
 import 'package:flutter/services.dart';
 import 'package:foria/screens/splash_screen.dart';
 import 'package:foria/screens/ticket_scan_screen.dart';
+import 'package:foria/screens/transfer_screen.dart';
 import 'package:foria/screens/venue_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/strings.dart';
@@ -80,6 +81,10 @@ void mainDelegate() {
 
               case VenueScreen.routeName:
                 return MaterialPageRoute(builder: (context) => VenueScreen(), settings: settings);
+                break;
+
+              case TransferScreen.routeName:
+                return MaterialPageRoute(builder: (context) => TransferScreen(), settings: settings, fullscreenDialog: true);
                 break;
 
               default:

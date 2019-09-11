@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 
 // Theme formatting. //
@@ -7,6 +8,10 @@ final int primaryColor = 0xFFFF0266;
 final int primaryColorDark = 0xFFC5003C;
 
 final int textGrey = 0xFF7E7E7E;
+
+final int formInputColor = 0xFFF2F2F2;
+
+const BorderRadius buttonBorderRadius = BorderRadius.all(Radius.circular(8.0));
 
 // Scanner constants. //
 
@@ -62,7 +67,7 @@ const String supportEmailAddress = "support@foriatickets.com";
 
 const String supportEmailSubject = "Foria Support";
 
-// my_passes_tab Strings. //
+// my_events_tab Strings. //
 
 const String noEvents = 'You don\'t have any \nupcoming events';
 
@@ -85,7 +90,7 @@ const String imageUnavailable = 'Image unavailable';
 const String ticketLoadingFailure = 'It looks like you\'re currently offline.\n\n'
     'Don\'t worry, we\'re using an offline copy of your tickets. As long as you haven\'t transferred or sold your tickets, they will be valid.';
 
-// selected_ticket_screen Strings. //
+// selected_event_screen Strings. //
 
 const String foriaPass ='Foria Pass';
 
@@ -99,7 +104,15 @@ const String barcodeLoading = 'Barcode Loading...';
 
 const String transferConfirm = 'Confirm Transfer';
 
-const String transferWarning = 'Transfers are non-reversible and processed immediately if the transferee has a Foria account. Otherwise, they are processed once the transferee creates an account.';
+const String transferWarning = 'Transfers are non-reversible and processed immediately if the transferee has a Foria account. Otherwise, they are pending until the transferee creates an account. You can cancel a pending transfer.';
+
+const String emailFieldText = 'Email';
+
+const String enterValidEmail = 'Please enter a valid email address.';
+
+const String enterTransferEmail = 'Enter transferee\'s email:';
+
+const String requestTransfer = 'Request Transfer';
 
 // ticket_scan_screen Strings. //
 

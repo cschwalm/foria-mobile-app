@@ -247,7 +247,7 @@ SPEC CHECKSUMS:
   FirebaseMLCommon: b236f9bc8a020d4c36744d6e402b2fb9d6fe3f6d
   FirebaseMLVision: ff6a597d10017c5dfe1cc6d24293b77f84808060
   FirebaseMLVisionBarcodeModel: 4ac90a8ed5a92e1ed8d9278b92d794230a01dd16
-  Flutter: 58dd7d1b27887414a370fcccb9e645c08ffd7a6a
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   flutter_auth0: 1d379ce1faf80f27b1058ef2502b6d0181561bdb
   flutter_email_sender: f787522d0e82f50e5766c1213dbffff22fdcf009
   flutter_secure_storage: 0c5779648ff644110e507909b77a57e620cbbf8b

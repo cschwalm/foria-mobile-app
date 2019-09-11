@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/providers/selected_ticket_provider.dart';
+import 'package:foria/screens/transfer_screen.dart';
 import 'package:foria/utils/static_images.dart';
 import 'package:foria/utils/strings.dart';
+import 'package:foria/widgets/primary_button.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -43,6 +45,7 @@ class _SelectedEventScreenState extends State<SelectedEventScreen> {
     }
 
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
       backgroundColor: Colors.black,
       body: ChangeNotifierProvider<SelectedTicketProvider>.value(
         value: _selectedTicketProvider,
@@ -168,6 +171,7 @@ class PassCard extends StatelessWidget {
                 PassRefresh(selectedTicketProvider.secondsRemaining),
               ],
             )),
+            PassOptions()
           ],
         ),
       ),
@@ -311,6 +315,22 @@ class PassRefresh extends StatelessWidget {
             ),
           ],
         )
+      ],
+    );
+  }
+}
+
+class PassOptions extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        PrimaryButton(
+          text: textTransfer,
+          onPress: () {
+            Navigator.of(context).pushNamed(TransferScreen.routeName);
+          },
+        ),
       ],
     );
   }
