@@ -262,6 +262,68 @@ class TicketProvider extends ChangeNotifier {
   }
 
   ///
+  /// Attempts to cancel the ticket transfer. This call is only successful if the ticket status is
+  /// TRANSFER_PENDING. Do NOT call it otherwise.
+  ///
+  /// If this call is successful, the ticket status goes back to ACTIVE.
+  /// Throws exception on network error.
+  ///
+  Future<void> cancelTicketTransfer(String ticketId) async {
+
+    if (ticketId == null) {
+      return null;
+    }
+
+    if (_ticketApi == null) {
+      ApiClient foriaApiClient = await _authUtils.obtainForiaApiClient();
+      _ticketApi = new TicketApi(foriaApiClient);
+    }
+
+    try {
+      await _ticketApi.cancelTransfer(ticketId);
+    } on ApiException catch (ex) {
+      print("### FORIA SERVER ERROR: cancelTransfer ###");
+      print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      rethrow;
+    }
+
+    debugPrint('Ticket Id: $ticketId ticket transfer canceled.');
+  }
+
+  ///
+  /// Attempts to transfer a ticket to an email address. If the ticket can't complete the transfer it will go in PENDING
+  /// status. If the network call is successful, expect the new ticket status to be ISSUED indicating a new user owns it
+  /// or TRANSFER_PENDING indicating the transfer will complete in future or be canceled.
+  ///
+  /// Throws exception on network error.
+  ///
+  Future<Ticket> transferTicket(String ticketId, String email) async {
+    if (ticketId == null || email == null) {
+      return null;
+    }
+
+    if (_ticketApi == null) {
+      ApiClient foriaApiClient = await _authUtils.obtainForiaApiClient();
+      _ticketApi = new TicketApi(foriaApiClient);
+    }
+
+    final TransferRequest transferRequest = new TransferRequest();
+    transferRequest.receiverEmail = email;
+
+    Ticket ticket;
+    try {
+      ticket = await _ticketApi.transferTicket(ticketId, transferRequest: transferRequest);
+    } on ApiException catch (ex) {
+      print("### FORIA SERVER ERROR: transferTicket ###");
+      print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      rethrow;
+    }
+
+    debugPrint('Ticket Id: $ticketId submitted for transfer. New status: ${ticket.status}');
+    return ticket;
+  }
+
+  ///
   /// Checks the ticket set for tickets that are in ISSUED status.
   /// If tickets are in ISSUED status, tickets are activated and ticket secret
   /// is stored in local database.

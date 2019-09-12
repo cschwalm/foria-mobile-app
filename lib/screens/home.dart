@@ -75,9 +75,6 @@ class TabsState extends State<Tabs> {
 
     this._titleApp = TabItems[0].title;
 
-    final TicketProvider ticketProvider = new TicketProvider();
-    GetIt.instance.registerSingleton<TicketProvider>(ticketProvider);
-
     _setupCloudMessaging(context);
     super.initState();
   }

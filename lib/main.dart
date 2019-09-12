@@ -4,10 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show DeviceOrientation, SystemChrome;
 import 'package:flutter/services.dart';
+import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/screens/splash_screen.dart';
 import 'package:foria/screens/ticket_scan_screen.dart';
 import 'package:foria/screens/venue_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
+import 'package:foria/utils/database_utils.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:get_it/get_it.dart';
 
@@ -29,7 +31,11 @@ void mainDelegate() {
     DeviceOrientation.portraitDown,
   ]);
 
+  //Configure Singletons for later use.
   GetIt.instance.registerSingleton<AuthUtils>(new AuthUtils());
+  GetIt.instance.registerSingleton<DatabaseUtils>(new DatabaseUtils());
+  GetIt.instance.registerSingleton<TicketProvider>(new TicketProvider());
+
   runApp(
       new MaterialApp(
           // Text scaling for accessibility mode turned off with 1.0 scale factor

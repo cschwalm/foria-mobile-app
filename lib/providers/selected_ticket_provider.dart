@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/database_utils.dart';
 import 'package:foria_flutter_client/api.dart';
+import 'package:get_it/get_it.dart';
 import 'package:otp/otp.dart';
 
 ///
@@ -12,8 +14,6 @@ import 'package:otp/otp.dart';
 class SelectedTicketProvider extends ChangeNotifier {
 
   final Event _event;
-  final Set<Ticket> _eventTickets;
-  final DatabaseUtils _databaseUtils = new DatabaseUtils();
 
   final int _refreshInterval = 30;
   final int _otpLength = 6;
@@ -22,12 +22,18 @@ class SelectedTicketProvider extends ChangeNotifier {
   final Map<String, String> _barcodeTextMap = new Map<String, String>();
   final Map<String, String> _ticketSecretMap = new Map<String, String>();
 
+  DatabaseUtils _databaseUtils;
+  TicketProvider _ticketProvider;
+
   int _secondsRemaining = 0;
   Timer _timer;
 
-  SelectedTicketProvider(this._event, this._eventTickets) {
+  SelectedTicketProvider(this._event) {
     _refreshBarcodes(_timer);
     _timer = Timer.periodic(_tick, _refreshBarcodes);
+
+    _databaseUtils = GetIt.instance<DatabaseUtils>();
+    _ticketProvider = GetIt.instance<TicketProvider>();
   }
 
   @override
@@ -38,7 +44,7 @@ class SelectedTicketProvider extends ChangeNotifier {
     super.dispose();
   }
 
-  List<Ticket> get eventTickets => List.unmodifiable(_eventTickets);
+  List<Ticket> get eventTickets => List.unmodifiable(_ticketProvider.getTicketsForEventId(_event.id));
   Event get event => _event;
   int get secondsRemaining => _secondsRemaining;
 
@@ -94,13 +100,14 @@ class SelectedTicketProvider extends ChangeNotifier {
 
     if (_secondsRemaining <= 0) {
 
-      for (final Ticket ticket in _eventTickets) {
+      final Set<Ticket> tickets = _ticketProvider.getTicketsForEventId(_event.id);
+      for (final Ticket ticket in tickets) {
 
         final String barcodeText = await _getTicketString(ticket);
         _barcodeTextMap[ticket.id] = barcodeText;
         _secondsRemaining = 30;
       }
-      debugPrint('${_eventTickets.length} tickets barcodes updated.');
+      debugPrint('${tickets.length} tickets barcodes updated.');
 
     } else {
       _secondsRemaining--;

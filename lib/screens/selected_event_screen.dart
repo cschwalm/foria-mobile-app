@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/providers/selected_ticket_provider.dart';
+import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/static_images.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria_flutter_client/api.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -27,18 +29,26 @@ class SelectedEventScreen extends StatefulWidget {
 class _SelectedEventScreenState extends State<SelectedEventScreen> {
 
   SelectedTicketProvider _selectedTicketProvider;
+  TicketProvider _ticketProvider; //TODO: Use this to call transferTicket & cancelTicket.
+
+  @override
+  void initState() {
+
+    Wakelock.enable();
+    _ticketProvider = GetIt.instance<TicketProvider>();
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
 
-    Wakelock.enable();
     final Map<String, dynamic> args = ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
-
     if (_selectedTicketProvider == null) {
-      if (args == null || args['event'] == null || args['tickets'] == null) {
+      if (args == null || args['event'] == null) {
         _selectedTicketProvider = widget._selectedTicketProvider;
       } else {
-        _selectedTicketProvider = new SelectedTicketProvider(args['event'], args['tickets']);
+        _selectedTicketProvider = new SelectedTicketProvider(args['event']);
       }
     }
 
