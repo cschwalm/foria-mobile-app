@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foria/utils/auth_utils.dart';
@@ -268,9 +269,9 @@ class TicketProvider extends ChangeNotifier {
   /// If this call is successful, the ticket status goes back to ACTIVE.
   /// Throws exception on network error.
   ///
-  Future<void> cancelTicketTransfer(String ticketId) async {
+  Future<void> cancelTicketTransfer(final Ticket currentTicket) async {
 
-    if (ticketId == null) {
+    if (currentTicket == null) {
       return null;
     }
 
@@ -280,14 +281,22 @@ class TicketProvider extends ChangeNotifier {
     }
 
     try {
-      await _ticketApi.cancelTransfer(ticketId);
+      await _ticketApi.cancelTransfer(currentTicket.id);
     } on ApiException catch (ex) {
       print("### FORIA SERVER ERROR: cancelTransfer ###");
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
       rethrow;
     }
 
-    debugPrint('Ticket Id: $ticketId ticket transfer canceled.');
+    _ticketSet.remove(currentTicket); //Remove stale ticket. Status is out of date.
+
+    currentTicket.status = 'ACTIVE';
+    _ticketSet.add(currentTicket);
+
+    await _databaseUtils.storeTicketSet(_ticketSet);
+    notifyListeners();
+
+    debugPrint('Ticket Id: ${currentTicket.id} ticket transfer canceled. Ticket set to ACTIVE.');
   }
 
   ///
@@ -297,8 +306,9 @@ class TicketProvider extends ChangeNotifier {
   ///
   /// Throws exception on network error.
   ///
-  Future<Ticket> transferTicket(String ticketId, String email) async {
-    if (ticketId == null || email == null) {
+  Future<Ticket> transferTicket(final Ticket currentTicket, final String email) async {
+
+    if (currentTicket == null || email == null) {
       return null;
     }
 
@@ -310,17 +320,26 @@ class TicketProvider extends ChangeNotifier {
     final TransferRequest transferRequest = new TransferRequest();
     transferRequest.receiverEmail = email;
 
-    Ticket ticket;
+    Ticket updatedTicket;
     try {
-      ticket = await _ticketApi.transferTicket(ticketId, transferRequest: transferRequest);
+      updatedTicket = await _ticketApi.transferTicket(currentTicket.id, transferRequest: transferRequest);
     } on ApiException catch (ex) {
       print("### FORIA SERVER ERROR: transferTicket ###");
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
       rethrow;
     }
 
-    debugPrint('Ticket Id: $ticketId submitted for transfer. New status: ${ticket.status}');
-    return ticket;
+    _ticketSet.remove(currentTicket); //Remove stale ticket. Status is out of date.
+
+    if (updatedTicket.status != 'ISSUED') { //Someone else does not own ticket.
+      _ticketSet.add(updatedTicket);
+    }
+
+    await _databaseUtils.storeTicketSet(_ticketSet);
+    notifyListeners();
+
+    debugPrint('Ticket Id: ${updatedTicket.id} submitted for transfer. New status: ${updatedTicket.status}');
+    return updatedTicket;
   }
 
   ///

@@ -1,17 +1,33 @@
 
 import 'package:flutter/material.dart';
+import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/primary_button.dart';
+import 'package:foria_flutter_client/api.dart';
+import 'package:get_it/get_it.dart';
 
 class TransferScreen extends StatelessWidget {
+
   final _emailController = TextEditingController();
   static const routeName = '/transfer-screen';
+  final TicketProvider _ticketProvider = GetIt.instance<TicketProvider>();
 
-  void _saveEmail() {
-    if (_emailController.text.isEmpty) {
+  ///
+  /// Block and wait until transfer network call completes.
+  ///
+  void _transferTicket() async {
+
+    final email = _emailController.text;
+    if (email.isEmpty) {
       return;
     }
-    //Corbin to hook up to API
+
+    Ticket ticket;
+    try {
+      ticket = await _ticketProvider.transferTicket(null, email);
+    } catch (ex) {
+      //TODO: Handle error case.
+    }
   }
 
   @override
@@ -57,7 +73,7 @@ class TransferScreen extends StatelessWidget {
             SizedBox(height: 20,),
             PrimaryButton(
               text: transferConfirm,
-              onPress: _saveEmail,
+              onPress: _transferTicket,
             ),
           ],
         ),
