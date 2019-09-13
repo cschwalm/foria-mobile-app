@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:foria/providers/ticket_provider.dart';
+import 'package:get_it/get_it.dart';
 import 'package:foria/utils/size_config.dart';
 import 'package:foria/utils/auth_utils.dart';
 
@@ -62,9 +63,6 @@ class Tabs extends StatefulWidget {
 
 class TabsState extends State<Tabs> {
 
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-  final TicketProvider _ticketProvider = new TicketProvider();
-
   PageController _tabController;
   MyEventsTab _myPassesTab;
   AccountTab _accountTab;
@@ -74,8 +72,9 @@ class TabsState extends State<Tabs> {
 
   @override
   void initState() {
+
     _tabController = new PageController();
-    _myPassesTab = new MyEventsTab(AuthUtils(), TicketProvider());
+    _myPassesTab = new MyEventsTab();
     _accountTab = new AccountTab();
 
     this._titleApp = TabItems[0].title;
@@ -184,9 +183,12 @@ class TabsState extends State<Tabs> {
   ///
   void _setupCloudMessaging(BuildContext context) {
 
-    _firebaseMessaging.requestNotificationPermissions(); //Moving permission here is better UI.
-    _firebaseMessaging.getToken().then((token) => _ticketProvider.registerDeviceToken(token));
-    _firebaseMessaging.configure(
+    final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+    final TicketProvider ticketProvider = GetIt.instance<TicketProvider>();
+
+    firebaseMessaging.requestNotificationPermissions(); //Moving permission here is better UI.
+    firebaseMessaging.getToken().then((token) => ticketProvider.registerDeviceToken(token));
+    firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
 
         String title, body;
