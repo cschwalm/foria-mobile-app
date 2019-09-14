@@ -65,7 +65,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data
-                        android:host="foriatickets-test.auth0.com"
+                        android:host="auth-test.foriatickets.com"
                         android:pathPrefix="/android/${applicationId}/callback"
                         android:scheme="${applicationId}" />
             </intent-filter>

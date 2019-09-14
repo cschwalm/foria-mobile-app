@@ -53,12 +53,11 @@ class _Config {
   static const apiBasePath = 'apiBasePath';
   static const jwksPath = 'jwksPath';
 
-
   static Map<String, dynamic> stagingConstants = {
     auth0ClientKey: 'QilsQNvoUwUVAMkkFAg4mBPgtrK9HwaU',
     auth0Audience: 'api.foriatickets.com',
-    auth0BaseUrl: 'https://foriatickets-test.auth0.com',
-    jwtIssuer: 'https://foriatickets-test.auth0.com/',
+    auth0BaseUrl: 'https://auth-test.foriatickets.com',
+    jwtIssuer: 'https://auth-test.foriatickets.com/',
     apiBasePath: 'https://test-api.foriatickets.com/v1',
     jwksPath: 'assets/jwks_staging.json',
   };
