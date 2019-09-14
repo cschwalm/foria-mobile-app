@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/providers/selected_ticket_provider.dart';
-import 'package:foria/screens/transfer_screen.dart';
 import 'package:foria/providers/ticket_provider.dart';
+import 'package:foria/screens/transfer_screen.dart';
 import 'package:foria/utils/static_images.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/primary_button.dart';
@@ -31,14 +31,11 @@ class SelectedEventScreen extends StatefulWidget {
 class _SelectedEventScreenState extends State<SelectedEventScreen> {
 
   SelectedTicketProvider _selectedTicketProvider;
-  TicketProvider _ticketProvider; //TODO: Use this to call transferTicket & cancelTicket.
 
   @override
   void initState() {
 
     Wakelock.enable();
-    _ticketProvider = GetIt.instance<TicketProvider>();
-
     super.initState();
   }
 
@@ -181,7 +178,7 @@ class PassCard extends StatelessWidget {
                 PassRefresh(selectedTicketProvider.secondsRemaining),
               ],
             )),
-            PassOptions()
+            PassOptions(ticket)
           ],
         ),
       ),
@@ -331,6 +328,11 @@ class PassRefresh extends StatelessWidget {
 }
 
 class PassOptions extends StatelessWidget {
+
+  final Ticket _selectedTicket;
+
+  PassOptions(this._selectedTicket);
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -338,10 +340,27 @@ class PassOptions extends StatelessWidget {
         PrimaryButton(
           text: textTransfer,
           onPress: () {
-            Navigator.of(context).pushNamed(TransferScreen.routeName);
+            Navigator.of(context).pushNamed(
+                TransferScreen.routeName,
+              arguments: _selectedTicket,
+            );
           },
         ),
       ],
     );
+  }
+
+  ///
+  /// Block and wait until cancel transfer network call completes.
+  ///
+  void _cancelTransfer() async {
+
+    final TicketProvider ticketProvider = GetIt.instance<TicketProvider>();
+
+    try {
+      await ticketProvider.cancelTicketTransfer(null); //TODO: NEEDS TICKET ID
+    } catch (ex) {
+      //TODO: Handle error case.
+    }
   }
 }
