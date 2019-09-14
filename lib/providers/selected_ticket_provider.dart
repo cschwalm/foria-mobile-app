@@ -98,6 +98,10 @@ class SelectedTicketProvider extends ChangeNotifier {
   ///
   Future<void> _refreshBarcodes(Timer timer) async {
 
+    if (_ticketProvider == null || timer == null) {
+      return;
+    }
+
     if (_secondsRemaining <= 0) {
 
       final Set<Ticket> tickets = _ticketProvider.getTicketsForEventId(_event.id);

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/strings.dart';
@@ -6,11 +5,13 @@ import 'package:foria/widgets/primary_button.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
 
+///
+/// Screen allows user to enter information such as email to allow transfer of a single ticket to a different user.
+///
 class TransferScreen extends StatelessWidget {
 
   final _emailController = TextEditingController();
   static const routeName = '/transfer-screen';
-  final TicketProvider _ticketProvider = GetIt.instance<TicketProvider>();
 
   ///
   /// Block and wait until transfer network call completes.
@@ -18,12 +19,14 @@ class TransferScreen extends StatelessWidget {
   Future<void> _transferTicket(Ticket selectedTicket, BuildContext context) async {
 
     final email = _emailController.text;
-    if (email.isEmpty) {
+    final TicketProvider ticketProvider = GetIt.instance<TicketProvider>();
+
+    if (email.isEmpty || selectedTicket == null) {
       return;
     }
 
     try {
-      await _ticketProvider.transferTicket(selectedTicket, email);
+      await ticketProvider.transferTicket(selectedTicket, email);
       Navigator.of(context).maybePop();
     } catch (ex) {
       //TODO: Handle error case.

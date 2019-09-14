@@ -286,6 +286,9 @@ class TicketProvider extends ChangeNotifier {
       print("### FORIA SERVER ERROR: cancelTransfer ###");
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
       rethrow;
+    } catch (e) {
+      debugPrint("### NETWORK ERROR: cancelTransfer Msg: ${e.toString()} ###");
+      rethrow;
     }
 
     _ticketSet.remove(currentTicket); //Remove stale ticket. Status is out of date.
@@ -327,18 +330,24 @@ class TicketProvider extends ChangeNotifier {
       print("### FORIA SERVER ERROR: transferTicket ###");
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
       rethrow;
+    } catch (e) {
+      debugPrint("### NETWORK ERROR: transferTicket Msg: ${e.toString()} ###");
+      rethrow;
     }
 
     _ticketSet.remove(currentTicket); //Remove stale ticket. Status is out of date.
 
-    if (updatedTicket.status != 'ISSUED') { //Someone else does not own ticket.
+    if (updatedTicket != null) {
+
       _ticketSet.add(updatedTicket);
+      debugPrint('Ticket Id: ${currentTicket.id} submitted for transfer. New status: ${updatedTicket.status}');
+
+    } else {
+      debugPrint('Ticket Id: ${currentTicket.id} completed transfer. Ticket removed for user.');
     }
 
     await _databaseUtils.storeTicketSet(_ticketSet);
     notifyListeners();
-
-    debugPrint('Ticket Id: ${updatedTicket.id} submitted for transfer. New status: ${updatedTicket.status}');
   }
 
   ///
