@@ -178,7 +178,7 @@ class PassCard extends StatelessWidget {
                 PassRefresh(selectedTicketProvider.secondsRemaining),
               ],
             )),
-            PassOptions()
+            PassOptions(ticket)
           ],
         ),
       ),
@@ -329,6 +329,10 @@ class PassRefresh extends StatelessWidget {
 
 class PassOptions extends StatelessWidget {
 
+  final Ticket _selectedTicket;
+
+  PassOptions(this._selectedTicket);
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -336,7 +340,10 @@ class PassOptions extends StatelessWidget {
         PrimaryButton(
           text: textTransfer,
           onPress: () {
-            Navigator.of(context).pushNamed(TransferScreen.routeName);
+            Navigator.of(context).pushNamed(
+                TransferScreen.routeName,
+              arguments: _selectedTicket,
+            );
           },
         ),
       ],

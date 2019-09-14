@@ -15,16 +15,16 @@ class TransferScreen extends StatelessWidget {
   ///
   /// Block and wait until transfer network call completes.
   ///
-  void _transferTicket() async {
+  Future<void> _transferTicket(Ticket selectedTicket, BuildContext context) async {
 
     final email = _emailController.text;
     if (email.isEmpty) {
       return;
     }
 
-    Ticket ticket;
     try {
-      ticket = await _ticketProvider.transferTicket(null, email);
+      await _ticketProvider.transferTicket(selectedTicket, email);
+      Navigator.of(context).maybePop();
     } catch (ex) {
       //TODO: Handle error case.
     }
@@ -32,6 +32,8 @@ class TransferScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Ticket args = ModalRoute.of(context).settings.arguments as Ticket;
+
     return Scaffold(
       appBar: AppBar(title: Text(requestTransfer),),
       body: Padding(
@@ -73,7 +75,7 @@ class TransferScreen extends StatelessWidget {
             SizedBox(height: 20,),
             PrimaryButton(
               text: transferConfirm,
-              onPress: _transferTicket,
+              onPress: () => _transferTicket(args, context),
             ),
           ],
         ),

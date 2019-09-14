@@ -272,7 +272,7 @@ class TicketProvider extends ChangeNotifier {
   Future<void> cancelTicketTransfer(final Ticket currentTicket) async {
 
     if (currentTicket == null) {
-      return null;
+      return;
     }
 
     if (_ticketApi == null) {
@@ -306,10 +306,10 @@ class TicketProvider extends ChangeNotifier {
   ///
   /// Throws exception on network error.
   ///
-  Future<Ticket> transferTicket(final Ticket currentTicket, final String email) async {
+  Future<void> transferTicket(final Ticket currentTicket, final String email) async {
 
     if (currentTicket == null || email == null) {
-      return null;
+      return;
     }
 
     if (_ticketApi == null) {
@@ -339,7 +339,6 @@ class TicketProvider extends ChangeNotifier {
     notifyListeners();
 
     debugPrint('Ticket Id: ${updatedTicket.id} submitted for transfer. New status: ${updatedTicket.status}');
-    return updatedTicket;
   }
 
   ///
