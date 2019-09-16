@@ -12,6 +12,7 @@ import 'package:foria/screens/venue_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/database_utils.dart';
+import 'package:foria/utils/error_stream.dart';
 import 'package:get_it/get_it.dart';
 
 import 'navigation/CustomNoTransition.dart';
@@ -35,6 +36,7 @@ void mainDelegate() {
   //Configure Singletons for later use.
   GetIt.instance.registerSingleton<AuthUtils>(new AuthUtils());
   GetIt.instance.registerSingleton<DatabaseUtils>(new DatabaseUtils());
+  GetIt.instance.registerSingleton<ErrorStream>(new ErrorStream());
   GetIt.instance.registerSingleton<TicketProvider>(new TicketProvider());
 
   runApp(
