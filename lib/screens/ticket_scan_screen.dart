@@ -4,7 +4,7 @@ import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_camera_ml_vision/flutter_camera_ml_vision.dart';
 import 'package:foria/utils/scan_processor.dart';
-import 'package:foria/utils/static_images.dart';
+import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:wakelock/wakelock.dart';
 
@@ -135,11 +135,11 @@ class _CameraWidgetState extends State<CameraWidget> {
                 },
                 errorBuilder: (context, cameraError) {
                   return AlertDialog(
-                    title: Text('Camera permission required'),
-                    content: Text('Please go to your phone\'s settings and allow the Foria app to access your camera'),
+                    title: Text(camPermissionRequired),
+                    content: Text(camPermissionText),
                     actions: <Widget>[
                       FlatButton(
-                        child: Text('Ok'),
+                        child: Text(okText),
                         onPressed: () {
                           Navigator.of(context).maybePop();
                         },

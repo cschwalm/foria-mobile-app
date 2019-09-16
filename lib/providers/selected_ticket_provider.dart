@@ -98,7 +98,7 @@ class SelectedTicketProvider extends ChangeNotifier {
   ///
   Future<void> _refreshBarcodes(Timer timer) async {
 
-    if (_ticketProvider == null || timer == null) {
+    if (_ticketProvider == null) {
       return;
     }
 

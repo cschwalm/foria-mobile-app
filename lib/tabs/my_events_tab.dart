@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/auth_utils.dart';
+import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria/widgets/primary_button.dart';
@@ -123,6 +124,11 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
       print('getTickets network call failed. Loading from offline database.');
       showErrorAlert(context, ticketLoadingFailure);
       ticketProvider.loadUserDataFromLocalDatabase().then((_) {
+        setState(() {
+          _isTicketsLoaded = true;
+          _currentState = _LoadingState.DONE;
+        });
+      }).catchError((error) {
         setState(() {
           _isTicketsLoaded = true;
           _currentState = _LoadingState.DONE;

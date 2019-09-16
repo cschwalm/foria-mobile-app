@@ -8,6 +8,8 @@ import 'package:foria/utils/strings.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
 
+import 'constants.dart';
+
 enum ScanResult { ALLOW, DENY, ERROR }
 
 class ScanUIResult {

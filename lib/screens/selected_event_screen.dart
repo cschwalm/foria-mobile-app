@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/providers/selected_ticket_provider.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/screens/transfer_screen.dart';
-import 'package:foria/utils/static_images.dart';
+import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/primary_button.dart';
 import 'package:foria_flutter_client/api.dart';
@@ -12,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wakelock/wakelock.dart';
+import 'dart:io' show Platform;
 
 ///
 /// Screen displays rotating barcodes for user to scan.
@@ -137,6 +139,44 @@ class PassCard extends StatelessWidget {
     final passNumber = _index + 1;
     final Ticket ticket = selectedTicketProvider.eventTickets.elementAt(_index);
     final String barcodeText = selectedTicketProvider.getBarcodeText(ticket.id);
+    final double passRefreshHeight = 25;
+    Widget barcodeContent;
+    bool showTimer = false;
+    List<Widget> barcodeList = List<Widget>();
+
+
+    if(barcodeText == null){
+      barcodeContent = Center(
+        child: CupertinoActivityIndicator(),
+    );
+    } else if (ticket.status == ticketStatusTransferPending) {
+      barcodeContent = Stack(
+        children: <Widget>[
+          Image.asset(
+            transferPendingImage,
+            width: 220,
+            height: 220,
+          ),
+          Center(child: Text('Transfer Pending'),),
+        ],
+      );
+    } else {
+      showTimer = true;
+      barcodeContent = QrImage(data: barcodeText);
+    }
+
+    barcodeList.add(Container(
+      height: 220,
+      width: 220,
+      child: barcodeContent,
+    ));
+    barcodeList.add(SizedBox(height: 10));
+
+    if(showTimer){
+      barcodeList.add(PassRefresh(selectedTicketProvider.secondsRemaining,passRefreshHeight));
+    } else {
+      barcodeList.add(SizedBox(height: passRefreshHeight,));
+    }
 
     return Card(
       child: Padding(
@@ -164,18 +204,8 @@ class PassCard extends StatelessWidget {
                       .textTheme
                       .title,
                 ),
-                SizedBox(
-                  height: 20,
-                ),
-                barcodeText == null ? Text(barcodeLoading) :
-                QrImage(
-                  data: barcodeText,
-                  size: 220,
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                PassRefresh(selectedTicketProvider.secondsRemaining),
+                SizedBox(height: 20),
+                Column(children: barcodeList),
               ],
             )),
             PassOptions(ticket)
@@ -291,8 +321,9 @@ class Directions extends StatelessWidget {
 class PassRefresh extends StatelessWidget {
 
   final _secondsRemaining;
+  final double _height;
 
-  PassRefresh(this._secondsRemaining);
+  PassRefresh(this._secondsRemaining,this._height);
 
   @override
   Widget build(BuildContext context) {
@@ -300,28 +331,19 @@ class PassRefresh extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
+        Container(
+          width: 25,
+          height: _height,
+          alignment: Alignment.center,
+          child: Text(
+            _secondsRemaining.toString(),
+            style: Theme.of(context).textTheme.body2,
+          ),
+        ),
         Text(
           passRefresh,
           style: Theme.of(context).textTheme.body2,
         ),
-        Stack(
-          children: <Widget>[
-            Image.asset(
-              refreshIcon,
-              width: 30,
-              height: 30,
-            ),
-            Container(
-              height: 30,
-              width: 30,
-              alignment: Alignment.center,
-              child: Text(
-                _secondsRemaining.toString(),
-                style: Theme.of(context).textTheme.body2,
-              ),
-            ),
-          ],
-        )
       ],
     );
   }
@@ -335,31 +357,90 @@ class PassOptions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        PrimaryButton(
-          text: textTransfer,
+    PrimaryButton button;
+    Widget dialog;
+
+    if(Platform.isIOS){
+      dialog = CupertinoAlertDialog(
+        title: Text(textConfirmCancel),
+        content: Text(textConfirmCancelBody),
+        actions: <Widget>[
+          CupertinoDialogAction(
+            isDefaultAction: false,
+            child: Text(textClose),
+            onPressed: () => Navigator.of(context).maybePop(),
+          ),
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            child: Text(textConfirm),
+            onPressed: () {
+              _cancelTransfer(_selectedTicket);
+              Navigator.of(context).maybePop();
+            },
+          ),
+        ],
+      );
+    } else {
+      dialog = AlertDialog(
+        title: Text(textConfirmCancel),
+        content: Text(textConfirmCancelBody),
+        actions: <Widget>[
+          FlatButton(
+            child: Text(textConfirm),
+            onPressed: () {
+              _cancelTransfer(_selectedTicket);
+              Navigator.of(context).maybePop();
+            },
+          ),
+          FlatButton(
+            child: Text(textClose),
+            onPressed: () => Navigator.of(context).maybePop(),
+          ),
+        ],
+      );
+    }
+
+    if(_selectedTicket.status == ticketStatusTransferPending){
+
+
+      button = PrimaryButton(
+          text: cancelTransfer,
+          isActive: false,
           onPress: () {
-            Navigator.of(context).pushNamed(
-                TransferScreen.routeName,
-              arguments: _selectedTicket,
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return dialog;
+              },
             );
-          },
-        ),
-      ],
-    );
+          }
+      );
+    } else {
+      button = PrimaryButton(
+        text: textTransfer,
+        onPress: () {
+          Navigator.of(context).pushNamed(
+            TransferScreen.routeName,
+            arguments: _selectedTicket,
+          );
+        },
+      );
+    }
+
+    return button;
   }
 
   ///
   /// Block and wait until cancel transfer network call completes.
   ///
-  void _cancelTransfer() async {
+  Future<void> _cancelTransfer(Ticket _selectedTicket) async {
 
     final TicketProvider ticketProvider = GetIt.instance<TicketProvider>();
 
     try {
-      await ticketProvider.cancelTicketTransfer(null); //TODO: NEEDS TICKET ID
+      await ticketProvider.cancelTicketTransfer(_selectedTicket);
     } catch (ex) {
+      debugPrint('Transfer for ${_selectedTicket.id} failed');
       //TODO: Handle error case.
     }
   }

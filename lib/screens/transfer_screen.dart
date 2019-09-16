@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foria/providers/ticket_provider.dart';
+import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/primary_button.dart';
 import 'package:foria_flutter_client/api.dart';
@@ -52,6 +53,7 @@ class TransferScreen extends StatelessWidget {
               controller: _emailController,
               decoration: InputDecoration(
                   filled: true,
+                  errorText: 'error1',
                   labelText: emailFieldText,
                   labelStyle: Theme.of(context).textTheme.body2,
                   fillColor: Color(formInputColor),

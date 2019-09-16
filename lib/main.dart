@@ -10,8 +10,8 @@ import 'package:foria/screens/ticket_scan_screen.dart';
 import 'package:foria/screens/transfer_screen.dart';
 import 'package:foria/screens/venue_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
+import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/database_utils.dart';
-import 'package:foria/utils/strings.dart';
 import 'package:get_it/get_it.dart';
 
 import 'navigation/CustomNoTransition.dart';

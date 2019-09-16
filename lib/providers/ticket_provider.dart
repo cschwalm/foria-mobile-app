@@ -9,6 +9,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/database_utils.dart';
 import 'package:foria_flutter_client/api.dart';
+import 'package:foria/utils/strings.dart';
 
 ///
 /// Provides access to Ticket related data from the Foria backend.
@@ -367,7 +368,7 @@ class TicketProvider extends ChangeNotifier {
     int ticketsActivated = 0;
     for (Ticket ticket in tickets) {
 
-      if (ticket.status != 'ISSUED') {
+      if (ticket.status != ticketStatusIssued) {
         continue;
       }
 
