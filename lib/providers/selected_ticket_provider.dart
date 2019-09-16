@@ -44,7 +44,24 @@ class SelectedTicketProvider extends ChangeNotifier {
     super.dispose();
   }
 
-  List<Ticket> get eventTickets => List.unmodifiable(_ticketProvider.getTicketsForEventId(_event.id));
+  List<Ticket> get eventTickets {
+
+    final List<Ticket> tickets = List.of(_ticketProvider.getTicketsForEventId(_event.id));
+    tickets.sort((ticketA, ticketB) {
+
+      final String ticketTypeConfigA = ticketA.ticketTypeConfig.name;
+      final String ticketTypeConfigB = ticketB.ticketTypeConfig.name;
+
+      if (ticketTypeConfigA.compareTo(ticketTypeConfigB) != 0) {
+        return ticketTypeConfigA.compareTo(ticketTypeConfigB);
+      }
+
+      return ticketA.id.compareTo(ticketB.id);
+    });
+
+    return List.unmodifiable(tickets);
+  }
+
   Event get event => _event;
   int get secondsRemaining => _secondsRemaining;
 
