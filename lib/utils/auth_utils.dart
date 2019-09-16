@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_auth0/flutter_auth0.dart';
@@ -30,6 +31,8 @@ class AuthUtils {
   static final Auth0 _auth = new Auth0(clientId: Configuration.auth0ClientKey, baseUrl: Configuration.auth0BaseUrl);
 
   static final _storage = new FlutterSecureStorage();
+
+  static final FirebaseAnalytics _analytics = new FirebaseAnalytics();
 
   ///
   /// Returns API client for use in Foria API libs.
@@ -251,6 +254,7 @@ class AuthUtils {
       }
     }
 
+    _analytics.setUserId(jwt.claims.subject);
     return true;
   }
 
