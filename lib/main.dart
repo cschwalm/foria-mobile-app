@@ -32,9 +32,9 @@ void mainDelegate() {
   ]);
 
   //Configure Singletons for later use.
-  final ErrorStream errorStream = new ErrorStream();
   GetIt.instance.registerSingleton<AuthUtils>(new AuthUtils());
   GetIt.instance.registerSingleton<DatabaseUtils>(new DatabaseUtils());
+  final ErrorStream errorStream = new ErrorStream();
   GetIt.instance.registerSingleton<ErrorStream>(errorStream);
   GetIt.instance.registerSingleton<TicketProvider>(new TicketProvider());
 
