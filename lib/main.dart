@@ -23,10 +23,6 @@ import 'screens/selected_event_screen.dart';
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final FirebaseAnalytics analytics = FirebaseAnalytics();
 
-const Color textGreyColor = Color(0xFFC7C7C7);
-const Color shapeGreyColor = Color(0xFFC7C7C7);
-const Color settingsBackgroundColor = Color(0xffEEEEEE);
-
 void mainDelegate() {
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -53,16 +49,16 @@ void mainDelegate() {
           theme: new ThemeData(
             backgroundColor: Colors.white,
             appBarTheme: AppBarTheme(
-              color: Color(primaryColorDark),
+              color: constPrimaryColorDark,
             ),
-            primaryColor: Color(primaryColor),
-            primaryColorDark: Color(primaryColorDark),
+            primaryColor: constPrimaryColor,
+            primaryColorDark: constPrimaryColorDark,
             fontFamily: 'Rubik',
             textTheme: TextTheme(
               title: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
               button: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white),
-              body1: TextStyle(fontSize: 18.0, color: Color(textGrey)),
-              body2: TextStyle(fontSize: 14.0, color: Color(textGrey)),
+              body1: TextStyle(fontSize: 18.0, color: textGreyColor),
+              body2: TextStyle(fontSize: 14.0, color: textGreyColor),
               display1: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.black),
               headline: TextStyle(
                 fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.black, fontFamily: 'Rubik',),

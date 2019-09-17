@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +7,7 @@ import 'package:foria/providers/selected_ticket_provider.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/screens/transfer_screen.dart';
 import 'package:foria/utils/constants.dart';
+import 'package:foria/utils/error_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/primary_button.dart';
 import 'package:foria_flutter_client/api.dart';
@@ -13,7 +16,6 @@ import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wakelock/wakelock.dart';
-import 'dart:io' show Platform;
 
 ///
 /// Screen displays rotating barcodes for user to scan.
@@ -36,7 +38,6 @@ class _SelectedEventScreenState extends State<SelectedEventScreen> {
 
   @override
   void initState() {
-
     Wakelock.enable();
     super.initState();
   }
@@ -53,14 +54,10 @@ class _SelectedEventScreenState extends State<SelectedEventScreen> {
       }
     }
 
-    return Scaffold(
-      resizeToAvoidBottomPadding: false,
-      backgroundColor: Colors.black,
-      body: ChangeNotifierProvider<SelectedTicketProvider>.value(
+    return ChangeNotifierProvider<SelectedTicketProvider>.value(
         value: _selectedTicketProvider,
         child: PassBody(),
-      )
-    );
+      );
   }
 
   @override
@@ -71,7 +68,12 @@ class _SelectedEventScreenState extends State<SelectedEventScreen> {
   }
 }
 
+///
+/// Creates the page view for ticket displays
+///
 class PassBody extends StatelessWidget {
+
+  final ErrorStream errorStream = GetIt.instance<ErrorStream>();
 
   @override
   Widget build(BuildContext context) {
@@ -84,40 +86,56 @@ class PassBody extends StatelessWidget {
     final SelectedTicketProvider _selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: false);
     final int _passCount = _selectedTicketProvider.eventTickets.length;
 
-    return SafeArea(
-      child: Column(
-        children: <Widget>[
-          Row(
-              children: <Widget>[
-                GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: closeButtonPadding, vertical: verticalPadding),
-                    child: Icon(
-                      Icons.close,
-                      color: Colors.white,
+    errorStream.stream.listen((errorMessage) {
+      Scaffold.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: snackbarColor,
+            elevation: 0,
+            content: FlatButton(
+              child: Text(errorMessage.body),
+              onPressed: () => Scaffold.of(context).hideCurrentSnackBar(),
+            ),
+          )
+      );
+    });
+
+    return Scaffold(
+        resizeToAvoidBottomPadding: false,
+        backgroundColor: Colors.black,
+        body: SafeArea(
+        child: Column(
+          children: <Widget>[
+            Row(
+                children: <Widget>[
+                  GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: closeButtonPadding, vertical: verticalPadding),
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                      ),
                     ),
+                    onTap: () {
+                      Navigator.maybePop(context);
+                    },
                   ),
-                  onTap: () {
-                    Navigator.maybePop(context);
-                  },
-                ),
-              ],
+                ],
+              ),
+            Expanded(
+              child: PageView.builder(
+                // store this controller in a State to save the carousel scroll position
+                controller: PageController(viewportFraction: viewportFraction),
+                itemCount: _passCount,
+                itemBuilder: (BuildContext context, int itemIndex) {
+                  return PassCard(itemIndex, _passCount);
+                },
+              ),
             ),
-          Expanded(
-            child: PageView.builder(
-              // store this controller in a State to save the carousel scroll position
-              controller: PageController(viewportFraction: viewportFraction),
-              itemCount: _passCount,
-              itemBuilder: (BuildContext context, int itemIndex) {
-                return PassCard(itemIndex, _passCount);
-              },
-            ),
-          ),
-          SizedBox(height: verticalPadding,)
-        ],
-      ),
-    );
+            SizedBox(height: verticalPadding,)
+          ],
+        ),
+      ));
   }
 }
 
@@ -157,7 +175,7 @@ class PassCard extends StatelessWidget {
             width: 220,
             height: 220,
           ),
-          Center(child: Text('Transfer Pending'),),
+          Center(child: Text(textTransferPending),),
         ],
       );
     } else {
@@ -216,6 +234,9 @@ class PassCard extends StatelessWidget {
   }
 }
 
+///
+/// Displays the event name, venue name and date
+///
 class EventInfo extends StatelessWidget {
 
   @override
@@ -282,6 +303,9 @@ class EventInfo extends StatelessWidget {
   }
 }
 
+///
+/// Directions provided via google maps link
+///
 class Directions extends StatelessWidget {
 
   @override
@@ -318,6 +342,9 @@ class Directions extends StatelessWidget {
   }
 }
 
+///
+/// Countdown to pass refresh widget
+///
 class PassRefresh extends StatelessWidget {
 
   final _secondsRemaining;
@@ -349,11 +376,24 @@ class PassRefresh extends StatelessWidget {
   }
 }
 
-class PassOptions extends StatelessWidget {
+///
+/// Button to initiate a transfer or to cancel a transfer.
+///
+/// There is a popup to confirm cancel transfer
+///
+class PassOptions extends StatefulWidget {
 
   final Ticket _selectedTicket;
 
   PassOptions(this._selectedTicket);
+
+  @override
+  _PassOptionsState createState() => _PassOptionsState();
+}
+
+class _PassOptionsState extends State<PassOptions> {
+
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -374,7 +414,7 @@ class PassOptions extends StatelessWidget {
             isDefaultAction: true,
             child: Text(textConfirm),
             onPressed: () {
-              _cancelTransfer(_selectedTicket);
+              _cancelTransfer(widget._selectedTicket);
               Navigator.of(context).maybePop();
             },
           ),
@@ -388,7 +428,7 @@ class PassOptions extends StatelessWidget {
           FlatButton(
             child: Text(textConfirm),
             onPressed: () {
-              _cancelTransfer(_selectedTicket);
+              _cancelTransfer(widget._selectedTicket);
               Navigator.of(context).maybePop();
             },
           ),
@@ -400,19 +440,21 @@ class PassOptions extends StatelessWidget {
       );
     }
 
-    if(_selectedTicket.status == ticketStatusTransferPending){
-
-
+    if (widget._selectedTicket.status == ticketStatusTransferPending) {
       button = PrimaryButton(
           text: cancelTransfer,
-          isActive: false,
+          isLoading: _isLoading,
           onPress: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return dialog;
-              },
-            );
+            if(!_isLoading){
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return dialog;
+                },
+              );
+            } else {
+              return null;
+            }
           }
       );
     } else {
@@ -421,7 +463,7 @@ class PassOptions extends StatelessWidget {
         onPress: () {
           Navigator.of(context).pushNamed(
             TransferScreen.routeName,
-            arguments: _selectedTicket,
+            arguments: widget._selectedTicket,
           );
         },
       );
@@ -434,14 +476,22 @@ class PassOptions extends StatelessWidget {
   /// Block and wait until cancel transfer network call completes.
   ///
   Future<void> _cancelTransfer(Ticket _selectedTicket) async {
-
+    final ErrorStream errorStream = GetIt.instance<ErrorStream>();
     final TicketProvider ticketProvider = GetIt.instance<TicketProvider>();
+
+    setState(() {
+      _isLoading = true;
+    });
 
     try {
       await ticketProvider.cancelTicketTransfer(_selectedTicket);
     } catch (ex) {
       debugPrint('Transfer for ${_selectedTicket.id} failed');
-      //TODO: Handle error case.
+      errorStream.announceError(new ErrorMessage("", netConnectionError));
     }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 }

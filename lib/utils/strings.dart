@@ -14,6 +14,8 @@ const String textConfirm = 'Confirm';
 
 const String textClose = 'Close';
 
+const String netConnectionError = 'Internet connection failed. Please try again.';
+
 
 // Venue related strings. //
 
@@ -92,7 +94,7 @@ const String emailFieldText = 'Email';
 
 const String enterValidEmail = 'Please enter a valid email address.';
 
-const String enterTransferEmail = 'Enter transferee\'s email:';
+const String enterTransferEmail = 'Transferee\'s email:';
 
 const String requestTransfer = 'Request Transfer';
 
@@ -103,6 +105,8 @@ const String textConfirmCancel = 'Confirm Cancellation';
 const String textConfirmCancelBody = 'This will cancel the pending transfer. The transferee will be notified.';
 
 const String textTransfer = 'Transfer';
+
+const String textTransferPending = 'Transfer Pending';
 
 // ticket_scan_screen Strings. //
 

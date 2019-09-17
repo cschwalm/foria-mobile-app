@@ -86,7 +86,7 @@ PODS:
     - Flutter
   - flutter_email_sender (0.0.1):
     - Flutter
-  - flutter_secure_storage (3.2.0):
+  - flutter_secure_storage (3.3.1):
     - Flutter
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
@@ -250,7 +250,7 @@ SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   flutter_auth0: 1d379ce1faf80f27b1058ef2502b6d0181561bdb
   flutter_email_sender: f787522d0e82f50e5766c1213dbffff22fdcf009
-  flutter_secure_storage: 0c5779648ff644110e507909b77a57e620cbbf8b
+  flutter_secure_storage: 7953c38a04c3fdbb00571bcd87d8e3b5ceb9daec
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   GoogleAPIClientForREST: 44c7b678cbab11d26a47eab7309d6179b1a61f0c
   GoogleAppMeasurement: 86a82f0e1f20b8eedf8e20326530138fd71409de

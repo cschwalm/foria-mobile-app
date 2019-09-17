@@ -139,7 +139,7 @@ class AuthUtils {
   /// WARNING: This deletes all data in the secure storage.
   ///
   Future<void> logout() async {
-    DatabaseUtils.deleteDatabase();
+    await DatabaseUtils.deleteDatabase();
     await _storage.deleteAll();
 
     debugPrint("Logout called. Secrets deleted.");

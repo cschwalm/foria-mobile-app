@@ -310,10 +310,10 @@ class TicketProvider extends ChangeNotifier {
   ///
   /// Throws exception on network error.
   ///
-  Future<void> transferTicket(final Ticket currentTicket, final String email) async {
+  Future<Ticket> transferTicket(final Ticket currentTicket, final String email) async {
 
     if (currentTicket == null || email == null) {
-      return;
+      return null;
     }
 
     if (_ticketApi == null) {
@@ -349,6 +349,7 @@ class TicketProvider extends ChangeNotifier {
 
     await _databaseUtils.storeTicketSet(_ticketSet);
     notifyListeners();
+    return updatedTicket;
   }
 
   ///

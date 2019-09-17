@@ -29,7 +29,7 @@ dependencies:
   firebase_messaging: ^5.1.4
   flutter_auth0: ^0.5.0
   flutter_camera_ml_vision: ^2.2.1
-  flutter_secure_storage: 3.2.1
+  flutter_secure_storage: 3.3.1
   font_awesome_flutter: ^8.0.1
   get_it: ^3.0.0+1
   intl: ^0.16.0

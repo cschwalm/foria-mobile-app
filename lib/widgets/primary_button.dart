@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:foria/main.dart' as theme;
+import 'package:foria/utils/constants.dart';
 
 class PrimaryButton extends StatelessWidget {
   final String text;
@@ -52,7 +52,7 @@ class PrimaryButton extends StatelessWidget {
       minSize: minSize,
       padding: EdgeInsets.zero,
       color: Theme.of(context).primaryColor,
-      disabledColor: isActive ? Theme.of(context).primaryColor : theme.shapeGreyColor,
+      disabledColor: isActive ? Theme.of(context).primaryColor : textGreyColor,
       onPressed: onPress,
       child: isLoading ? _loadingContent() : _buttonContent(context),
     );

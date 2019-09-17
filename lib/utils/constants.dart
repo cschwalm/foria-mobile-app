@@ -18,13 +18,17 @@ const String transferPendingImage = 'assets/ui_elements/transfer-pending-image.p
 
 // Theme formatting. //
 
-final int primaryColor = 0xFFFF0266;
+final Color constPrimaryColor = Color(0xFFFF0266);
 
-final int primaryColorDark = 0xFFC5003C;
+final Color constPrimaryColorDark = Color(0xFFC5003C);
 
-final int textGrey = 0xFF7E7E7E;
+const Color settingsBackgroundColor = Color(0xffEEEEEE);
 
-final int formInputColor = 0xFFF2F2F2;
+final Color textGreyColor = Color(0xFF7E7E7E);
+
+final Color formInputColor = Color(0xFFF2F2F2);
+
+final Color snackbarColor = Color(0xFF313131);
 
 const BorderRadius buttonBorderRadius = BorderRadius.all(Radius.circular(8.0));
 

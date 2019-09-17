@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/constants.dart';
-import 'package:foria/utils/error_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria/widgets/primary_button.dart';
@@ -54,12 +53,6 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
     _isUserEmailCheckFinished = false;
     _isTicketsLoaded = false;
     _isTicketsReactivateLoading = false;
-
-    /// TODO: THIS IS EXAMPLE CODE - REMOVE ME ###
-    final ErrorStream errorStream = GetIt.instance<ErrorStream>();
-    errorStream.stream.listen((errorMessage) {
-      showErrorAlert(context, errorMessage.body);
-    });
 
     super.initState();
   }
@@ -161,10 +154,6 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
           _currentState = _LoadingState.DONE;
         }
       });
-
-      /// TODO: THIS IS EXAMPLE CODE - REMOVE ME ###
-      final ErrorStream errorStream = GetIt.instance<ErrorStream>();
-      errorStream.announceError(new ErrorMessage("Test", "test!"));
 
     } catch (ex) {
       print('getTickets network call failed during manual refresh. Loading from offline database.');
