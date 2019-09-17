@@ -32,10 +32,10 @@ void mainDelegate() {
   ]);
 
   //Configure Singletons for later use.
-  GetIt.instance.registerSingleton<AuthUtils>(new AuthUtils());
-  GetIt.instance.registerSingleton<DatabaseUtils>(new DatabaseUtils());
   final ErrorStream errorStream = new ErrorStream();
   GetIt.instance.registerSingleton<ErrorStream>(errorStream);
+  GetIt.instance.registerSingleton<AuthUtils>(new AuthUtils());
+  GetIt.instance.registerSingleton<DatabaseUtils>(new DatabaseUtils());
   GetIt.instance.registerSingleton<TicketProvider>(new TicketProvider());
 
   runZoned<Future<void>>(() async {

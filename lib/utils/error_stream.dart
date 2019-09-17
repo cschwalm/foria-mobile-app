@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
-import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/configuration.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria_flutter_client/api.dart' as foriaUser;
@@ -38,8 +37,13 @@ class ErrorStream {
 
   ErrorStream() {
     _streamController = new StreamController<ErrorMessage>.broadcast();
+  }
 
-    final foriaUser.User user = AuthUtils.user;
+  ///
+  /// Tags user with data from Auth0
+  ///
+  void setUserInfo(foriaUser.User user) {
+
     if (user != null) {
       final User userContext = new User(id: user.id, email: user.email);
       _sentry.userContext = userContext;
