@@ -8,8 +8,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/database_utils.dart';
-import 'package:foria_flutter_client/api.dart';
 import 'package:foria/utils/strings.dart';
+import 'package:foria_flutter_client/api.dart';
 
 ///
 /// Provides access to Ticket related data from the Foria backend.
@@ -160,7 +160,7 @@ class TicketProvider extends ChangeNotifier {
     Set<Ticket> newTickets = new Set<Ticket>();
     for (Ticket ticket in _ticketSet) {
 
-      if (ticket.status != 'ACTIVE') {
+      if (ticket.status != 'ACTIVE' && ticket.status != 'TRANSFER_PENDING') {
         continue;
       }
 
