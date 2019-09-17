@@ -1,15 +1,25 @@
 enum Environment { STAGING, PROD }
 
+///
+/// Class used to set environment specific constants.
+/// This class may also be used to determine the running mode of the app.
+///
 class Configuration {
+
   static Map<String, dynamic> _config;
+  static Environment _environment;
+
+  static Environment getEnvironment() => _environment;
 
   static void setEnvironment(Environment env) {
     switch (env) {
       case Environment.STAGING:
         _config = _Config.stagingConstants;
+        _environment = Environment.STAGING;
         break;
       case Environment.PROD:
         _config = _Config.prodConstants;
+        _environment = Environment.PROD;
         break;
     }
   }

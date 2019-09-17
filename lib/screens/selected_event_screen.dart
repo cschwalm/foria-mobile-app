@@ -476,7 +476,7 @@ class _PassOptionsState extends State<PassOptions> {
   /// Block and wait until cancel transfer network call completes.
   ///
   Future<void> _cancelTransfer(Ticket _selectedTicket) async {
-    final ErrorStream errorStream = GetIt.instance<ErrorStream>();
+
     final TicketProvider ticketProvider = GetIt.instance<TicketProvider>();
 
     setState(() {
@@ -487,7 +487,6 @@ class _PassOptionsState extends State<PassOptions> {
       await ticketProvider.cancelTicketTransfer(_selectedTicket);
     } catch (ex) {
       debugPrint('Transfer for ${_selectedTicket.id} failed');
-      errorStream.announceError(new ErrorMessage("", netConnectionError));
     }
 
     setState(() {

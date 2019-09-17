@@ -8,8 +8,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/database_utils.dart';
+import 'package:foria/utils/error_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria_flutter_client/api.dart';
+import 'package:get_it/get_it.dart';
 
 ///
 /// Provides access to Ticket related data from the Foria backend.
@@ -31,6 +33,8 @@ class TicketProvider extends ChangeNotifier {
 
   final Set<Event> _eventSet = new HashSet();
   final Set<Ticket> _ticketSet = new HashSet();
+
+  final ErrorStream errorStream = GetIt.instance<ErrorStream>();
 
   bool _ticketsActiveOnOtherDevice = false;
 
@@ -90,9 +94,11 @@ class TicketProvider extends ChangeNotifier {
     Set<Ticket> tickets;
     try {
       tickets = (await _userApi.getTickets()).toSet();
-    } on ApiException catch (ex) {
+    } on ApiException catch (ex, stackTrace) {
       print("### FORIA SERVER ERROR: getTickets ###");
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+
+      errorStream.announceError(new ErrorMessage.error("### FORIA SERVER ERROR: getTickets ###", ex.message, ex, stackTrace));
 
       if (ex.code == HttpStatus.unauthorized || ex.code == HttpStatus.forbidden) {
         debugPrint('Logging user out due to bad token.');
@@ -160,7 +166,7 @@ class TicketProvider extends ChangeNotifier {
     Set<Ticket> newTickets = new Set<Ticket>();
     for (Ticket ticket in _ticketSet) {
 
-      if (ticket.status != 'ACTIVE' && ticket.status != 'TRANSFER_PENDING') {
+      if (ticket.status != ticketStatusActive && ticket.status != ticketStatusTransferPending) {
         continue;
       }
 
@@ -209,9 +215,10 @@ class TicketProvider extends ChangeNotifier {
     RedemptionResult result;
     try {
      result = await _ticketApi.redeemTicket(redemptionRequest);
-    } on ApiException catch (ex) {
+    } on ApiException catch (ex, stackTrace) {
       debugPrint("### FORIA SERVER ERROR: redeemTicket ###");
       debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      errorStream.announceError(new ErrorMessage.error("### FORIA SERVER ERROR ###", ex.message, ex, stackTrace));
       throw new Exception(ex.message);
     } catch (e) {
       debugPrint("### NETWORK ERROR: redeemTicket Msg: ${e.toString()} ###");
@@ -250,9 +257,10 @@ class TicketProvider extends ChangeNotifier {
 
     try {
       await _userApi.registerToken(deviceToken);
-    } on ApiException catch (ex) {
+    } on ApiException catch (ex, stackTrace) {
       debugPrint("### FORIA SERVER ERROR: registerToken ###");
       debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      errorStream.announceError(new ErrorMessage.error("### FORIA SERVER ERROR ###", ex.message, ex, stackTrace));
       return;
     } catch (e) {
       debugPrint("### NETWORK ERROR: registerToken Msg: ${e.toString()} ###");
@@ -283,9 +291,10 @@ class TicketProvider extends ChangeNotifier {
 
     try {
       await _ticketApi.cancelTransfer(currentTicket.id);
-    } on ApiException catch (ex) {
+    } on ApiException catch (ex, stackTrace) {
       print("### FORIA SERVER ERROR: cancelTransfer ###");
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      errorStream.announceError(new ErrorMessage.error("### FORIA SERVER ERROR ###", ex.message, ex, stackTrace));
       rethrow;
     } catch (e) {
       debugPrint("### NETWORK ERROR: cancelTransfer Msg: ${e.toString()} ###");
@@ -327,9 +336,10 @@ class TicketProvider extends ChangeNotifier {
     Ticket updatedTicket;
     try {
       updatedTicket = await _ticketApi.transferTicket(currentTicket.id, transferRequest: transferRequest);
-    } on ApiException catch (ex) {
+    } on ApiException catch (ex, stackTrace) {
       print("### FORIA SERVER ERROR: transferTicket ###");
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      errorStream.announceError(new ErrorMessage.error("### FORIA SERVER ERROR: transferTicket ###", ex.message, ex, stackTrace));
       rethrow;
     } catch (e) {
       debugPrint("### NETWORK ERROR: transferTicket Msg: ${e.toString()} ###");
@@ -376,10 +386,11 @@ class TicketProvider extends ChangeNotifier {
       ActivationResult result;
       try {
         result = await _ticketApi.activateTicket(ticket.id);
-      } on ApiException catch (ex) {
+      } on ApiException catch (ex, stackTrace) {
         debugPrint("### FORIA SERVER ERROR: activateTicket ###");
         debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
-        throw new Exception(ex.message);
+        errorStream.announceError(new ErrorMessage.error("### FORIA SERVER ERROR: activateTicket ###", ex.message, ex, stackTrace));
+        rethrow;
       } catch (e) {
         debugPrint("### NETWORK ERROR: activateTicket Msg: ${e.toString()} ###");
         rethrow;
@@ -470,9 +481,10 @@ class TicketProvider extends ChangeNotifier {
     Event event;
     try {
       event = await _eventApi.getEvent(eventId);
-    } on ApiException catch (ex) {
+    } on ApiException catch (ex, stackTrace) {
       print("### FORIA SERVER ERROR: getEventById ###");
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      errorStream.announceError(new ErrorMessage.error("### FORIA SERVER ERROR: getEvent ###", ex.message, ex, stackTrace));
       rethrow;
     }
 

@@ -34,6 +34,9 @@ class AuthUtils {
 
   static final FirebaseAnalytics _analytics = new FirebaseAnalytics();
 
+  /// Data from logged in user
+  static User user;
+
   ///
   /// Returns API client for use in Foria API libs.
   /// This correctly sets the Bearer token for OAuth2 server authentication.
@@ -254,7 +257,14 @@ class AuthUtils {
       }
     }
 
-    _analytics.setUserId(jwt.claims.subject);
+    // Setup user data.
+    user = new User();
+    user.id = jwt.claims.subject;
+    user.email = jwt.claims["email"];
+    user.firstName = jwt.claims["given_name"];
+    user.lastName = jwt.claims["family_name"];
+
+    _analytics.setUserId(user.id);
     return true;
   }
 

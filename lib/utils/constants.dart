@@ -41,3 +41,6 @@ const Duration scannerShutdownDuration = Duration(seconds: 1);
 final dateFormatShortMonth = DateFormat('MMM');
 
 final dateFormatTime = DateFormat('jm');
+
+// Sentry DSN //
+const String sentryDsn = 'https://6c60214971cd4a2f914ebac3a233155d@sentry.io/1729721';
