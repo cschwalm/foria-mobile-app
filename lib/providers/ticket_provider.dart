@@ -300,7 +300,7 @@ class TicketProvider extends ChangeNotifier {
       rethrow;
     } catch (e) {
       debugPrint("### NETWORK ERROR: cancelTransfer Msg: ${e.toString()} ###");
-      errorStream.announceMessage(ForiaNotification.message(MessageType.ERROR, netConnectionError, null));
+      errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
       rethrow;
     }
 
@@ -346,7 +346,7 @@ class TicketProvider extends ChangeNotifier {
       return;
     } catch (e) {
       debugPrint("### NETWORK ERROR: transferTicket Msg: ${e.toString()} ###");
-      errorStream.announceMessage(ForiaNotification.message(MessageType.ERROR, netConnectionError, null));
+      errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
       return;
     }
 
@@ -398,7 +398,7 @@ class TicketProvider extends ChangeNotifier {
         rethrow;
       } catch (e) {
         debugPrint("### NETWORK ERROR: activateTicket Msg: ${e.toString()} ###");
-        errorStream.announceMessage(ForiaNotification.message(MessageType.ERROR, netConnectionError, null));
+        errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
         rethrow;
       }
 
