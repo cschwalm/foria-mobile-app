@@ -4,22 +4,32 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/database_utils.dart';
+import 'package:foria/utils/message_stream.dart';
 import 'package:foria_flutter_client/api.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
+
+import '../screens/selected_event_screen_test.dart';
 
 class MockDatabaseUtils extends Mock implements DatabaseUtils {}
 class MockEventApi extends Mock implements EventApi {}
 class MockTicketApi extends Mock implements TicketApi {}
 class MockUserApi extends Mock implements UserApi {}
+class MockMessageStream extends Mock implements MessageStream {}
 
 void main() {
+
+  final MessageStream messageStream = new MockMessageStream();
+  GetIt.instance.registerSingleton<MessageStream>(messageStream);
 
   final _channel = MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
   final DatabaseUtils databaseUtils = new MockDatabaseUtils();
   final TicketProvider ticketProvider = new TicketProvider();
 
   setUp(() {
-    
+
+    when(messageStream.stream).thenAnswer((_) => null);
+    when(mockStream.listen((_) => null)).thenAnswer((_) => null);
     ticketProvider.databaseUtils = databaseUtils;
 
     _channel.setMockMethodCallHandler((MethodCall methodCall) async {

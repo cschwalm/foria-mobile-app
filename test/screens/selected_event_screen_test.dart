@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
@@ -12,17 +11,21 @@ import 'package:mockito/mockito.dart';
 
 class MockSelectedTicketProvider extends Mock implements SelectedTicketProvider {}
 class MockMessageStream extends Mock implements MessageStream {}
-class MockStreamController extends Mock implements StreamController<ForiaNotification> {}
+class MockStream extends Mock implements Stream<ForiaNotification> {}
 
 final SelectedTicketProvider selectedTicketProviderMock = new MockSelectedTicketProvider();
 final MessageStream messageStreamMock = new MockMessageStream();
-
+final MockStream mockStream = new MockStream();
 
 void main() {
 
-  GetIt.instance.registerSingleton<MessageStream>(messageStreamMock);
+  final MessageStream messageStream = new MockMessageStream();
+  GetIt.instance.registerSingleton<MessageStream>(messageStream);
 
   setUp(() {
+    when(messageStream.stream).thenAnswer((_) => mockStream);
+    when(mockStream.listen((_) => null)).thenAnswer((_) => null);
+
     List<Ticket> tickets = _generateFakeTickets();
     when(selectedTicketProviderMock.eventTickets).thenReturn(UnmodifiableListView(tickets));
     when(selectedTicketProviderMock.event).thenReturn(_generateFakeEvents()[0]);
@@ -42,7 +45,6 @@ void main() {
     final String typeOfPassExpected = tickets[0].ticketTypeConfig.name;
     final String venueAddrName = events[0].address.venueName;
 
-    when(messageStreamMock.listen()).thenAnswer((_) async => null);
     expect(find.byType(PassBody), findsOneWidget);
     expect(find.text(nameOfFirstEventCardExpected), findsNWidgets(2)); //Currently set to 2 because partial of the next card is on screen.
     expect(find.text(typeOfPassExpected), findsOneWidget);

@@ -6,12 +6,17 @@ import 'package:foria/screens/login.dart';
 import 'package:foria/screens/splash_screen.dart';
 import 'package:foria/screens/venue_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
+import 'package:foria/utils/message_stream.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 
 class MockAuthUtils extends Mock implements AuthUtils {}
+class MockMessageStream extends Mock implements MessageStream {}
 
 void main() {
+
+  final MessageStream messageStream = new MockMessageStream();
+  GetIt.instance.registerSingleton<MessageStream>(messageStream);
 
   final AuthUtils authUtils = new MockAuthUtils();
   GetIt.instance.registerSingleton<AuthUtils>(authUtils);
