@@ -355,11 +355,11 @@ class TicketProvider extends ChangeNotifier {
     if (updatedTicket != null) {
 
       _ticketSet.add(updatedTicket);
-      errorStream.announceError(ForiaNotification.message(MessageType.MESSAGE, textTransferPending, null));
+      errorStream.announceMessage(ForiaNotification.message(MessageType.MESSAGE, textTransferPending, null));
       debugPrint('Ticket Id: ${currentTicket.id} submitted for transfer. New status: ${updatedTicket.status}');
 
     } else {
-      errorStream.announceError(ForiaNotification.message(MessageType.MESSAGE, textTransferComplete, null));
+      errorStream.announceMessage(ForiaNotification.message(MessageType.MESSAGE, textTransferComplete, null));
       debugPrint('Ticket Id: ${currentTicket.id} completed transfer. Ticket removed for user.');
     }
 

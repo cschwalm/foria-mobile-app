@@ -28,7 +28,10 @@ class ForiaNotification {
 
   String get body => _body;
   String get title => _title;
-  MessageType get message => _messageType;
+  MessageType get messageType => _messageType;
+  dynamic get stackTrace => _stackTrace;
+  dynamic get initialException => _initialException;
+
 
 }
 
@@ -88,7 +91,9 @@ class MessageStream {
   ///
   void announceError(ForiaNotification notification) {
 
-    reportError(notification._initialException, notification._stackTrace);
+    if (notification.messageType != MessageType.NETWORK_ERROR) {
+      reportError(notification.initialException, notification.stackTrace);
+    }
 
     if (_streamController.isPaused || _streamController.isClosed) {
       debugPrint('Failed to write error to error stream. Stream is paused/closed.');
