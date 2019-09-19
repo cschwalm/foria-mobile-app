@@ -437,15 +437,15 @@ class _PassOptionsState extends State<PassOptions> {
         content: Text(textConfirmCancelBody),
         actions: <Widget>[
           FlatButton(
+            child: Text(textClose),
+            onPressed: () => Navigator.of(context).maybePop(),
+          ),
+          FlatButton(
             child: Text(textConfirm),
             onPressed: () {
               _cancelTransfer(widget._selectedTicket);
               Navigator.of(context).maybePop();
             },
-          ),
-          FlatButton(
-            child: Text(textClose),
-            onPressed: () => Navigator.of(context).maybePop(),
           ),
         ],
       );

@@ -55,20 +55,6 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
     _isTicketsLoaded = false;
     _isTicketsReactivateLoading = false;
 
-    final ErrorStream errorStream = GetIt.instance<ErrorStream>();
-    errorStream.stream.listen((errorMessage) {
-      Scaffold.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: snackbarColor,
-            elevation: 0,
-            content: FlatButton(
-              child: Text(errorMessage.body),
-              onPressed: () => Scaffold.of(context).hideCurrentSnackBar(),
-            ),
-          )
-      );
-    });
-
     super.initState();
   }
 

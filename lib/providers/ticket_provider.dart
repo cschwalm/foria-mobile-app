@@ -9,7 +9,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/database_utils.dart';
 import 'package:foria/utils/error_stream.dart';
-import 'package:foria/utils/error_stream.dart' as prefix0;
 import 'package:foria/utils/strings.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
@@ -99,7 +98,7 @@ class TicketProvider extends ChangeNotifier {
       print("### FORIA SERVER ERROR: getTickets ###");
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
 
-//      errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
+      errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
 
       if (ex.code == HttpStatus.unauthorized || ex.code == HttpStatus.forbidden) {
         debugPrint('Logging user out due to bad token.');
@@ -219,11 +218,11 @@ class TicketProvider extends ChangeNotifier {
     } on ApiException catch (ex, stackTrace) {
       debugPrint("### FORIA SERVER ERROR: redeemTicket ###");
       debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
-//      errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
+      errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       throw new Exception(ex.message);
     } catch (e) {
       debugPrint("### NETWORK ERROR: redeemTicket Msg: ${e.toString()} ###");
-//      errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
+      errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
       rethrow;
     }
 
@@ -262,11 +261,11 @@ class TicketProvider extends ChangeNotifier {
     } on ApiException catch (ex, stackTrace) {
       debugPrint("### FORIA SERVER ERROR: registerToken ###");
       debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
-//      errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
+      errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       return;
     } catch (e) {
       debugPrint("### NETWORK ERROR: registerToken Msg: ${e.toString()} ###");
-//      errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, textGenericError, null, ex, stackTrace));
+      errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, textGenericError, null, null, null));
       return;
     }
 
@@ -344,11 +343,11 @@ class TicketProvider extends ChangeNotifier {
       debugPrint("### FORIA SERVER ERROR: transferTicket ###");
       debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
       errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
-      rethrow;
+      return;
     } catch (e) {
       debugPrint("### NETWORK ERROR: transferTicket Msg: ${e.toString()} ###");
       errorStream.announceMessage(ForiaNotification.message(MessageType.ERROR, netConnectionError, null));
-      rethrow;
+      return;
     }
 
     _ticketSet.remove(currentTicket); //Remove stale ticket. Status is out of date.

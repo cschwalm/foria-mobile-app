@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/primary_button.dart';
@@ -73,6 +74,7 @@ class _TransferScreenState extends State<TransferScreen> {
                     onSaved: (value) {
                       _emailSubmission = value;
                     },
+                keyboardType: TextInputType.emailAddress,
                   ),
             ),
             SizedBox(height: 20,),
