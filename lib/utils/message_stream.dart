@@ -38,12 +38,12 @@ class ForiaNotification {
 ///
 /// @author Corbin Schwalm <corbin@foriatickets.com>
 ///
-class ErrorStream {
+class MessageStream {
 
   final SentryClient _sentry = SentryClient(dsn: sentryDsn);
   StreamController<ForiaNotification> _streamController;
 
-  ErrorStream() {
+  MessageStream() {
     _streamController = new StreamController<ForiaNotification>.broadcast();
   }
 

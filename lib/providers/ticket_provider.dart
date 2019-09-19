@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/database_utils.dart';
-import 'package:foria/utils/error_stream.dart';
+import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
@@ -34,7 +34,7 @@ class TicketProvider extends ChangeNotifier {
   final Set<Event> _eventSet = new HashSet();
   final Set<Ticket> _ticketSet = new HashSet();
 
-  final ErrorStream errorStream = GetIt.instance<ErrorStream>();
+  final MessageStream errorStream = GetIt.instance<MessageStream>();
 
   bool _ticketsActiveOnOtherDevice = false;
 

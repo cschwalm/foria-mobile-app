@@ -10,7 +10,7 @@ import 'package:foria/screens/home.dart';
 import 'package:foria/screens/login.dart';
 import 'package:foria/screens/venue_screen.dart';
 import 'package:foria/utils/database_utils.dart';
-import 'package:foria/utils/error_stream.dart';
+import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria_flutter_client/api.dart';
@@ -36,7 +36,7 @@ class AuthUtils {
 
   static final FirebaseAnalytics _analytics = new FirebaseAnalytics();
 
-  final ErrorStream errorStream = GetIt.instance<ErrorStream>();
+  final MessageStream errorStream = GetIt.instance<MessageStream>();
 
   /// Data from logged in user
   static User user;

@@ -7,7 +7,7 @@ import 'package:foria/providers/selected_ticket_provider.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/screens/transfer_screen.dart';
 import 'package:foria/utils/constants.dart';
-import 'package:foria/utils/error_stream.dart';
+import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/primary_button.dart';
 import 'package:foria_flutter_client/api.dart';
@@ -86,7 +86,7 @@ class _PassBodyState extends State<PassBody> {
 
   @override
   void initState() {
-    final ErrorStream errorStream = GetIt.instance<ErrorStream>();
+    final MessageStream errorStream = GetIt.instance<MessageStream>();
     errorStream.stream.listen((errorMessage) {
       Scaffold.of(context).showSnackBar(
           SnackBar(
