@@ -29,6 +29,7 @@ void main() {
     List<Ticket> tickets = _generateFakeTickets();
     when(selectedTicketProviderMock.eventTickets).thenReturn(UnmodifiableListView(tickets));
     when(selectedTicketProviderMock.event).thenReturn(_generateFakeEvents()[0]);
+    when(selectedTicketProviderMock.getBarcodeText(argThat(anything))).thenAnswer((_) => "test");
   });
 
   testWidgets('selectedEventScreen containes proper event name', (WidgetTester tester) async {
