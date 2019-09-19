@@ -54,10 +54,13 @@ class _SelectedEventScreenState extends State<SelectedEventScreen> {
       }
     }
 
-    return ChangeNotifierProvider<SelectedTicketProvider>.value(
+    return Scaffold(
+        resizeToAvoidBottomPadding: false,
+        backgroundColor: Colors.black,
+        body: ChangeNotifierProvider<SelectedTicketProvider>.value(
         value: _selectedTicketProvider,
         child: PassBody(),
-      );
+      ));
   }
 
   @override
@@ -69,23 +72,21 @@ class _SelectedEventScreenState extends State<SelectedEventScreen> {
 }
 
 ///
-/// Creates the page view for ticket displays
+/// Creates the page view for ticket displays.
 ///
-class PassBody extends StatelessWidget {
-
-  final ErrorStream errorStream = GetIt.instance<ErrorStream>();
+/// Also listens for stream updates
+///
+class PassBody extends StatefulWidget {
 
   @override
-  Widget build(BuildContext context) {
+  _PassBodyState createState() => _PassBodyState();
+}
 
-    final double viewportFraction = 0.9;
-    final double width = MediaQuery.of(context).size.width;
-    final double closeButtonPadding = (1-viewportFraction) * width / 2;
-    final double verticalPadding = 7;
+class _PassBodyState extends State<PassBody> {
 
-    final SelectedTicketProvider _selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: false);
-    final int _passCount = _selectedTicketProvider.eventTickets.length;
-
+  @override
+  void initState() {
+    final ErrorStream errorStream = GetIt.instance<ErrorStream>();
     errorStream.stream.listen((errorMessage) {
       Scaffold.of(context).showSnackBar(
           SnackBar(
@@ -98,11 +99,21 @@ class PassBody extends StatelessWidget {
           )
       );
     });
+    super.initState();
+  }
 
-    return Scaffold(
-        resizeToAvoidBottomPadding: false,
-        backgroundColor: Colors.black,
-        body: SafeArea(
+  @override
+  Widget build(BuildContext context) {
+
+    final double viewportFraction = 0.9;
+    final double width = MediaQuery.of(context).size.width;
+    final double closeButtonPadding = (1-viewportFraction) * width / 2;
+    final double verticalPadding = 7;
+
+    final SelectedTicketProvider _selectedTicketProvider = Provider.of<SelectedTicketProvider>(context, listen: false);
+    final int _passCount = _selectedTicketProvider.eventTickets.length;
+
+    return SafeArea(
         child: Column(
           children: <Widget>[
             Row(
@@ -135,7 +146,7 @@ class PassBody extends StatelessWidget {
             SizedBox(height: verticalPadding,)
           ],
         ),
-      ));
+      );
   }
 }
 

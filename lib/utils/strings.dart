@@ -14,6 +14,12 @@ const String textConfirm = 'Confirm';
 
 const String textClose = 'Close';
 
+const String textError = 'Error';
+
+const String emailFieldText = 'Email';
+
+const String textGenericError = 'Sorry, there was a problem. Please try again later.';
+
 const String netConnectionError = 'Internet connection failed. Please try again.';
 
 
@@ -90,9 +96,7 @@ const String transferConfirm = 'Confirm Transfer';
 
 const String transferWarning = 'Transfers are non-reversible and processed immediately if the transferee has a Foria account. Otherwise, they are pending until the transferee creates an account. You can cancel a pending transfer.';
 
-const String emailFieldText = 'Email';
-
-const String enterValidEmail = 'Please enter a valid email address.';
+const String enterValidEmail = 'Please enter a valid email';
 
 const String enterTransferEmail = 'Transferee\'s email:';
 
@@ -107,6 +111,8 @@ const String textConfirmCancelBody = 'This will cancel the pending transfer. The
 const String textTransfer = 'Transfer';
 
 const String textTransferPending = 'Transfer Pending';
+
+const String textTransferComplete = 'Transfer Completed';
 
 // ticket_scan_screen Strings. //
 

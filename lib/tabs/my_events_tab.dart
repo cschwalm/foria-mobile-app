@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/constants.dart';
+import 'package:foria/utils/error_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria/widgets/primary_button.dart';
@@ -53,6 +54,20 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
     _isUserEmailCheckFinished = false;
     _isTicketsLoaded = false;
     _isTicketsReactivateLoading = false;
+
+    final ErrorStream errorStream = GetIt.instance<ErrorStream>();
+    errorStream.stream.listen((errorMessage) {
+      Scaffold.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: snackbarColor,
+            elevation: 0,
+            content: FlatButton(
+              child: Text(errorMessage.body),
+              onPressed: () => Scaffold.of(context).hideCurrentSnackBar(),
+            ),
+          )
+      );
+    });
 
     super.initState();
   }

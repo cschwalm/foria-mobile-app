@@ -6,22 +6,30 @@ import 'package:foria/utils/constants.dart';
 import 'package:foria_flutter_client/api.dart' as foriaUser;
 import 'package:sentry/sentry.dart';
 
+enum MessageType {
+  MESSAGE,
+  ERROR,
+  NETWORK_ERROR
+}
 ///
 /// Struct containing relevant error data to display.
 ///
-class ErrorMessage {
+class ForiaNotification {
+
+  final String _body;
+  final MessageType _messageType;
 
   final String _title;
-  final String _body;
+  dynamic _initialException;
+  dynamic _stackTrace;
 
-  dynamic initialException;
-  dynamic stackTrace;
-
-  ErrorMessage(this._title, this._body);
-  ErrorMessage.error(this._title, this._body, this.initialException, this.stackTrace);
+  ForiaNotification.error(this._messageType, this._body, this._title, this._initialException, this._stackTrace);
+  ForiaNotification.message(this._messageType, this._body, this._title);
 
   String get body => _body;
   String get title => _title;
+  MessageType get message => _messageType;
+
 }
 
 ///
@@ -33,10 +41,10 @@ class ErrorMessage {
 class ErrorStream {
 
   final SentryClient _sentry = SentryClient(dsn: sentryDsn);
-  StreamController<ErrorMessage> _streamController;
+  StreamController<ForiaNotification> _streamController;
 
   ErrorStream() {
-    _streamController = new StreamController<ErrorMessage>.broadcast();
+    _streamController = new StreamController<ForiaNotification>.broadcast();
   }
 
   ///
@@ -51,7 +59,26 @@ class ErrorStream {
   }
 
   /// Exposes steam to listen to.
-  Stream<ErrorMessage> get stream => _streamController.stream;
+  Stream<ForiaNotification> get stream => _streamController.stream;
+
+  ///
+  /// Use this method to send a user a message.
+  /// Ensure that the stream has a subscriber.
+  ///
+  void announceMessage(ForiaNotification notification) {
+
+    if (_streamController.isPaused || _streamController.isClosed) {
+      debugPrint('Failed to write message to stream. Stream is paused/closed.');
+      return;
+    }
+
+    if (!_streamController.hasListener) {
+      debugPrint('Failed to write message to stream. Stream has no listeners.');
+      return;
+    }
+
+    _streamController.add(notification);
+  }
 
   ///
   /// Use this method when an operation fails and you want to display an error to the user.
@@ -59,9 +86,9 @@ class ErrorStream {
   ///
   /// Reports error to Sentry in production.
   ///
-  void announceError(ErrorMessage errorMessage) {
+  void announceError(ForiaNotification notification) {
 
-    reportError(errorMessage.initialException, errorMessage.stackTrace);
+    reportError(notification._initialException, notification._stackTrace);
 
     if (_streamController.isPaused || _streamController.isClosed) {
       debugPrint('Failed to write error to error stream. Stream is paused/closed.');
@@ -73,7 +100,7 @@ class ErrorStream {
       return;
     }
 
-    _streamController.add(errorMessage);
+    _streamController.add(notification);
   }
 
   ///

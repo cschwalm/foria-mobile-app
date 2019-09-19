@@ -5,7 +5,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:get_it/get_it.dart';
 import 'package:foria/utils/size_config.dart';
-import 'package:foria/utils/auth_utils.dart';
 
 import '../tabs/account_tab.dart';
 import '../tabs/my_events_tab.dart';
