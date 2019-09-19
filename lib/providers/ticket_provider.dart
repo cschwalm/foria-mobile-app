@@ -394,10 +394,11 @@ class TicketProvider extends ChangeNotifier {
       } on ApiException catch (ex, stackTrace) {
         debugPrint("### FORIA SERVER ERROR: activateTicket ###");
         debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
-//        errorStream.announceError(new Notification.error("### FORIA SERVER ERROR ###", textGenericError, ex, stackTrace));
+        errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
         rethrow;
       } catch (e) {
         debugPrint("### NETWORK ERROR: activateTicket Msg: ${e.toString()} ###");
+        errorStream.announceMessage(ForiaNotification.message(MessageType.ERROR, netConnectionError, null));
         rethrow;
       }
 
@@ -489,7 +490,7 @@ class TicketProvider extends ChangeNotifier {
     } on ApiException catch (ex, stackTrace) {
       print("### FORIA SERVER ERROR: getEventById ###");
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
-//      errorStream.announceError(new Notification.error("### FORIA SERVER ERROR ###", textGenericError, ex, stackTrace));
+      errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       rethrow;
     }
 
