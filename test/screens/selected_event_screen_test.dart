@@ -4,20 +4,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foria/providers/selected_ticket_provider.dart';
 import 'package:foria/screens/selected_event_screen.dart';
+import 'package:foria/utils/message_stream.dart';
 import 'package:foria_flutter_client/api.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 
 class MockSelectedTicketProvider extends Mock implements SelectedTicketProvider {}
+class MockMessageStream extends Mock implements MessageStream {}
+class MockStream extends Mock implements Stream<ForiaNotification> {}
 
 final SelectedTicketProvider selectedTicketProviderMock = new MockSelectedTicketProvider();
+final MessageStream messageStreamMock = new MockMessageStream();
+final MockStream mockStream = new MockStream();
 
 void main() {
 
+  final MessageStream messageStream = new MockMessageStream();
+  GetIt.instance.registerSingleton<MessageStream>(messageStream);
+
   setUp(() {
+    when(messageStream.stream).thenAnswer((_) => mockStream);
+    when(mockStream.listen((_) => null)).thenAnswer((_) => null);
 
     List<Ticket> tickets = _generateFakeTickets();
     when(selectedTicketProviderMock.eventTickets).thenReturn(UnmodifiableListView(tickets));
     when(selectedTicketProviderMock.event).thenReturn(_generateFakeEvents()[0]);
+    when(selectedTicketProviderMock.getBarcodeText(argThat(anything))).thenAnswer((_) => "test");
   });
 
   testWidgets('selectedEventScreen containes proper event name', (WidgetTester tester) async {

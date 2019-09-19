@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_auth0/flutter_auth0.dart';
@@ -9,9 +10,11 @@ import 'package:foria/screens/home.dart';
 import 'package:foria/screens/login.dart';
 import 'package:foria/screens/venue_screen.dart';
 import 'package:foria/utils/database_utils.dart';
+import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria_flutter_client/api.dart';
+import 'package:get_it/get_it.dart';
 import 'package:jose/jose.dart';
 
 import 'configuration.dart';
@@ -30,6 +33,13 @@ class AuthUtils {
   static final Auth0 _auth = new Auth0(clientId: Configuration.auth0ClientKey, baseUrl: Configuration.auth0BaseUrl);
 
   static final _storage = new FlutterSecureStorage();
+
+  static final FirebaseAnalytics _analytics = new FirebaseAnalytics();
+
+  final MessageStream errorStream = GetIt.instance<MessageStream>();
+
+  /// Data from logged in user
+  static User user;
 
   ///
   /// Returns API client for use in Foria API libs.
@@ -136,7 +146,7 @@ class AuthUtils {
   /// WARNING: This deletes all data in the secure storage.
   ///
   Future<void> logout() async {
-    DatabaseUtils.deleteDatabase();
+    await DatabaseUtils.deleteDatabase();
     await _storage.deleteAll();
 
     debugPrint("Logout called. Secrets deleted.");
@@ -251,6 +261,18 @@ class AuthUtils {
       }
     }
 
+    // Setup user data.
+    user = new User();
+    user.id = jwt.claims.subject;
+    user.email = jwt.claims["email"];
+    user.firstName = jwt.claims["given_name"];
+    user.lastName = jwt.claims["family_name"];
+
+    if (errorStream != null) {
+      errorStream.setUserInfo(user);
+    }
+
+    _analytics.setUserId(user.id);
     return true;
   }
 

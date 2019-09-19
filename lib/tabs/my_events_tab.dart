@@ -3,19 +3,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/auth_utils.dart';
+import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria/widgets/primary_button.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 
 import '../screens/selected_event_screen.dart';
 
 class MyEventsTab extends StatefulWidget {
-
-  final AuthUtils _authUtils;
-  final TicketProvider _ticketProvider;
-
-  MyEventsTab(this._authUtils, this._ticketProvider);
 
   @override
   _MyEventsTabState createState() => _MyEventsTabState();
@@ -39,6 +36,8 @@ enum _LoadingState {
 class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClientMixin<MyEventsTab> {
 
   AuthUtils _authUtils;
+  TicketProvider _ticketProvider;
+
   _LoadingState _currentState;
   bool _isUserEmailCheckFinished;
   bool _isTicketsLoaded;
@@ -47,7 +46,8 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
   @override
   void initState() {
 
-    _authUtils = widget._authUtils;
+    _authUtils = GetIt.instance<AuthUtils>();
+    _ticketProvider = GetIt.instance<TicketProvider>();
     _currentState = _LoadingState.EMAIL_VERIFY;
 
     _isUserEmailCheckFinished = false;
@@ -67,7 +67,6 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
 
     super.build(context);
 
-    TicketProvider ticketProvider = widget._ticketProvider;
     switch (_currentState) {
 
       case _LoadingState.EMAIL_VERIFY:
@@ -92,7 +91,7 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
     }
 
     return ChangeNotifierProvider.value(
-        value: ticketProvider,
+        value: _ticketProvider,
         child: determineFinalWidget()
     );
   }
@@ -106,7 +105,7 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
     _currentState = _LoadingState.LOAD_TICKETS;
 
     //Email is verified. Load tickets and stop spinner when completed.
-    TicketProvider ticketProvider = widget._ticketProvider;
+    TicketProvider ticketProvider = _ticketProvider;
     Future<void> result = ticketProvider.loadUserDataFromNetwork();
     result.then((_) {
       setState(() {
@@ -129,6 +128,11 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
           _isTicketsLoaded = true;
           _currentState = _LoadingState.DONE;
         });
+      }).catchError((error) {
+        setState(() {
+          _isTicketsLoaded = true;
+          _currentState = _LoadingState.DONE;
+        });
       });
     });
   }
@@ -138,7 +142,7 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
   ///
   Future<void> _awaitTicketLoad() async {
 
-    TicketProvider ticketProvider = widget._ticketProvider;
+    TicketProvider ticketProvider = _ticketProvider;
     try {
       await ticketProvider.loadUserDataFromNetwork();
 
@@ -202,7 +206,7 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
       _isTicketsReactivateLoading = true;
     });
 
-    widget._ticketProvider.reactivateTickets().then((_) {
+    _ticketProvider.reactivateTickets().then((_) {
       setState(() {
         _isTicketsReactivateLoading = false;
         _currentState = _LoadingState.DONE;
@@ -227,7 +231,7 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
       finalStateWidget = EmailVerificationConflict(emailVerifyCallback);
     } else if (_currentState == _LoadingState.DEVICE_CHECK) {
       finalStateWidget = DeviceConflict(_isTicketsReactivateLoading, _deviceCheckCallback);
-    } else if (widget._ticketProvider.eventList.length <= 0) {
+    } else if (_ticketProvider.eventList.length <= 0) {
       finalStateWidget = MissingTicket(_awaitTicketLoad);
     } else {
       finalStateWidget = EventCard(_awaitTicketLoad);

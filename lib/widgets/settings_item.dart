@@ -1,11 +1,8 @@
-// Copyright 2018 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'dart:async';
-import 'package:flutter/material.dart';
+
 import 'package:flutter/cupertino.dart';
-import 'package:foria/main.dart';
+import 'package:flutter/material.dart';
+import 'package:foria/utils/constants.dart';
 
 // The widgets in this file present a Cupertino-style settings item to the user.
 // In the future, the Cupertino package in the Flutter SDK will include

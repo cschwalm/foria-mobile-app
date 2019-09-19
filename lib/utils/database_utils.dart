@@ -230,7 +230,7 @@ class DatabaseUtils {
   }
 
   ///
-  /// Stores the entire set of tickets in database.
+  /// Stores the entire set of tickets in database and deletes previous entries.
   ///
   Future<void> storeTicketSet(Set<Ticket> ticketSet) async {
 
@@ -238,12 +238,14 @@ class DatabaseUtils {
       await _initDatabase();
     }
 
+    final int ticketsDeleted = await _ticketListStore.delete(_db); //Purges entire ticket store every refresh.
     for (Ticket ticket in ticketSet) {
 
       Map<String, dynamic> ticketJson = ticket.toJson();
       await _ticketListStore.record(ticket.id).put(_db, ticketJson);
     }
 
+    debugPrint('Purged $ticketsDeleted tickets in local storage.');
     debugPrint('Stored ${ticketSet.length} tickets in local storage.');
   }
 }

@@ -6,22 +6,27 @@ import 'package:foria/screens/login.dart';
 import 'package:foria/screens/splash_screen.dart';
 import 'package:foria/screens/venue_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
+import 'package:foria/utils/message_stream.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 
-
 class MockAuthUtils extends Mock implements AuthUtils {}
+class MockMessageStream extends Mock implements MessageStream {}
 
 void main() {
 
-  final AuthUtils authUtils = new MockAuthUtils();
+  final MessageStream messageStream = new MockMessageStream();
+  GetIt.instance.registerSingleton<MessageStream>(messageStream);
 
+  final AuthUtils authUtils = new MockAuthUtils();
+  GetIt.instance.registerSingleton<AuthUtils>(authUtils);
 
   testWidgets('navigates to login screen if user not logged in', (WidgetTester tester) async {
 
     when(authUtils.isUserLoggedIn(true)).thenAnswer((_) => Future.value(false));
 
     await tester.pumpWidget(MaterialApp(
-        home: SplashScreen(authUtils),
+        home: SplashScreen(),
       navigatorKey: navigatorKey,
       routes: {
         Login.routeName: (context) => Login(),
@@ -30,7 +35,6 @@ void main() {
     ));
 
     await tester.pumpAndSettle();
-
     expect(find.byType(Login), findsOneWidget);
 
   });
@@ -41,7 +45,7 @@ void main() {
     when(authUtils.doesUserHaveVenueAccess()).thenAnswer((_) => Future.value(true));
 
     await tester.pumpWidget(MaterialApp(
-      home: SplashScreen(authUtils),
+      home: SplashScreen(),
       navigatorKey: navigatorKey,
       routes: {
         VenueScreen.routeName: (context) => VenueScreen(),
@@ -60,7 +64,7 @@ void main() {
     when(authUtils.doesUserHaveVenueAccess()).thenAnswer((_) => Future.value(false));
 
     await tester.pumpWidget(MaterialApp(
-      home: SplashScreen(authUtils),
+      home: SplashScreen(),
       navigatorKey: navigatorKey,
       routes: {
         Home.routeName: (context) => Login(),
@@ -73,5 +77,4 @@ void main() {
     expect(find.byType(Login), findsOneWidget);
 
   });
-
 }

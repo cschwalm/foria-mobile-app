@@ -1,32 +1,27 @@
-import 'package:intl/intl.dart';
 
-// Theme formatting. //
-
-final int primaryColor = 0xFFFF0266;
-
-final int primaryColorDark = 0xFFC5003C;
-
-final int textGrey = 0xFF7E7E7E;
-
-// Scanner constants. //
-
-const Duration scannerShutdownDuration = Duration(seconds: 1);
-
-// Date string formatting. //
-
-final dateFormatShortMonth = DateFormat('MMM');
-
-final dateFormatTime = DateFormat('jm');
 
 // General purpose strings. //
-
-const String textTransfer = 'Transfer';
 
 const String textLogout = 'Logout';
 
 const String googleMapsSearchUrl = 'https://www.google.com/maps/search/?api=1&query=';
 
 const String textCancel = 'Cancel';
+
+const String okText = 'Ok';
+
+const String textConfirm = 'Confirm';
+
+const String textClose = 'Close';
+
+const String textError = 'Error';
+
+const String emailFieldText = 'Email';
+
+const String textGenericError = 'Sorry, there was a problem. Please try again later.';
+
+const String netConnectionError = 'Internet connection failed. Please try again.';
+
 
 // Venue related strings. //
 
@@ -62,7 +57,7 @@ const String supportEmailAddress = "support@foriatickets.com";
 
 const String supportEmailSubject = "Foria Support";
 
-// my_passes_tab Strings. //
+// my_events_tab Strings. //
 
 const String noEvents = 'You don\'t have any \nupcoming events';
 
@@ -85,11 +80,11 @@ const String imageUnavailable = 'Image unavailable';
 const String ticketLoadingFailure = 'It looks like you\'re currently offline.\n\n'
     'Don\'t worry, we\'re using an offline copy of your tickets. As long as you haven\'t transferred or sold your tickets, they will be valid.';
 
-// selected_ticket_screen Strings. //
+// selected_event_screen Strings. //
 
 const String foriaPass ='Foria Pass';
 
-const String passRefresh ='Your pass refreshes in  ';
+const String passRefresh ='seconds until your pass refresh';
 
 const String passOptions = 'Pass Options';
 
@@ -99,7 +94,25 @@ const String barcodeLoading = 'Barcode Loading...';
 
 const String transferConfirm = 'Confirm Transfer';
 
-const String transferWarning = 'Transfers are non-reversible and processed immediately if the transferee has a Foria account. Otherwise, they are processed once the transferee creates an account.';
+const String transferWarning = 'Transfers are non-reversible and processed immediately if the transferee has a Foria account. Otherwise, they are pending until the transferee creates an account. You can cancel a pending transfer.';
+
+const String enterValidEmail = 'Please enter a valid email';
+
+const String enterTransferEmail = 'Transferee\'s email:';
+
+const String requestTransfer = 'Request Transfer';
+
+const String cancelTransfer = 'Cancel Transfer';
+
+const String textConfirmCancel = 'Confirm Cancellation';
+
+const String textConfirmCancelBody = 'This will cancel the pending transfer. The transferee will be notified.';
+
+const String textTransfer = 'Transfer';
+
+const String textTransferPending = 'Transfer Pending';
+
+const String textTransferComplete = 'Transfer Completed';
 
 // ticket_scan_screen Strings. //
 
@@ -112,3 +125,21 @@ const String passInvalidInfo = 'Pass already redeemed or transferred';
 const String barcodeInvalid = 'Invalid Barcode';
 
 const String barcodeInvalidInfo = 'Not a foria pass';
+
+const String camPermissionRequired = 'Camera permission required';
+
+const String camPermissionText = 'Please go to your phone\'s settings and allow the Foria app to access your camera';
+
+// ticket status Strings. //
+
+const String ticketStatusTransferPending = 'TRANSFER_PENDING';
+
+const String ticketStatusIssued = 'ISSUED';
+
+const String ticketStatusActive = 'ACTIVE';
+
+const String ticketStatusRedeemed = 'REDEEMED';
+
+const String ticketStatusCanceled = 'CANCELED';
+
+const String ticketStatusCanceledFraud = 'CANCELED_FRAUD';

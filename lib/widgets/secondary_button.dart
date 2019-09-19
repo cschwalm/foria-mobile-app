@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foria/main.dart' as theme;
+import 'package:foria/utils/constants.dart';
 
 
 class SecondaryButton extends StatelessWidget {
@@ -34,7 +34,7 @@ class SecondaryButton extends StatelessWidget {
             decoration: BoxDecoration(
                 borderRadius: borderRadius,
                 border: Border.all(
-                  color: theme.shapeGreyColor,
+                  color: textGreyColor,
                   width: 2.0,
                 )
             ),
