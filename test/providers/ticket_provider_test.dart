@@ -28,7 +28,7 @@ void main() {
 
   setUp(() {
 
-    when(messageStream.stream).thenAnswer((_) => null);
+
     when(mockStream.listen((_) => null)).thenAnswer((_) => null);
     ticketProvider.databaseUtils = databaseUtils;
 

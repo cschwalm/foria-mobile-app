@@ -2,8 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/constants.dart';
+import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/primary_button.dart';
+import 'package:get_it/get_it.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../widgets/contact_support.dart';
@@ -11,10 +13,23 @@ import '../widgets/settings_item.dart';
 
 class AccountTab extends StatelessWidget {
 
-  final AuthUtils _authUtils = new AuthUtils();
-
   @override
   Widget build(BuildContext context) {
+
+    final MessageStream messageStream = GetIt.instance<MessageStream>();
+    messageStream.addListener((errorMessage) {
+      Scaffold.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: snackbarColor,
+            elevation: 0,
+            content: FlatButton(
+              child: Text(errorMessage.body),
+              onPressed: () => Scaffold.of(context).hideCurrentSnackBar(),
+            ),
+          )
+      );
+    });
+
     return Container(
       color: settingsBackgroundColor,
       child: Column(
@@ -52,6 +67,7 @@ class AccountTab extends StatelessWidget {
                   child: PrimaryButton(
                     text: textLogout,
                     onPress: () {
+                      final AuthUtils _authUtils = GetIt.instance<AuthUtils>();
                       _authUtils.logout();
                     },
                   ),

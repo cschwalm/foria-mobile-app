@@ -1,9 +1,6 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:foria/providers/ticket_provider.dart';
-import 'package:get_it/get_it.dart';
 import 'package:foria/utils/size_config.dart';
 
 import '../tabs/account_tab.dart';
@@ -78,7 +75,6 @@ class TabsState extends State<Tabs> {
 
     this._titleApp = TabItems[0].title;
 
-    _setupCloudMessaging(context);
     super.initState();
   }
 
@@ -90,6 +86,7 @@ class TabsState extends State<Tabs> {
 
   @override
   Widget build(BuildContext context) {
+
     return new Scaffold(
       //App Bar
       appBar: new AppBar(
@@ -173,61 +170,6 @@ class TabsState extends State<Tabs> {
           break;
       }
     });
-  }
-
-  ///
-  /// Prompts for permission once per app install.
-  /// Shows snackbar if push is received while the app is opened.
-  /// Obtains token and uploads it to server.
-  ///
-  void _setupCloudMessaging(BuildContext context) {
-
-    final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
-    final TicketProvider ticketProvider = GetIt.instance<TicketProvider>();
-
-    firebaseMessaging.requestNotificationPermissions(); //Moving permission here is better UI.
-    firebaseMessaging.getToken().then((token) => ticketProvider.registerDeviceToken(token));
-    firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) async {
-
-        String title, body;
-        if (message['notification'] != null) {
-
-          title = message['notification']['title'];
-          body = message['notification']['body'];
-
-        } else if (message['aps'] != null) {
-
-          title = message['aps']['alert']['title'];
-          body = message['aps']['alert']['body'];
-
-        } else {
-          debugPrint('ERROR: Failed to parse notification');
-          return;
-        }
-
-        print("Received push notification: $message");
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(title),
-            content: Text(body),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('Ok'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          ),
-        );
-      },
-      onLaunch: (Map<String, dynamic> message) async {
-        //Do nothing.
-      },
-      onResume: (Map<String, dynamic> message) async {
-        //Do nothing.
-      },
-    );
   }
 }
 

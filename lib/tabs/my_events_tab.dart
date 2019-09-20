@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/constants.dart';
+import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria/widgets/primary_button.dart';
@@ -54,6 +56,20 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
     _isTicketsLoaded = false;
     _isTicketsReactivateLoading = false;
 
+    final MessageStream messageStream = GetIt.instance<MessageStream>();
+    messageStream.addListener((errorMessage) {
+      Scaffold.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: snackbarColor,
+            elevation: 0,
+            content: FlatButton(
+              child: Text(errorMessage.body),
+              onPressed: () => Scaffold.of(context).hideCurrentSnackBar(),
+            ),
+          )
+      );
+    });
+
     super.initState();
   }
 
@@ -66,7 +82,6 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
   Widget build(BuildContext context) {
 
     super.build(context);
-
     switch (_currentState) {
 
       case _LoadingState.EMAIL_VERIFY:
@@ -86,7 +101,11 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
         break;
 
       case _LoadingState.DONE:
-      //All checks passed. Show tickets to user.
+        //All checks passed. Show tickets to user.
+        //Moving permission here is better UI because popup shows with content on screen.
+        final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+        firebaseMessaging.requestNotificationPermissions();
+        firebaseMessaging.getToken().then((token) => _ticketProvider.registerDeviceToken(token));
         break;
     }
 
