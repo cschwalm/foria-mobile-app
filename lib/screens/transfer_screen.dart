@@ -32,6 +32,7 @@ class _TransferScreenState extends State<TransferScreen> {
   Future<void> _transferTicket(Ticket selectedTicket, BuildContext context) async {
 
     final TicketProvider ticketProvider = GetIt.instance<TicketProvider>();
+    bool isEventNowEmpty;
 
     final isValid = _form.currentState.validate();
     if (!isValid) {
@@ -41,12 +42,16 @@ class _TransferScreenState extends State<TransferScreen> {
     setState(() {
       _isLoading = true;
     });
-    await ticketProvider.transferTicket(selectedTicket, _emailSubmission);
+    isEventNowEmpty = await ticketProvider.transferTicket(selectedTicket, _emailSubmission);
     setState(() {
       _isLoading = false;
     });
-
     Navigator.of(context).maybePop();
+
+    //If the last ticket for an event was transferred the MyTicketsScreen should be popped
+    if(isEventNowEmpty){
+      Navigator.of(context).maybePop();
+    }
   }
 
   @override

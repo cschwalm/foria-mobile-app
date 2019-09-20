@@ -10,7 +10,7 @@ import 'package:foria/widgets/primary_button.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 
-import '../screens/selected_event_screen.dart';
+import '../screens/my_tickets_screen.dart';
 
 class MyEventsTab extends StatefulWidget {
 
@@ -282,7 +282,7 @@ class EventCard extends StatelessWidget {
                   key: Key(eventData.eventList[index].id),
                   onTap: () {
                     Navigator.of(context).pushNamed(
-                      SelectedEventScreen.routeName,
+                      MyTicketsScreen.routeName,
                       arguments: {
                         'event': eventData.eventList[index],
                         'tickets': eventData.getTicketsForEventId(eventData.eventList[index].id)

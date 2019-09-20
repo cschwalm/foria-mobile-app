@@ -21,18 +21,18 @@ import 'package:wakelock/wakelock.dart';
 /// Screen displays rotating barcodes for user to scan.
 /// Barcodes cannot be generated unless tickets are active and their secrets are stored.
 ///
-class SelectedEventScreen extends StatefulWidget {
+class MyTicketsScreen extends StatefulWidget {
 
-  static const routeName = '/selected-ticket';
+  static const routeName = '/my-tickets-screen';
   final SelectedTicketProvider _selectedTicketProvider;
 
-  SelectedEventScreen([this._selectedTicketProvider]);
+  MyTicketsScreen([this._selectedTicketProvider]);
 
   @override
-  _SelectedEventScreenState createState() => _SelectedEventScreenState();
+  _MyTicketsScreenState createState() => _MyTicketsScreenState();
 }
 
-class _SelectedEventScreenState extends State<SelectedEventScreen> {
+class _MyTicketsScreenState extends State<MyTicketsScreen> {
 
   SelectedTicketProvider _selectedTicketProvider;
 

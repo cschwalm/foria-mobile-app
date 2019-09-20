@@ -20,7 +20,7 @@ import 'package:get_it/get_it.dart';
 import 'navigation/CustomNoTransition.dart';
 import 'screens/home.dart';
 import 'screens/login.dart';
-import 'screens/selected_event_screen.dart';
+import 'screens/my_tickets_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final FirebaseAnalytics analytics = FirebaseAnalytics();
@@ -81,8 +81,8 @@ void mainDelegate() {
                   return CustomNoTransition(builder: (context) => Login(), settings: settings);
                   break;
 
-                case SelectedEventScreen.routeName:
-                  return MaterialPageRoute(builder: (context) => SelectedEventScreen(), settings: settings);
+                case MyTicketsScreen.routeName:
+                  return MaterialPageRoute(builder: (context) => MyTicketsScreen(), settings: settings);
                   break;
 
                 case TicketScanScreen.routeName:

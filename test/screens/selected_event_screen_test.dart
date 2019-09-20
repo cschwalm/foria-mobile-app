@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foria/providers/selected_ticket_provider.dart';
-import 'package:foria/screens/selected_event_screen.dart';
+import 'package:foria/screens/my_tickets_screen.dart';
 import 'package:foria/utils/message_stream.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
@@ -38,7 +38,7 @@ void main() {
     final List<Ticket> tickets = _generateFakeTickets();
 
     await tester.pumpWidget(MaterialApp(
-        home: SelectedEventScreen(selectedTicketProviderMock)
+        home: MyTicketsScreen(selectedTicketProviderMock)
     ));
     await tester.pumpAndSettle();
 
