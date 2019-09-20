@@ -63,7 +63,7 @@ void mainDelegate() {
                 button: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white),
                 body1: TextStyle(fontSize: 18.0, color: textGreyColor),
                 body2: TextStyle(fontSize: 14.0, color: textGreyColor),
-                display1: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.black),
+                display1: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold, color: Colors.black),
                 headline: TextStyle(
                   fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.black, fontFamily: 'Rubik',),
               ),

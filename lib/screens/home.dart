@@ -99,7 +99,7 @@ class TabsState extends State<Tabs> {
             fontSize: Theme
                 .of(context)
                 .platform == TargetPlatform.iOS
-                ? 17.0
+                ? 18.0
                 : 20.0,
           ),
         ),
