@@ -148,10 +148,10 @@ class AuthUtils {
   Future<void> logout() async {
     await DatabaseUtils.deleteDatabase();
     await _storage.deleteAll();
-
+    await _auth.webAuth.clearSession();
     debugPrint("Logout called. Secrets deleted.");
 
-    await _auth.webAuth.clearSession();
+    setupDependencies();
     await navigatorKey.currentState.pushNamedAndRemoveUntil(Login.routeName, ModalRoute.withName('/'));
   }
 

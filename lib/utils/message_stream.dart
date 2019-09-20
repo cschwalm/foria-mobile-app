@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:foria/utils/configuration.dart';
 import 'package:foria/utils/constants.dart';
@@ -31,8 +32,6 @@ class ForiaNotification {
   MessageType get messageType => _messageType;
   dynamic get stackTrace => _stackTrace;
   dynamic get initialException => _initialException;
-
-
 }
 
 ///
@@ -46,8 +45,20 @@ class MessageStream {
   final SentryClient _sentry = SentryClient(dsn: sentryDsn);
   StreamController<ForiaNotification> _streamController;
 
+  StreamSubscription<ForiaNotification> _currentStreamSubscription;
+
   MessageStream() {
     _streamController = new StreamController<ForiaNotification>.broadcast();
+    _setupCloudMessaging();
+  }
+
+  void addListener(void onData(ForiaNotification event)) {
+
+    if (_currentStreamSubscription != null) {
+      _currentStreamSubscription.cancel();
+    }
+
+    _currentStreamSubscription = _streamController.stream.asBroadcastStream().listen(onData);
   }
 
   ///
@@ -60,9 +71,6 @@ class MessageStream {
       _sentry.userContext = userContext;
     }
   }
-
-  /// Exposes steam to listen to.
-  Stream<ForiaNotification> get stream => _streamController.stream;
 
   ///
   /// Use this method to send a user a message.
@@ -123,5 +131,41 @@ class MessageStream {
         );
       }
     }
+  }
+
+  ///
+  /// Configures Firebase to pump messages into event stream.
+  /// Obtains token and uploads it to server.
+  ///
+  void _setupCloudMessaging() {
+
+    final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+
+    firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+
+        String title, body;
+        if (message['notification'] != null) {
+          title = message['notification']['title'];
+          body = message['notification']['body'];
+        } else if (message['aps'] != null) {
+          title = message['aps']['alert']['title'];
+          body = message['aps']['alert']['body'];
+        } else {
+          debugPrint('ERROR: Failed to parse notification');
+          return;
+        }
+
+        print("Received push notification: $message");
+        final ForiaNotification foriaNotification = new ForiaNotification.message(MessageType.MESSAGE, body, title);
+        announceMessage(foriaNotification);
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        //Do nothing.
+      },
+      onResume: (Map<String, dynamic> message) async {
+        //Do nothing.
+      },
+    );
   }
 }

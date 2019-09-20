@@ -31,12 +31,7 @@ void mainDelegate() {
     DeviceOrientation.portraitDown,
   ]);
 
-  //Configure Singletons for later use.
-  final MessageStream errorStream = new MessageStream();
-  GetIt.instance.registerSingleton<MessageStream>(errorStream);
-  GetIt.instance.registerSingleton<AuthUtils>(new AuthUtils());
-  GetIt.instance.registerSingleton<DatabaseUtils>(new DatabaseUtils());
-  GetIt.instance.registerSingleton<TicketProvider>(new TicketProvider());
+  setupDependencies();
 
   runZoned<Future<void>>(() async {
     runApp(
@@ -108,6 +103,19 @@ void mainDelegate() {
 
     // Whenever an error occurs, call the `_reportError` function. This sends
     // Dart errors to the dev console or Sentry depending on the environment.
+    final MessageStream errorStream = GetIt.instance<MessageStream>();
     errorStream.reportError(error, stackTrace);
   });
+}
+
+///
+/// Purges existing singletons and sets up new copies.
+///
+void setupDependencies() {
+
+  GetIt.instance.reset();
+  GetIt.instance.registerSingleton<MessageStream>(new MessageStream());
+  GetIt.instance.registerSingleton<AuthUtils>(new AuthUtils());
+  GetIt.instance.registerSingleton<DatabaseUtils>(new DatabaseUtils());
+  GetIt.instance.registerSingleton<TicketProvider>(new TicketProvider());
 }

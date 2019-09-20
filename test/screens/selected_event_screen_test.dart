@@ -23,7 +23,6 @@ void main() {
   GetIt.instance.registerSingleton<MessageStream>(messageStream);
 
   setUp(() {
-    when(messageStream.stream).thenAnswer((_) => mockStream);
     when(mockStream.listen((_) => null)).thenAnswer((_) => null);
 
     List<Ticket> tickets = _generateFakeTickets();

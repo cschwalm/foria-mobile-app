@@ -86,8 +86,15 @@ class _PassBodyState extends State<PassBody> {
 
   @override
   void initState() {
-    final MessageStream errorStream = GetIt.instance<MessageStream>();
-    errorStream.stream.listen((errorMessage) {
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    final MessageStream messageStream = GetIt.instance<MessageStream>();
+    messageStream.addListener((errorMessage) {
       Scaffold.of(context).showSnackBar(
           SnackBar(
             backgroundColor: snackbarColor,
@@ -99,11 +106,6 @@ class _PassBodyState extends State<PassBody> {
           )
       );
     });
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
 
     final double viewportFraction = 0.9;
     final double width = MediaQuery.of(context).size.width;

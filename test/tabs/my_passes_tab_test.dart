@@ -5,20 +5,24 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/tabs/my_events_tab.dart';
 import 'package:foria/utils/auth_utils.dart';
+import 'package:foria/utils/message_stream.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 
 class MockAuthUtils extends Mock implements AuthUtils {}
 class MockTicketProvider extends Mock implements TicketProvider {}
+class MockMessageStream extends Mock implements MessageStream {}
 
 final String _eventName = 'TestEvent';
 
 void main() {
 
+  final MessageStream messageStream = new MockMessageStream();
   final AuthUtils authUtils = new MockAuthUtils();
   final TicketProvider ticketProviderMock = new MockTicketProvider();
 
+  GetIt.instance.registerSingleton<MessageStream>(messageStream);
   GetIt.instance.registerSingleton<AuthUtils>(authUtils);
   GetIt.instance.registerSingleton<TicketProvider>(ticketProviderMock);
 
