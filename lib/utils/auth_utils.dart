@@ -39,7 +39,12 @@ class AuthUtils {
   final MessageStream errorStream = GetIt.instance<MessageStream>();
 
   /// Data from logged in user
-  static User user;
+  User _user;
+
+  ///
+  /// May be null if user has not logged in.
+  ///
+  User get user => _user;
 
   ///
   /// Returns API client for use in Foria API libs.
@@ -262,7 +267,7 @@ class AuthUtils {
     }
 
     // Setup user data.
-    user = new User();
+    _user = new User();
     user.id = jwt.claims.subject;
     user.email = jwt.claims["email"];
     user.firstName = jwt.claims["given_name"];
