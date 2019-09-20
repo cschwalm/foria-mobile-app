@@ -5,6 +5,7 @@ import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/primary_button.dart';
+import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -13,13 +14,12 @@ import '../widgets/settings_item.dart';
 
 class AccountTab extends StatelessWidget {
 
-  final String _firstName = AuthUtils.user.firstName;
-  final String _lastName = AuthUtils.user.lastName;
-  final String _email = AuthUtils.user.email;
+  final AuthUtils _authUtils = GetIt.instance<AuthUtils>();
 
   @override
   Widget build(BuildContext context) {
 
+    final User user = _authUtils.user;
     final MessageStream messageStream = GetIt.instance<MessageStream>();
     messageStream.addListener((errorMessage) {
       Scaffold.of(context).showSnackBar(
@@ -36,7 +36,7 @@ class AccountTab extends StatelessWidget {
 
 
     Widget accountInfo;
-    if(_firstName == null || _lastName == null || _email == null){
+    if (user == null || user.firstName == null || user.lastName == null || user.email == null) {
       accountInfo = SizedBox(height: 20);
     } else {
       accountInfo = Row(children: <Widget>[
@@ -49,12 +49,12 @@ class AccountTab extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    _firstName+' '+_lastName,
+                    user.firstName + ' '+ user.lastName,
                     style: Theme.of(context).textTheme.display1,
                   ),
                   SizedBox(height: 7),
                   Text(
-                    _email,
+                    user.email,
                     style: Theme.of(context).textTheme.body1,
                   ),
                 ],
@@ -100,7 +100,6 @@ class AccountTab extends StatelessWidget {
                   child: PrimaryButton(
                     text: textLogout,
                     onPress: () {
-                      final AuthUtils _authUtils = GetIt.instance<AuthUtils>();
                       _authUtils.logout();
                     },
                   ),
