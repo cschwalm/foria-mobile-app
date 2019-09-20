@@ -283,7 +283,7 @@ class EventInfo extends StatelessWidget {
                   child: Text(
                     '$month\n$day',
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.display1,
+                    style: Theme.of(context).textTheme.headline,
                   ),
                 ),
               ),
