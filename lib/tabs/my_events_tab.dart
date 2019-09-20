@@ -56,6 +56,17 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
     _isTicketsLoaded = false;
     _isTicketsReactivateLoading = false;
 
+    super.initState();
+  }
+
+  ///
+  /// Build method preforms two key actions.
+  /// 1) Determines the new state to be resolved to.
+  /// 2) Builds the correct widget based on new state.
+  ///
+  @override
+  Widget build(BuildContext context) {
+
     final MessageStream messageStream = GetIt.instance<MessageStream>();
     messageStream.addListener((errorMessage) {
       Scaffold.of(context).showSnackBar(
@@ -69,17 +80,6 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
           )
       );
     });
-
-    super.initState();
-  }
-
-  ///
-  /// Build method preforms two key actions.
-  /// 1) Determines the new state to be resolved to.
-  /// 2) Builds the correct widget based on new state.
-  ///
-  @override
-  Widget build(BuildContext context) {
 
     super.build(context);
     switch (_currentState) {
