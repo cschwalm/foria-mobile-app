@@ -7,6 +7,7 @@ import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
+import 'package:foria/widgets/errors/image_unavailable.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria/widgets/primary_button.dart';
 import 'package:get_it/get_it.dart';
@@ -271,16 +272,6 @@ class EventCard extends StatelessWidget {
   final Function _refreshFunction;
   EventCard(this._refreshFunction);
 
-  Widget _imageUnavailableWidget() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Icon(Icons.error, color: Colors.red,),
-        Text(imageUnavailable,textAlign: TextAlign.center,)
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final eventData = Provider.of<TicketProvider>(context, listen: true);
@@ -354,7 +345,7 @@ class EventCard extends StatelessWidget {
                             placeholder: (context, url) =>
                                 CupertinoActivityIndicator(),
                             errorWidget: (context, url, error) {
-                              return _imageUnavailableWidget();
+                              return ImageUnavailable();
                             },
                             imageUrl: eventData.eventList[index].imageUrl,
                             imageBuilder: (context, imageProvider) =>

@@ -95,3 +95,6 @@ flutter:
     - family: ellipse
       fonts:
         - asset: assets/ui_elements/ellipse.ttf
+    - family: outline_material_icons
+      fonts:
+        - asset: assets/ui_elements/outline_material_icons.ttf
