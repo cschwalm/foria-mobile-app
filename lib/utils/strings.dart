@@ -64,8 +64,7 @@ const String supportEmailSubject = "Foria Support";
 
 const String noEvents = 'You don\'t have any \nupcoming events';
 
-const String noTickets = 'If you can\'t find your tickets, \nplease first check '
-    'your \nemail order confirmation \n pulldown to refresh your tickets.';
+const String noTickets = 'If you recently purchased tickets, pull down to refresh';
 
 const String otherwiseContact = 'Otherwise, Contact Us';
 
