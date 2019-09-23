@@ -32,11 +32,19 @@ final Color snackbarColor = Color(0xFF313131);
 
 const BorderRadius buttonBorderRadius = BorderRadius.all(Radius.circular(8.0));
 
+const SizedBox sizedBoxH3 = SizedBox(height: 3);
+
 // Scanner constants. //
 
 const Duration scannerShutdownDuration = Duration(seconds: 1);
 
 // Date string formatting. //
+
+final dateFormatDay = DateFormat('E, MMMM d');
+
+final dateFormatShortDay = DateFormat('E');
+
+final dateFormatLongMonth = DateFormat('MMMM');
 
 final dateFormatShortMonth = DateFormat('MMM');
 

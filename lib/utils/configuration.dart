@@ -52,6 +52,9 @@ class Configuration {
     return _config[_Config.jwksPath];
   }
 
+  static get eventUrl {
+    return _config[_Config.eventUrl];
+  }
 }
 
 class _Config {
@@ -62,6 +65,7 @@ class _Config {
   static const jwtIssuer = 'jwtIssuer';
   static const apiBasePath = 'apiBasePath';
   static const jwksPath = 'jwksPath';
+  static const eventUrl = 'eventUrl';
 
   static Map<String, dynamic> stagingConstants = {
     auth0ClientKey: 'QilsQNvoUwUVAMkkFAg4mBPgtrK9HwaU',
@@ -70,6 +74,7 @@ class _Config {
     jwtIssuer: 'https://auth-test.foriatickets.com/',
     apiBasePath: 'https://test-api.foriatickets.com/v1',
     jwksPath: 'assets/jwks_staging.json',
+    eventUrl: 'https://events-test.foriatickets.com?eventId={eventId}',
   };
 
   static Map<String, dynamic> prodConstants = {
@@ -80,6 +85,7 @@ class _Config {
     jwtIssuer: 'https://auth.foriatickets.com/',
     apiBasePath: 'https://api.foriatickets.com/v1',
     jwksPath: 'assets/jwks_prod.json',
+    eventUrl: 'https://events.foriatickets.com?eventId={eventId}',
   };
 }
 

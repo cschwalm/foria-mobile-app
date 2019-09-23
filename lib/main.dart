@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show DeviceOrientation, SystemChrome;
 import 'package:flutter/services.dart';
+import 'package:foria/providers/event_provider.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/screens/splash_screen.dart';
 import 'package:foria/screens/ticket_scan_screen.dart';
@@ -118,4 +119,5 @@ void setupDependencies() {
   GetIt.instance.registerSingleton<AuthUtils>(new AuthUtils());
   GetIt.instance.registerSingleton<DatabaseUtils>(new DatabaseUtils());
   GetIt.instance.registerSingleton<TicketProvider>(new TicketProvider());
+  GetIt.instance.registerSingleton<EventProvider>(new EventProvider());
 }

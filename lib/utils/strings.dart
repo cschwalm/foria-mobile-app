@@ -22,6 +22,9 @@ const String textGenericError = 'Sorry, there was a problem. Please try again la
 
 const String netConnectionError = 'Internet connection failed. Please try again.';
 
+const String textOops = 'Oops! Something went wrong...';
+
+const String tryAgain = 'Try again';
 
 // Venue related strings. //
 
@@ -84,7 +87,7 @@ const String ticketLoadingFailure = 'It looks like you\'re currently offline.\n\
 
 const String foriaPass ='Foria Pass';
 
-const String passRefresh ='seconds until your pass refresh';
+const String passRefresh ='seconds until refresh';
 
 const String passOptions = 'Pass Options';
 
@@ -143,3 +146,7 @@ const String ticketStatusRedeemed = 'REDEEMED';
 const String ticketStatusCanceled = 'CANCELED';
 
 const String ticketStatusCanceledFraud = 'CANCELED_FRAUD';
+
+// discover_events_tab Strings. //
+
+const String noEventsAvailable = 'There aren\'t any events available at the moment. Please check back later';

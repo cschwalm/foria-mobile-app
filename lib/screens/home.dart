@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:foria/tabs/discover_events_tab.dart';
 import 'package:foria/utils/size_config.dart';
 
 import '../tabs/account_tab.dart';
@@ -62,18 +63,20 @@ class TabsState extends State<Tabs> {
   PageController _tabController;
   MyEventsTab _myPassesTab;
   AccountTab _accountTab;
+  DiscoverEventsTab _discoverEventsTab;
 
   String _titleApp;
-  int _tab = 0;
+  int _tab = 1;
 
   @override
   void initState() {
 
-    _tabController = new PageController();
+    _tabController = new PageController(initialPage: 1);
     _myPassesTab = new MyEventsTab();
     _accountTab = new AccountTab();
+    _discoverEventsTab = new DiscoverEventsTab();
 
-    this._titleApp = TabItems[0].title;
+    this._titleApp = TabItems[1].title;
 
     super.initState();
   }
@@ -111,8 +114,9 @@ class TabsState extends State<Tabs> {
               controller: _tabController,
               onPageChanged: onTabChanged,
               children: <Widget>[
+                _discoverEventsTab,
                 _myPassesTab,
-                _accountTab
+                _accountTab,
               ]),
       bottomNavigationBar: Theme
           .of(context)
@@ -168,6 +172,10 @@ class TabsState extends State<Tabs> {
         case 1:
           this._titleApp = TabItems[1].title;
           break;
+
+        case 2:
+          this._titleApp = TabItems[2].title;
+          break;
       }
     });
   }
@@ -184,7 +192,15 @@ class TabItem {
 
 const List<TabItem> TabItems = const <TabItem>[
   const TabItem(
-    title: 'My Events',
+    title: 'Home',
+    icon: IconData(
+      0xead0,
+      fontFamily: 'outline_material_icons',
+    ),
+    activeIcon: Icons.home,
+  ),
+  const TabItem(
+    title: 'My Passes',
     icon: IconData(
       0xe900,
       fontFamily: 'ticket',
