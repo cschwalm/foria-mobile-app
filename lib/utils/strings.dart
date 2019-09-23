@@ -22,6 +22,9 @@ const String textGenericError = 'Sorry, there was a problem. Please try again la
 
 const String netConnectionError = 'Internet connection failed. Please try again.';
 
+const String textOops = 'Oops! Something went wrong...';
+
+const String tryAgain = 'Try again';
 
 // Venue related strings. //
 
