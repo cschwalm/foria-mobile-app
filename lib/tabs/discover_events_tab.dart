@@ -26,7 +26,8 @@ enum _LoadingState {
 
   INITIAL_LOAD,
   NETWORK_ERROR,
-  EVENTS_LOADED
+  EVENTS_LOADED,
+  NO_EVENTS_AVAILABLE
 }
 
 class _DiscoverEventsTabState extends State<DiscoverEventsTab> {
@@ -64,6 +65,28 @@ class _DiscoverEventsTabState extends State<DiscoverEventsTab> {
       debugPrint('Discover events state set to $_currentState');
     }
   }
+
+  Widget _noEvents (){
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        children: <Widget>[
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Text(noEventsAvailable,
+                  style: Theme.of(context).textTheme.title,
+                  textAlign: TextAlign.center,),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   Widget _error (){
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -97,13 +120,16 @@ class _DiscoverEventsTabState extends State<DiscoverEventsTab> {
   Widget build(BuildContext context) {
     Widget child;
 
-    if (_currentState == _LoadingState.EVENTS_LOADED) {
-      child = EventList();
-    } else if (_currentState == _LoadingState.INITIAL_LOAD) {
+    if (_currentState == _LoadingState.INITIAL_LOAD) {
       child = CupertinoActivityIndicator(radius: 15);
       _loadEvents();
+    } else if (_currentState == _LoadingState.EVENTS_LOADED) {
+      child = EventList();
+    } else if (_currentState == _LoadingState.NO_EVENTS_AVAILABLE) {
+      child = _noEvents();
     } else {
       child = _error();
+
     }
 
     return ChangeNotifierProvider.value(value: _ticketProvider, child: child);
