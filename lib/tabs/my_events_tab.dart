@@ -48,7 +48,7 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
 
   @override
   void initState() {
-    debugPrint('Events: Init state called');
+
     _authUtils = GetIt.instance<AuthUtils>();
     _ticketProvider = GetIt.instance<TicketProvider>();
     _currentState = _LoadingState.EMAIL_VERIFY;
