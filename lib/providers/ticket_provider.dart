@@ -23,8 +23,8 @@ class TicketProvider extends ChangeNotifier {
 
   final String _fcmTokenKey = 'FCM_TOKEN';
 
-  DatabaseUtils _databaseUtils = new DatabaseUtils();
-  AuthUtils _authUtils = new AuthUtils();
+  DatabaseUtils _databaseUtils;
+  AuthUtils _authUtils;
   FlutterSecureStorage _secureStorage = new FlutterSecureStorage();
 
   EventApi _eventApi;
@@ -42,12 +42,10 @@ class TicketProvider extends ChangeNotifier {
   bool get ticketsActiveOnOtherDevice => _ticketsActiveOnOtherDevice;
   UnmodifiableListView<Ticket> get userTicketList => UnmodifiableListView(_ticketSet);
 
-  set authUtils(AuthUtils value) {
-    _authUtils = value;
-  }
+  TicketProvider() {
 
-  set databaseUtils(DatabaseUtils value) {
-    _databaseUtils = value;
+    _authUtils = GetIt.instance<AuthUtils>();
+    _databaseUtils = GetIt.instance<DatabaseUtils>();
   }
 
   set eventApi(EventApi value) {

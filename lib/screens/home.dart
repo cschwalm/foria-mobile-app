@@ -66,18 +66,17 @@ class TabsState extends State<Tabs> {
   DiscoverEventsTab _discoverEventsTab;
 
   String _titleApp;
-  int _tab = 0;
+  int _tab = 1;
 
   @override
   void initState() {
 
-    _tabController = new PageController();
+    _tabController = new PageController(initialPage: 1);
     _myPassesTab = new MyEventsTab();
     _accountTab = new AccountTab();
     _discoverEventsTab = new DiscoverEventsTab();
 
-
-    this._titleApp = TabItems[0].title;
+    this._titleApp = TabItems[1].title;
 
     super.initState();
   }

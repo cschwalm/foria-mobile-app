@@ -1,11 +1,10 @@
-
-
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:foria/providers/ticket_provider.dart';
+import 'package:foria/providers/event_provider.dart';
+import 'package:foria/utils/configuration.dart';
 import 'package:foria/utils/constants.dart';
+import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/image_unavailable.dart';
 import 'package:foria_flutter_client/api.dart';
@@ -13,11 +12,11 @@ import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
 ///
 /// Sets up the provider for the discover events tab and shows spinner when loading
 ///
 class DiscoverEventsTab extends StatefulWidget {
+
   @override
   _DiscoverEventsTabState createState() => _DiscoverEventsTabState();
 }
@@ -30,63 +29,43 @@ enum _LoadingState {
   NO_EVENTS_AVAILABLE
 }
 
-class _DiscoverEventsTabState extends State<DiscoverEventsTab> {
+class _DiscoverEventsTabState extends State<DiscoverEventsTab> with AutomaticKeepAliveClientMixin<DiscoverEventsTab> {
 
-  TicketProvider _ticketProvider;
-
+  EventProvider _eventProvider;
   _LoadingState _currentState;
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   void initState() {
-    debugPrint('Home: Init state called');
-    _ticketProvider = GetIt.instance<TicketProvider>();
+    _eventProvider = GetIt.instance<EventProvider>();
     _currentState = _LoadingState.INITIAL_LOAD;
     super.initState();
   }
 
-
   ///
-  /// Helper function that allows ticket loading to be blocked until finishing.
+  /// Fires network call to load and cache events.
   ///
   Future<void> _loadEvents() async {
 
-    TicketProvider ticketProvider = _ticketProvider;
-
     try {
-      await ticketProvider.loadUserDataFromNetwork();
+      List<Event> events = await _eventProvider.getAllEvents();
       setState(() {
-        _currentState = _LoadingState.EVENTS_LOADED;
+        if (events == null || events.isEmpty) {
+          _currentState = _LoadingState.NO_EVENTS_AVAILABLE;
+        } else {
+          _currentState = _LoadingState.EVENTS_LOADED;
+        }
       });
-      debugPrint('Discover events state set to $_currentState');
-    } catch (e){
+    } catch (e) {
       setState(() {
         _currentState = _LoadingState.NETWORK_ERROR;
       });
-      debugPrint('Discover events state set to $_currentState');
     }
   }
 
-  Widget _noEvents (){
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        children: <Widget>[
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Text(noEventsAvailable,
-                  style: Theme.of(context).textTheme.title,
-                  textAlign: TextAlign.center,),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
+  /// Displayed in error case.
   Widget _error (){
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -118,21 +97,64 @@ class _DiscoverEventsTabState extends State<DiscoverEventsTab> {
 
   @override
   Widget build(BuildContext context) {
-    Widget child;
 
+    super.build(context);
+
+    final MessageStream messageStream = GetIt.instance<MessageStream>();
+    messageStream.addListener((errorMessage) {
+      Scaffold.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: snackbarColor,
+            elevation: 0,
+            content: FlatButton(
+              child: Text(errorMessage.body),
+              onPressed: () => Scaffold.of(context).hideCurrentSnackBar(),
+            ),
+          )
+      );
+    });
+
+    Widget child;
     if (_currentState == _LoadingState.INITIAL_LOAD) {
       child = CupertinoActivityIndicator(radius: 15);
       _loadEvents();
     } else if (_currentState == _LoadingState.EVENTS_LOADED) {
       child = EventList();
     } else if (_currentState == _LoadingState.NO_EVENTS_AVAILABLE) {
-      child = _noEvents();
+      child = NoEvent();
     } else {
       child = _error();
-
     }
 
-    return ChangeNotifierProvider.value(value: _ticketProvider, child: child);
+    return ChangeNotifierProvider<EventProvider>.value(value: _eventProvider, child: child);
+  }
+}
+
+///
+/// Shown if events API returned no results.
+///
+class NoEvent extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        children: <Widget>[
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Text(noEventsAvailable,
+                  style: Theme.of(context).textTheme.title,
+                  textAlign: TextAlign.center,),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
   }
 }
 
@@ -140,27 +162,29 @@ class EventList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final eventData = Provider.of<TicketProvider>(context, listen: true);
+
+    final eventData = Provider.of<EventProvider>(context, listen: true);
     final Duration timezoneOffset = DateTime.now().timeZoneOffset;
     final Duration timeDiff = new Duration(hours: timezoneOffset.inHours, minutes: timezoneOffset.inMinutes % 60);
 
     return ListView.builder(
-            itemCount: eventData.eventList.length,
+            itemCount: eventData.events.length,
             itemBuilder: (context, index) {
-              DateTime serverStartTime = eventData.eventList[index].startTime;
+              DateTime serverStartTime = eventData.events[index].startTime;
               DateTime localStartTime = serverStartTime.add(timeDiff);
-              EventAddress addr = eventData.eventList[index].address;
-
+              EventAddress addr = eventData.events[index].address;
+              final String eventUrl = (Configuration.eventUrl as String).replaceAll('{eventId}', eventData.events[index].id);
+              final imageUrl = eventData.events[index].imageUrl;
 
               return Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                 child: GestureDetector(
-                  key: Key(eventData.eventList[index].id),
+                  key: Key(eventData.events[index].id),
                   onTap: () async {
-                    if (await canLaunch('https://events-test.foriatickets.com/?eventId=52991c6d-7703-488d-93ae-1aacdd7c4291')) {
-                      await launch('https://events-test.foriatickets.com/?eventId=52991c6d-7703-488d-93ae-1aacdd7c4291');
+                    if (await canLaunch(eventUrl)) {
+                      await launch(eventUrl);
                     } else {
-                      print("Failed to load FAQ URL."); ///
+                      print("Failed to load eventUrl");
                     }
                   },
                   child: Column(
@@ -169,14 +193,14 @@ class EventList extends StatelessWidget {
                       Container(
                         height: 150,
                         width: double.infinity,
-                        child: eventData.eventList[index].imageUrl == null ? null :
+                        child: imageUrl == null ? null :
                         CachedNetworkImage(
                           placeholder: (context, url) =>
                               CupertinoActivityIndicator(),
                           errorWidget: (context, url, error) {
                             return ImageUnavailable();
                           },
-                          imageUrl: eventData.eventList[index].imageUrl,
+                          imageUrl: imageUrl,
                           imageBuilder: (context, imageProvider) =>
                               Container(
                                 decoration: BoxDecoration(
@@ -191,7 +215,7 @@ class EventList extends StatelessWidget {
                       ),
                       sizedBoxH3,
                       Text(
-                        eventData.eventList[index].name,
+                        eventData.events[index].name,
                         style: Theme.of(context).textTheme.title,
                       ),
                       sizedBoxH3,
@@ -201,7 +225,7 @@ class EventList extends StatelessWidget {
                       ),
                       sizedBoxH3,
                       Text(
-                        addr.city+', '+addr.state,
+                        addr.city + ', ' + addr.state,
                         style: Theme.of(context).textTheme.body2,
                       ),
                     ],

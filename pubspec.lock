@@ -212,10 +212,10 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "4c9bfb822ce2f4656992bb00a26f0339e75ea2ef"
+      resolved-ref: "74db1f16ce31ccfe9bf014547fdddcaff8a0302b"
       url: "ssh://git@bitbucket.org/foriatickets/foria-flutter-client.git"
     source: git
-    version: "1.4.0"
+    version: "1.5.1"
   get_it:
     dependency: "direct main"
     description:
