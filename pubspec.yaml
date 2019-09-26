@@ -50,7 +50,7 @@ dependencies:
   sembast: ^2.0.1
 
   foria_flutter_client:
-    version: 1.5.1
+    version: 1.6.0
     git:
       url: ssh://git@bitbucket.org/foriatickets/foria-flutter-client.git
 

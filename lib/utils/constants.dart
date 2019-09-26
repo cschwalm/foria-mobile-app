@@ -18,17 +18,17 @@ const String transferPendingImage = 'assets/ui_elements/transfer-pending-image.p
 
 // Theme formatting. //
 
-final Color constPrimaryColor = Color(0xFFFF0266);
+const Color constPrimaryColor = Color(0xFFFF0266);
 
-final Color constPrimaryColorDark = Color(0xFFC5003C);
+const Color constPrimaryColorDark = Color(0xFFC5003C);
 
 const Color settingsBackgroundColor = Color(0xffEEEEEE);
 
-final Color textGreyColor = Color(0xFF7E7E7E);
+const Color textGreyColor = Color(0xFF7E7E7E);
 
-final Color formInputColor = Color(0xFFF2F2F2);
+const Color formInputColor = Color(0xFFF2F2F2);
 
-final Color snackbarColor = Color(0xFF313131);
+const Color snackbarColor = Color(0xFF313131);
 
 const BorderRadius buttonBorderRadius = BorderRadius.all(Radius.circular(8.0));
 
@@ -52,3 +52,7 @@ final dateFormatTime = DateFormat('jm');
 
 // Sentry DSN //
 const String sentryDsn = 'https://6c60214971cd4a2f914ebac3a233155d@sentry.io/1729721';
+
+// TextStyle //
+
+const TextStyle foriaBodyTwo = TextStyle(fontSize: 14.0, color: constPrimaryColor);

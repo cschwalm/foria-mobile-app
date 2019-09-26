@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:foria/tabs/discover_events_tab.dart';
+import 'package:foria/tabs/explore_events_tab.dart';
 import 'package:foria/utils/size_config.dart';
 
 import '../tabs/account_tab.dart';
@@ -63,7 +63,7 @@ class TabsState extends State<Tabs> {
   PageController _tabController;
   MyEventsTab _myPassesTab;
   AccountTab _accountTab;
-  DiscoverEventsTab _discoverEventsTab;
+  ExploreEventsTab _discoverEventsTab;
 
   String _titleApp;
   int _tab = 1;
@@ -74,7 +74,7 @@ class TabsState extends State<Tabs> {
     _tabController = new PageController(initialPage: 1);
     _myPassesTab = new MyEventsTab();
     _accountTab = new AccountTab();
-    _discoverEventsTab = new DiscoverEventsTab();
+    _discoverEventsTab = new ExploreEventsTab();
 
     this._titleApp = TabItems[1].title;
 
@@ -192,12 +192,12 @@ class TabItem {
 
 const List<TabItem> TabItems = const <TabItem>[
   const TabItem(
-    title: 'Home',
+    title: 'Explore',
     icon: IconData(
-      0xead0,
+      0xea4a,
       fontFamily: 'outline_material_icons',
     ),
-    activeIcon: Icons.home,
+    activeIcon: Icons.explore,
   ),
   const TabItem(
     title: 'My Passes',
