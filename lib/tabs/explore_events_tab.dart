@@ -178,35 +178,32 @@ class EventList extends StatelessWidget {
               final List<TicketTypeConfig> ticketTiers = eventData.events[index].ticketTypeConfig;
               //TODO add capability for multiple currencies
 
-              double min;
-              double max;
+              double min = double.maxFinite;
+              double max = double.minPositive;
+
               String priceOutput;
 
               for (TicketTypeConfig tier in ticketTiers) {
 
-                if(tier.amountRemaining <= 0){
+                if (tier.amountRemaining <= 0){
                   continue;
                 }
 
                 double faceValue = double.tryParse(tier.price);
                 double fee = double.tryParse(tier.calculatedFee);
+                if (faceValue == null || fee == null){
+                  continue;
+                }
                 double price = faceValue + fee;
 
-                if(price == null){
-                  continue;
-                } else if(min == null){
+                if (price < min) {
                   min = price;
-                  max = price;
-                } else if (min == price){
-                  continue;
-                } else if(min > price) {
-                  min = price;
-                } else if(max < price){
+                } else if (price > max){
                   max = price;
                 }
               }
 
-              if(max == null || min == null){
+              if(max == double.minPositive && min == double.maxFinite){
                 priceOutput = textSoldOut;
               } else if(min < 0.01 && max < 0.01){
                 priceOutput = textFreeEvent;
@@ -275,7 +272,6 @@ class EventList extends StatelessWidget {
 class DiscoverEventImage extends StatelessWidget {
 
   final String _imageUrl;
-
 
   DiscoverEventImage(this._imageUrl);
 
