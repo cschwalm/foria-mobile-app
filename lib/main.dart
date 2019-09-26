@@ -107,6 +107,11 @@ void mainDelegate() {
     final MessageStream errorStream = GetIt.instance<MessageStream>();
     errorStream.reportError(error, stackTrace);
   });
+
+  // This captures errors reported by the Flutter framework.
+  FlutterError.onError = (FlutterErrorDetails details) {
+    Zone.current.handleUncaughtError(details.exception, details.stack);
+  };
 }
 
 ///

@@ -149,3 +149,7 @@ const String ticketStatusCanceledFraud = 'CANCELED_FRAUD';
 // discover_events_tab Strings. //
 
 const String noEventsAvailable = 'There aren\'t any events available at the moment. Please check back later';
+
+const String textSoldOut = 'SOLD OUT';
+
+const String textFreeEvent = 'FREE';

@@ -10,11 +10,9 @@ import 'package:foria/screens/home.dart';
 import 'package:foria/screens/login.dart';
 import 'package:foria/screens/venue_screen.dart';
 import 'package:foria/utils/database_utils.dart';
-import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria_flutter_client/api.dart';
-import 'package:get_it/get_it.dart';
 import 'package:jose/jose.dart';
 
 import 'configuration.dart';
@@ -35,8 +33,6 @@ class AuthUtils {
   static final _storage = new FlutterSecureStorage();
 
   static final FirebaseAnalytics _analytics = new FirebaseAnalytics();
-
-  final MessageStream errorStream = GetIt.instance<MessageStream>();
 
   /// Data from logged in user
   User _user;
@@ -272,10 +268,6 @@ class AuthUtils {
     user.email = jwt.claims["email"];
     user.firstName = jwt.claims["given_name"];
     user.lastName = jwt.claims["family_name"];
-
-    if (errorStream != null) {
-      errorStream.setUserInfo(user);
-    }
 
     _analytics.setUserId(user.id);
     return true;

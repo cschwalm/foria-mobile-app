@@ -212,10 +212,10 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "74db1f16ce31ccfe9bf014547fdddcaff8a0302b"
+      resolved-ref: d7ec4a71115f7417465ea1394ee045fd64c3ff1d
       url: "ssh://git@bitbucket.org/foriatickets/foria-flutter-client.git"
     source: git
-    version: "1.5.1"
+    version: "1.6.0"
   get_it:
     dependency: "direct main"
     description:
@@ -286,6 +286,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.3"
+  package_info:
+    dependency: "direct main"
+    description:
+      name: package_info
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.0+6"
   path:
     dependency: "direct main"
     description:

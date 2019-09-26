@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foria/providers/event_provider.dart';
-import 'package:foria/tabs/discover_events_tab.dart';
+import 'package:foria/tabs/explore_events_tab.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/configuration.dart';
 import 'package:foria/utils/message_stream.dart';
@@ -37,7 +37,7 @@ void main() {
   testWidgets('myPassesTab contains event cards', (WidgetTester tester) async {
 
     await tester.pumpWidget(MaterialApp(
-      home: DiscoverEventsTab(),
+      home: ExploreEventsTab(),
     ));
 
     await tester.pumpAndSettle();
@@ -51,7 +51,7 @@ void main() {
     when(eventProviderMock.getAllEvents()).thenAnswer((_) async => new List<Event>());
 
     await tester.pumpWidget(MaterialApp(
-      home: DiscoverEventsTab(),
+      home: ExploreEventsTab(),
     ));
 
     await tester.pumpAndSettle();

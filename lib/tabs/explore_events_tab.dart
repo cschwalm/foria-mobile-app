@@ -15,10 +15,10 @@ import 'package:url_launcher/url_launcher.dart';
 ///
 /// Sets up the provider for the discover events tab and shows spinner when loading
 ///
-class DiscoverEventsTab extends StatefulWidget {
+class ExploreEventsTab extends StatefulWidget {
 
   @override
-  _DiscoverEventsTabState createState() => _DiscoverEventsTabState();
+  _ExploreEventsTabState createState() => _ExploreEventsTabState();
 }
 
 enum _LoadingState {
@@ -29,7 +29,7 @@ enum _LoadingState {
   NO_EVENTS_AVAILABLE
 }
 
-class _DiscoverEventsTabState extends State<DiscoverEventsTab> with AutomaticKeepAliveClientMixin<DiscoverEventsTab> {
+class _ExploreEventsTabState extends State<ExploreEventsTab> with AutomaticKeepAliveClientMixin<ExploreEventsTab> {
 
   EventProvider _eventProvider;
   _LoadingState _currentState;
@@ -174,7 +174,44 @@ class EventList extends StatelessWidget {
               DateTime localStartTime = serverStartTime.add(timeDiff);
               EventAddress addr = eventData.events[index].address;
               final String eventUrl = (Configuration.eventUrl as String).replaceAll('{eventId}', eventData.events[index].id);
-              final imageUrl = eventData.events[index].imageUrl;
+              final String imageUrl = eventData.events[index].imageUrl;
+              final List<TicketTypeConfig> ticketTiers = eventData.events[index].ticketTypeConfig;
+              //TODO add capability for multiple currencies
+
+              double min = double.maxFinite;
+              double max = double.minPositive;
+
+              String priceOutput;
+
+              for (TicketTypeConfig tier in ticketTiers) {
+
+                if (tier.amountRemaining <= 0){
+                  continue;
+                }
+
+                double faceValue = double.tryParse(tier.price);
+                double fee = double.tryParse(tier.calculatedFee);
+                if (faceValue == null || fee == null){
+                  continue;
+                }
+                double price = faceValue + fee;
+
+                if (price < min) {
+                  min = price;
+                } else if (price > max){
+                  max = price;
+                }
+              }
+
+              if(max == double.minPositive && min == double.maxFinite){
+                priceOutput = textSoldOut;
+              } else if(min < 0.01 && max < 0.01){
+                priceOutput = textFreeEvent;
+              } else if(min == max){
+                priceOutput = '\$'+(min).toStringAsFixed(0);
+              } else {
+                priceOutput = 'From \$' + min.toStringAsFixed(0);
+              }
 
               return Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -193,25 +230,21 @@ class EventList extends StatelessWidget {
                       Container(
                         height: 150,
                         width: double.infinity,
-                        child: imageUrl == null ? null :
-                        CachedNetworkImage(
-                          placeholder: (context, url) =>
-                              CupertinoActivityIndicator(),
-                          errorWidget: (context, url, error) {
-                            return ImageUnavailable();
-                          },
-                          imageUrl: imageUrl,
-                          imageBuilder: (context, imageProvider) =>
-                              Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.all(Radius.circular(2)),
-                                  image: DecorationImage(
-                                    image: imageProvider,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
+                        child: Stack(children: <Widget>[
+                          DiscoverEventImage(imageUrl),
+                          Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.white.withOpacity(0.9),
                               ),
-                        ),
+                              child: Text(priceOutput,style: foriaBodyTwo),
+                            ),
+                          )
+                        ],alignment: Alignment.bottomLeft,
+                        )
                       ),
                       sizedBoxH3,
                       Text(
@@ -235,4 +268,34 @@ class EventList extends StatelessWidget {
             });
   }
 }
+
+class DiscoverEventImage extends StatelessWidget {
+
+  final String _imageUrl;
+
+  DiscoverEventImage(this._imageUrl);
+
+  @override
+  Widget build(BuildContext context) {
+    return _imageUrl == null ? Container() : CachedNetworkImage(
+      placeholder: (context, url) =>
+          CupertinoActivityIndicator(),
+      errorWidget: (context, url, error) {
+        return ImageUnavailable();
+      },
+      imageUrl: _imageUrl,
+      imageBuilder: (context, imageProvider) =>
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(2)),
+              image: DecorationImage(
+                image: imageProvider,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+    );
+  }
+}
+
 
