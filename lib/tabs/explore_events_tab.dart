@@ -179,10 +179,9 @@ class EventList extends StatelessWidget {
               final List<TicketTypeConfig> ticketTiers = eventData.events[index].ticketTypeConfig;
               NumberFormat formatter;
 
-              if(ticketTiers[0] != null || ticketTiers[0].currency != null) {
+              if (ticketTiers[0] != null || ticketTiers[0].currency != null) {
                  formatter = NumberFormat.simpleCurrency(name: ticketTiers[0].currency, decimalDigits: 2);
               }
-
 
               double min = double.maxFinite;
               double max = double.minPositive;
@@ -210,7 +209,7 @@ class EventList extends StatelessWidget {
                 }
               }
 
-              if(max == double.minPositive && min == double.maxFinite){
+              if (max == double.minPositive && min == double.maxFinite){
                 priceOutput = textSoldOut;
               } else if(min < 0.01 && max < 0.01){
                 priceOutput = textFreeEvent;
