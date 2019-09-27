@@ -159,6 +159,9 @@ class NoEvent extends StatelessWidget {
   }
 }
 
+///
+/// Creates a list view containing all the events.
+///
 class EventList extends StatelessWidget {
 
   @override
@@ -177,46 +180,11 @@ class EventList extends StatelessWidget {
               final String eventUrl = (Configuration.eventUrl as String).replaceAll('{eventId}', eventData.events[index].id);
               final String imageUrl = eventData.events[index].imageUrl;
               final List<TicketTypeConfig> ticketTiers = eventData.events[index].ticketTypeConfig;
-              NumberFormat formatter;
+              List<Widget> imageStack = new List<Widget>();
 
-              if (ticketTiers[0] != null || ticketTiers[0].currency != null) {
-                 formatter = NumberFormat.simpleCurrency(name: ticketTiers[0].currency, decimalDigits: 2);
-              }
-
-              double min = double.maxFinite;
-              double max = double.minPositive;
-
-              String priceOutput;
-
-              for (TicketTypeConfig tier in ticketTiers) {
-
-                if (tier.amountRemaining <= 0){
-                  continue;
-                }
-
-                double faceValue = double.tryParse(tier.price);
-                double fee = double.tryParse(tier.calculatedFee);
-                if (faceValue == null || fee == null){
-                  continue;
-                }
-                double price = faceValue + fee;
-
-                if (price < min) {
-                  min = price;
-                }
-                if (price > max){
-                  max = price;
-                }
-              }
-
-              if (max == double.minPositive && min == double.maxFinite){
-                priceOutput = textSoldOut;
-              } else if(min < 0.01 && max < 0.01){
-                priceOutput = textFreeEvent;
-              } else if(min == max){
-                priceOutput = formatter.format(min);
-              } else {
-                priceOutput = 'From ' + formatter.format(min);
+              imageStack.add(DiscoverEventImage(imageUrl));
+              if (ticketTiers != null && ticketTiers.isNotEmpty && ticketTiers[0].currency != null) {
+                 imageStack.add(PriceSticker(ticketTiers));
               }
 
               return Padding(
@@ -236,20 +204,9 @@ class EventList extends StatelessWidget {
                       Container(
                         height: 150,
                         width: double.infinity,
-                        child: Stack(children: <Widget>[
-                          DiscoverEventImage(imageUrl),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.white.withOpacity(0.9),
-                              ),
-                              child: Text(priceOutput,style: foriaBodyTwo),
-                            ),
-                          )
-                        ],alignment: Alignment.bottomLeft,
+                        child: Stack(
+                          children: imageStack,
+                          alignment: Alignment.bottomLeft,
                         )
                       ),
                       sizedBoxH3,
@@ -275,6 +232,9 @@ class EventList extends StatelessWidget {
   }
 }
 
+///
+/// Cached image for the event
+///
 class DiscoverEventImage extends StatelessWidget {
 
   final String _imageUrl;
@@ -303,5 +263,69 @@ class DiscoverEventImage extends StatelessWidget {
     );
   }
 }
+
+///
+/// A sticker that goes on top of the event images.
+/// Displays the price, SOLD OUT or FREE depending on the circumstances.
+///
+class PriceSticker extends StatelessWidget {
+
+  final List<TicketTypeConfig> ticketTiers;
+
+  PriceSticker(this.ticketTiers);
+
+  @override
+  Widget build(BuildContext context) {
+      NumberFormat formatter = NumberFormat.simpleCurrency(name: ticketTiers[0].currency, decimalDigits: 2);
+      double min = double.maxFinite;
+      double max = double.minPositive;
+      String priceText;
+
+      for (TicketTypeConfig tier in ticketTiers) {
+
+        if (tier.amountRemaining <= 0){
+          continue;
+        }
+
+        double faceValue = double.tryParse(tier.price);
+        double fee = double.tryParse(tier.calculatedFee);
+        if (faceValue == null || fee == null){
+          continue;
+        }
+        double price = faceValue + fee;
+
+        if (price < min) {
+          min = price;
+        }
+        if (price > max){
+          max = price;
+        }
+      }
+
+      if (max == double.minPositive && min == double.maxFinite){
+        priceText = textSoldOut;
+      } else if(min < 0.01 && max < 0.01){
+        priceText = textFreeEvent;
+      } else if(min == max){
+        priceText = formatter.format(min);
+      } else {
+        priceText = 'From ' + formatter.format(min);
+      }
+
+      return Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.white.withOpacity(0.9),
+          ),
+          child: Text(priceText,style: foriaBodyTwo),
+        ),
+      );
+
+  }
+}
+
 
 

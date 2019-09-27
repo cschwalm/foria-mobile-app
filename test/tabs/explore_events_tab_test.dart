@@ -80,6 +80,7 @@ List<Event> _generateFakeEvents() {
     event.description = 'test description';
     event.startTime = DateTime.now();
     event.imageUrl = null;
+//    event.ticketTypeConfig = null;
 
     events.add(event);
   }
