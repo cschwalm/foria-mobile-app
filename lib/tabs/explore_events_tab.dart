@@ -9,6 +9,7 @@ import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/image_unavailable.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -176,7 +177,12 @@ class EventList extends StatelessWidget {
               final String eventUrl = (Configuration.eventUrl as String).replaceAll('{eventId}', eventData.events[index].id);
               final String imageUrl = eventData.events[index].imageUrl;
               final List<TicketTypeConfig> ticketTiers = eventData.events[index].ticketTypeConfig;
-              //TODO add capability for multiple currencies
+              NumberFormat formatter;
+
+              if(ticketTiers[0] != null || ticketTiers[0].currency != null) {
+                 formatter = NumberFormat.simpleCurrency(name: ticketTiers[0].currency, decimalDigits: 2);
+              }
+
 
               double min = double.maxFinite;
               double max = double.minPositive;
@@ -198,7 +204,8 @@ class EventList extends StatelessWidget {
 
                 if (price < min) {
                   min = price;
-                } else if (price > max){
+                }
+                if (price > max){
                   max = price;
                 }
               }
@@ -208,9 +215,9 @@ class EventList extends StatelessWidget {
               } else if(min < 0.01 && max < 0.01){
                 priceOutput = textFreeEvent;
               } else if(min == max){
-                priceOutput = '\$'+(min).toStringAsFixed(0);
+                priceOutput = formatter.format(min);
               } else {
-                priceOutput = 'From \$' + min.toStringAsFixed(0);
+                priceOutput = 'From ' + formatter.format(min);
               }
 
               return Padding(
