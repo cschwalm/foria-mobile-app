@@ -192,6 +192,7 @@ class EventList extends StatelessWidget {
                 child: GestureDetector(
                   key: Key(eventData.events[index].id),
                   onTap: () async {
+
                     if (await canLaunch(eventUrl)) {
                       await launch(eventUrl);
                     } else {
@@ -304,7 +305,7 @@ class PriceSticker extends StatelessWidget {
 
       if (max == double.minPositive && min == double.maxFinite){
         priceText = textSoldOut;
-      } else if(min < 0.01 && max < 0.01){
+      } else if(min < 0.01){
         priceText = textFreeEvent;
       } else if(min == max){
         priceText = formatter.format(min);
