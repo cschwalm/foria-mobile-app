@@ -8,6 +8,7 @@ import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/screens/transfer_screen.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/message_stream.dart';
+import 'package:foria/utils/size_config.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/primary_button.dart';
 import 'package:foria_flutter_client/api.dart';
@@ -108,7 +109,7 @@ class _PassBodyState extends State<PassBody> {
     });
 
     final double viewportFraction = 0.9;
-    final double width = MediaQuery.of(context).size.width;
+    final double width = SizeConfig.screenWidth;
     final double closeButtonPadding = (1-viewportFraction) * width / 2;
     final double verticalPadding = 7;
 
@@ -217,28 +218,34 @@ class PassCard extends StatelessWidget {
             EventInfo(),
             SizedBox(height: 5),
             Directions(),
-            Expanded(child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  'Pass $passNumber of $_passCount',
-                  style: Theme
-                      .of(context)
-                      .textTheme
-                      .title,
-                ),
-                SizedBox(height: 5),
-                Text(
-                  ticket.ticketTypeConfig.name,
-                  style: Theme
-                      .of(context)
-                      .textTheme
-                      .title,
-                ),
-                SizedBox(height: 20),
-                Column(children: barcodeList),
-              ],
-            )),
+            Expanded(
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          'Pass $passNumber of $_passCount',
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .title,
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          ticket.ticketTypeConfig.name,
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .title,
+                        ),
+                        SizedBox(height: 20),
+                        Column(children: barcodeList),
+                      ],
+                    ),
+                  ),
+                )
+            ),
             PassOptions(ticket)
           ],
         ),
