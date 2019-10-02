@@ -103,15 +103,20 @@ void mainDelegate() {
   }, onError: (error, stackTrace) {
 
     // Whenever an error occurs, call the `_reportError` function. This sends
-    // Dart errors to the dev console or Sentry depending on the environment.
+    // to Sentry depending on the environment.
     final MessageStream errorStream = GetIt.instance<MessageStream>();
     errorStream.reportError(error, stackTrace);
-  });
 
-  // This captures errors reported by the Flutter framework.
-  FlutterError.onError = (FlutterErrorDetails details) {
-    Zone.current.handleUncaughtError(details.exception, details.stack);
-  };
+    //Report to Dev console
+    print('### UNHANDLED ERROR: $error ###');
+    print(stackTrace);
+
+    // This captures errors reported by the Flutter framework.
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.dumpErrorToConsole(details);
+      Zone.current.handleUncaughtError(details.exception, details.stack);
+    };
+  });
 }
 
 ///

@@ -4,23 +4,36 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:foria/providers/ticket_provider.dart';
+import 'package:foria/utils/constants.dart';
+import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/primary_button.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
 
-///
-/// Screen allows user to enter information such as email to allow transfer of a single ticket to a different user.
-///
-class TransferScreen extends StatefulWidget {
+class TransferScreen extends StatelessWidget {
 
   static const routeName = '/transfer-screen';
 
   @override
-  _TransferScreenState createState() => _TransferScreenState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(title: Text(requestTransfer),),
+        body: TransferScreenBody());
+  }
 }
 
-class _TransferScreenState extends State<TransferScreen> {
+
+///
+/// Screen allows user to enter information such as email to allow transfer of a single ticket to a different user.
+///
+class TransferScreenBody extends StatefulWidget {
+
+  @override
+  _TransferScreenBodyState createState() => _TransferScreenBodyState();
+}
+
+class _TransferScreenBodyState extends State<TransferScreenBody> {
 
   String _emailSubmission;
   final _form = GlobalKey<FormState>();
@@ -34,7 +47,7 @@ class _TransferScreenState extends State<TransferScreen> {
   Future<void> _transferTicket(Ticket selectedTicket, BuildContext context) async {
 
     final TicketProvider ticketProvider = GetIt.instance<TicketProvider>();
-    bool isEventNowEmpty;
+    bool isEventNowEmpty = false;
 
     setState(() {
       _isLoading = true;
@@ -43,20 +56,34 @@ class _TransferScreenState extends State<TransferScreen> {
     setState(() {
       _isLoading = false;
     });
-    Navigator.of(context).pop();
+    Navigator.pop(context, 'hello');
+    Navigator.pop(context, 'hello');
 
     //If the last ticket for an event was transferred the MyTicketsScreen should be popped
     if(isEventNowEmpty){
       Navigator.of(context).maybePop();
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final Ticket args = ModalRoute.of(context).settings.arguments as Ticket;
 
-    return Scaffold(
-      appBar: AppBar(title: Text(requestTransfer),),
-      body: Padding(
+    final MessageStream messageStream = GetIt.instance<MessageStream>();
+    messageStream.addListener((errorMessage) {
+      Scaffold.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: snackbarColor,
+            elevation: 0,
+            content: FlatButton(
+              child: Text(errorMessage.body),
+              onPressed: () => Scaffold.of(context).hideCurrentSnackBar(),
+            ),
+          )
+      );
+    });
+
+    return Padding(
         padding: const EdgeInsets.fromLTRB(16,30,16,0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -98,8 +125,8 @@ class _TransferScreenState extends State<TransferScreen> {
                   context: context,
                   builder: (BuildContext context) {
                     final String title = ConfirmTransfer;
-                    final String body = ConfirmTransferBody+_emailSubmission;
-                    if(Platform.isIOS){
+                    final String body = ConfirmTransferBody + _emailSubmission;
+                    if (Platform.isIOS) {
                       return CupertinoAlertDialog(
                         title: Text(title),
                         content: Text(body),
@@ -113,8 +140,7 @@ class _TransferScreenState extends State<TransferScreen> {
                             isDefaultAction: true,
                             child: Text(textConfirm),
                             onPressed: () async {
-                               await _transferTicket(args, context);
-                              Navigator.of(context).maybePop();
+                              await _transferTicket(args, context);
                             },
                           ),
                         ],
@@ -141,10 +167,9 @@ class _TransferScreenState extends State<TransferScreen> {
                   },
                 );
               },
-            ),
+            )
           ],
         ),
-      ),
-    );
+      );
   }
 }

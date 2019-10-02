@@ -8,7 +8,6 @@ import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/screens/transfer_screen.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/message_stream.dart';
-import 'package:foria/utils/size_config.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/primary_button.dart';
 import 'package:foria_flutter_client/api.dart';
@@ -109,7 +108,7 @@ class _PassBodyState extends State<PassBody> {
     });
 
     final double viewportFraction = 0.9;
-    final double width = SizeConfig.screenWidth;
+    final double width = MediaQuery.of(context).size.width;
     final double closeButtonPadding = (1-viewportFraction) * width / 2;
     final double verticalPadding = 7;
 
@@ -480,11 +479,26 @@ class _PassOptionsState extends State<PassOptions> {
     } else {
       button = PrimaryButton(
         text: textTransfer,
-        onPress: () {
-          Navigator.of(context).pushNamed(
+        onPress: () async {
+          final result = await Navigator.of(context).pushNamed(
             TransferScreen.routeName,
-            arguments: widget._selectedTicket,
           );
+          final MessageStream messageStream = GetIt.instance<MessageStream>();
+          messageStream.addListener((errorMessage) {
+            Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: snackbarColor,
+                  elevation: 0,
+                  content: FlatButton(
+                    child: Text(errorMessage.body),
+                    onPressed: () => Scaffold.of(context).hideCurrentSnackBar(),
+                  ),
+                )
+            );
+          });
+          if (result != null){
+            messageStream.announceMessage(ForiaNotification.message(MessageType.MESSAGE, result, null));
+          }
         },
       );
     }

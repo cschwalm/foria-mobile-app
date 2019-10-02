@@ -100,6 +100,7 @@ class _ExploreEventsTabState extends State<ExploreEventsTab> with AutomaticKeepA
   Widget build(BuildContext context) {
 
     super.build(context);
+    debugPrint('Build: Explore tab');
 
     final MessageStream messageStream = GetIt.instance<MessageStream>();
     messageStream.addListener((errorMessage) {
