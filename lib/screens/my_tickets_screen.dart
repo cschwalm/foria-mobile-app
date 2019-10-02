@@ -217,28 +217,34 @@ class PassCard extends StatelessWidget {
             EventInfo(),
             SizedBox(height: 5),
             Directions(),
-            Expanded(child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  'Pass $passNumber of $_passCount',
-                  style: Theme
-                      .of(context)
-                      .textTheme
-                      .title,
-                ),
-                SizedBox(height: 5),
-                Text(
-                  ticket.ticketTypeConfig.name,
-                  style: Theme
-                      .of(context)
-                      .textTheme
-                      .title,
-                ),
-                SizedBox(height: 20),
-                Column(children: barcodeList),
-              ],
-            )),
+            Expanded(
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          'Pass $passNumber of $_passCount',
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .title,
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          ticket.ticketTypeConfig.name,
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .title,
+                        ),
+                        SizedBox(height: 20),
+                        Column(children: barcodeList),
+                      ],
+                    ),
+                  ),
+                )
+            ),
             PassOptions(ticket)
           ],
         ),

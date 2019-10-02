@@ -115,9 +115,12 @@ class MessageStream {
     if (error != null) {
 
       final String envLabel = Environment.STAGING == Configuration.getEnvironment() ? 'staging' : 'prodution';
+      final PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
+      if (packageInfo.buildNumber == '1'){
+        return;
+      }
       if (_sentry == null) {
-        final PackageInfo packageInfo = await PackageInfo.fromPlatform();
         final buildVersion = '${packageInfo.version} - Build: ${packageInfo.buildNumber}';
 
         final AuthUtils authUtils = GetIt.instance<AuthUtils>();

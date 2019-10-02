@@ -106,6 +106,10 @@ const String requestTransfer = 'Request Transfer';
 
 const String cancelTransfer = 'Cancel Transfer';
 
+const String ConfirmTransfer = 'Confirm Transfer';
+
+const String ConfirmTransferBody = 'Your ticket will be transfered to ';
+
 const String textConfirmCancel = 'Confirm Cancellation';
 
 const String textConfirmCancelBody = 'This will cancel the pending transfer. The transferee will be notified.';

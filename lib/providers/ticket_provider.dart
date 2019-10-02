@@ -325,7 +325,8 @@ class TicketProvider extends ChangeNotifier {
   Future<bool> transferTicket(final Ticket currentTicket, final String email) async {
 
     if (currentTicket == null || email == null) {
-      return null;
+      errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, null, null));
+      throw new Exception('null passed to transferTicket method');
     }
 
     if (_ticketApi == null) {
@@ -343,11 +344,11 @@ class TicketProvider extends ChangeNotifier {
       debugPrint("### FORIA SERVER ERROR: transferTicket ###");
       debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
       errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
-      return null;
+      throw ex;
     } catch (e) {
       debugPrint("### NETWORK ERROR: transferTicket Msg: ${e.toString()} ###");
       errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
-      return null;
+      throw e;
     }
 
     _ticketSet.remove(currentTicket); //Remove stale ticket. Status is out of date.

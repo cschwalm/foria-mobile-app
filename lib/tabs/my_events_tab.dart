@@ -290,14 +290,30 @@ class EventCard extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
                 child: GestureDetector(
                   key: Key(eventData.eventList[index].id),
-                  onTap: () {
-                    Navigator.of(context).pushNamed(
+                  onTap: () async {
+                    final result = await Navigator.of(context).pushNamed(
                       MyTicketsScreen.routeName,
                       arguments: {
                         'event': eventData.eventList[index],
                         'tickets': eventData.getTicketsForEventId(eventData.eventList[index].id)
                       },
                     );
+                    final MessageStream messageStream = GetIt.instance<MessageStream>();
+                    messageStream.addListener((errorMessage) {
+                      Scaffold.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: snackbarColor,
+                            elevation: 0,
+                            content: FlatButton(
+                              child: Text(errorMessage.body),
+                              onPressed: () => Scaffold.of(context).hideCurrentSnackBar(),
+                            ),
+                          )
+                      );
+                    });
+                    if (result != null){
+                      messageStream.announceMessage(ForiaNotification.message(MessageType.MESSAGE, result, null));
+                    }
                   },
                   child: Card(
                     shape: RoundedRectangleBorder(

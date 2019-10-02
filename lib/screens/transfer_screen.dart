@@ -30,27 +30,23 @@ class _TransferScreenState extends State<TransferScreen> {
   /// Block and wait until transfer network call completes.
   ///
   Future<void> _transferTicket(Ticket selectedTicket, BuildContext context) async {
-
     final TicketProvider ticketProvider = GetIt.instance<TicketProvider>();
-    bool isEventNowEmpty;
+    bool isEventNowEmpty = false;
 
-    final isValid = _form.currentState.validate();
-    if (!isValid) {
-      return;
-    }
-    _form.currentState.save();
     setState(() {
       _isLoading = true;
     });
-    isEventNowEmpty = await ticketProvider.transferTicket(selectedTicket, _emailSubmission);
+    try {
+      isEventNowEmpty = await ticketProvider.transferTicket(selectedTicket, _emailSubmission);
+    } catch (e){}
     setState(() {
       _isLoading = false;
     });
-    Navigator.of(context).maybePop();
+    Navigator.pop(context);
 
     //If the last ticket for an event was transferred the MyTicketsScreen should be popped
-    if(isEventNowEmpty){
-      Navigator.of(context).maybePop();
+    if (isEventNowEmpty) {
+      Navigator.pop(context, textTransferComplete);
     }
   }
 
@@ -61,7 +57,7 @@ class _TransferScreenState extends State<TransferScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(requestTransfer),),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(16,30,16,0),
+        padding: const EdgeInsets.fromLTRB(16, 30, 16, 0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -69,18 +65,18 @@ class _TransferScreenState extends State<TransferScreen> {
             Form(
               key: _form,
               child: TextFormField(
-                    decoration: InputDecoration(labelText: enterTransferEmail),
-                    validator: (value) {
-                      if (RegExp(_emailCheck).hasMatch(value)) {
-                        return null;
-                      }
-                      return enterValidEmail;
-                    },
-                    onSaved: (value) {
-                      _emailSubmission = value;
-                    },
+                decoration: InputDecoration(labelText: enterTransferEmail),
+                validator: (value) {
+                  if (RegExp(_emailCheck).hasMatch(value)) {
+                    return null;
+                  }
+                  return enterValidEmail;
+                },
+                onSaved: (value) {
+                  _emailSubmission = value;
+                },
                 keyboardType: TextInputType.emailAddress,
-                  ),
+              ),
             ),
             SizedBox(height: 20,),
             Text(
@@ -92,11 +88,17 @@ class _TransferScreenState extends State<TransferScreen> {
             PrimaryButton(
               text: transferConfirm,
               isLoading: _isLoading,
-              onPress: _isLoading ? null : () => _transferTicket(args, context),
-            ),
+              onPress: _isLoading ? null : () {
+                final isValid = _form.currentState.validate();
+                if (!isValid) {
+                  return;
+                }
+                _form.currentState.save();
+                _transferTicket(args, context);
+              },
+            )
           ],
         ),
-      ),
-    );
+      ),);
   }
 }
