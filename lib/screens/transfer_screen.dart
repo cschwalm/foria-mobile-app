@@ -36,7 +36,9 @@ class _TransferScreenState extends State<TransferScreen> {
     setState(() {
       _isLoading = true;
     });
-    isEventNowEmpty = await ticketProvider.transferTicket(selectedTicket, _emailSubmission);
+    try {
+      isEventNowEmpty = await ticketProvider.transferTicket(selectedTicket, _emailSubmission);
+    } catch (e){}
     setState(() {
       _isLoading = false;
     });
