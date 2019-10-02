@@ -322,11 +322,11 @@ class TicketProvider extends ChangeNotifier {
   ///
   /// Returns bool. TRUE is returned if the last ticket for that event has a completed transfer. FALSE if not. NULL if there is an error.
   ///
-  Future<TransferResult> transferTicket(final Ticket currentTicket, final String email) async {
+  Future<bool> transferTicket(final Ticket currentTicket, final String email) async {
 
     if (currentTicket == null || email == null) {
       errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, null, null));
-      return TransferResult.ERROR;
+      return false;
     }
 
     if (_ticketApi == null) {
@@ -344,11 +344,11 @@ class TicketProvider extends ChangeNotifier {
       debugPrint("### FORIA SERVER ERROR: transferTicket ###");
       debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
       errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
-      return TransferResult.ERROR;
+      return false;
     } catch (e) {
       debugPrint("### NETWORK ERROR: transferTicket Msg: ${e.toString()} ###");
       errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
-      return TransferResult.ERROR;
+      return false;
     }
 
     _ticketSet.remove(currentTicket); //Remove stale ticket. Status is out of date.
@@ -369,10 +369,10 @@ class TicketProvider extends ChangeNotifier {
     if(getTicketsForEventId(currentTicket.eventId).isEmpty){
       _eventSet.removeWhere((event) => event.id == currentTicket.eventId);
       notifyListeners();
-      return TransferResult.ERROR;
+      return true;
     } else {
       notifyListeners();
-      return TransferResult.ERROR;
+      return false;
     }
   }
 

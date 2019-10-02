@@ -479,26 +479,11 @@ class _PassOptionsState extends State<PassOptions> {
     } else {
       button = PrimaryButton(
         text: textTransfer,
-        onPress: () async {
-          final result = await Navigator.of(context).pushNamed(
+        onPress: () {
+          Navigator.of(context).pushNamed(
             TransferScreen.routeName,
+            arguments: widget._selectedTicket,
           );
-          final MessageStream messageStream = GetIt.instance<MessageStream>();
-          messageStream.addListener((errorMessage) {
-            Scaffold.of(context).showSnackBar(
-                SnackBar(
-                  backgroundColor: snackbarColor,
-                  elevation: 0,
-                  content: FlatButton(
-                    child: Text(errorMessage.body),
-                    onPressed: () => Scaffold.of(context).hideCurrentSnackBar(),
-                  ),
-                )
-            );
-          });
-          if (result != null){
-            messageStream.announceMessage(ForiaNotification.message(MessageType.MESSAGE, result, null));
-          }
         },
       );
     }

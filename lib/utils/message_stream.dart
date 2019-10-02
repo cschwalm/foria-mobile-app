@@ -14,12 +14,6 @@ enum MessageType {
   ERROR,
   NETWORK_ERROR
 }
-enum TransferResult {
-  PENDING_TRANSFER,
-  TRANSFER,
-  FINAL_TRANSFER,
-  ERROR
-}
 ///
 /// Struct containing relevant error data to display.
 ///

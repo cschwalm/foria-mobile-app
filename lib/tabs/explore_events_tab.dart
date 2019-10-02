@@ -100,7 +100,6 @@ class _ExploreEventsTabState extends State<ExploreEventsTab> with AutomaticKeepA
   Widget build(BuildContext context) {
 
     super.build(context);
-    debugPrint('Build: Explore tab');
 
     final MessageStream messageStream = GetIt.instance<MessageStream>();
     messageStream.addListener((errorMessage) {
@@ -193,7 +192,6 @@ class EventList extends StatelessWidget {
                 child: GestureDetector(
                   key: Key(eventData.events[index].id),
                   onTap: () async {
-
                     if (await canLaunch(eventUrl)) {
                       await launch(eventUrl);
                     } else {
