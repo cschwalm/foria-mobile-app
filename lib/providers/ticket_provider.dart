@@ -344,11 +344,11 @@ class TicketProvider extends ChangeNotifier {
       debugPrint("### FORIA SERVER ERROR: transferTicket ###");
       debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
       errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
-      throw new Exception('null passed to transferTicket method');
+      throw ex;
     } catch (e) {
       debugPrint("### NETWORK ERROR: transferTicket Msg: ${e.toString()} ###");
       errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
-      throw new Exception('null passed to transferTicket method');
+      throw e;
     }
 
     _ticketSet.remove(currentTicket); //Remove stale ticket. Status is out of date.
