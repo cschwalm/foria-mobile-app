@@ -283,7 +283,7 @@ class PriceSticker extends StatelessWidget {
 
       for (TicketTypeConfig tier in ticketTiers) {
 
-        if (tier.amountRemaining <= 0){
+        if (tier.amountRemaining == null || tier.price == null || tier.calculatedFee == null || tier.amountRemaining <= 0){
           continue;
         }
 
