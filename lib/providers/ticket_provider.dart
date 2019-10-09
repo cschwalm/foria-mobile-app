@@ -34,7 +34,7 @@ class TicketProvider extends ChangeNotifier {
   final Set<Event> _eventSet = new HashSet();
   final Set<Ticket> _ticketSet = new HashSet();
 
-  final MessageStream errorStream = GetIt.instance<MessageStream>();
+  final MessageStream _errorStream = GetIt.instance<MessageStream>();
 
   bool _ticketsActiveOnOtherDevice = false;
 
@@ -43,7 +43,6 @@ class TicketProvider extends ChangeNotifier {
   UnmodifiableListView<Ticket> get userTicketList => UnmodifiableListView(_ticketSet);
 
   TicketProvider() {
-
     _authUtils = GetIt.instance<AuthUtils>();
     _databaseUtils = GetIt.instance<DatabaseUtils>();
   }
@@ -64,7 +63,6 @@ class TicketProvider extends ChangeNotifier {
   /// Returns a subset of tickets from the specified ticket ID.
   ///
   Set<Ticket> getTicketsForEventId(String eventId) {
-
     assert (eventId != null);
 
     Set<Ticket> tickets = new Set<Ticket>();
@@ -96,7 +94,7 @@ class TicketProvider extends ChangeNotifier {
       print("### FORIA SERVER ERROR: getTickets ###");
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
 
-      errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
+      _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
 
       if (ex.code == HttpStatus.unauthorized || ex.code == HttpStatus.forbidden) {
         debugPrint('Logging user out due to bad token.');
@@ -104,28 +102,75 @@ class TicketProvider extends ChangeNotifier {
         return;
       }
       rethrow;
-
     } catch (e) {
       print("### UNKNOWN ERROR: getTickets Msg: ${e.toString()} ###");
       rethrow;
     }
 
-    debugPrint("Loaded ${tickets.length} tickets from Foria API.");
+    await checkAndSetDataFromNetwork(tickets);
 
-    await _activateAllIssuedTickets(tickets);
-    await _databaseUtils.storeTicketSet(tickets.toSet());
+    debugPrint("Loaded ${_ticketSet.length} tickets from Foria API.");
 
-    final bool areTicketsActiveElsewhere = await _areTicketsActiveElsewhere(tickets);
+    await _activateAllIssuedTickets(_ticketSet);
+    await _databaseUtils.storeTicketSet(_ticketSet);
+
+    final bool areTicketsActiveElsewhere = await _areTicketsActiveElsewhere(_ticketSet);
     if (areTicketsActiveElsewhere) {
       _ticketsActiveOnOtherDevice = true;
     }
 
+    notifyListeners();
+  }
+
+  ///
+  /// Removes any tickets that are missing one or more important fields.
+  /// Individually pulls via network all events for valid tickets. No duplicated events.
+  /// Removes any events that are missing one or more important fields. When an event is removed
+  /// all associated tickets would be removed too.
+  ///
+  /// One UI error displayed if any event or ticket is removed
+  ///
+  /// As a result of this method, _ticketSet and _eventSet are checked and set
+  ///
+  Future<void> checkAndSetDataFromNetwork(Set<Ticket> tickets) async {
+    bool isError = false;
+
+    Set<Ticket> checkedTickets = Set<Ticket>();
+    Set<String> processedEventIdSet = new HashSet();
+
     _ticketSet.clear();
     _eventSet.clear();
 
-    _ticketSet.addAll(tickets);
-    _eventSet.addAll(await _buildEventSet(tickets, true));
-    notifyListeners();
+    // Checks tickets
+    for (Ticket ticket in tickets) {
+      if (_isValidTicket(ticket)) {
+        checkedTickets.add(ticket);
+        _ticketSet.add(ticket);
+      } else {
+        debugPrint('Error: Ticket invalid');
+        isError = true;
+      }
+    }
+
+    // Checks events and removes tickets for invalid events
+    for (Ticket ticket in checkedTickets) {
+      if (processedEventIdSet.contains(ticket.eventId)) {
+        continue;
+      }
+      Event event = await fetchEventByIdViaNetwork(ticket.eventId);
+      if (_isValidEvent(event)) {
+        _eventSet.add(event);
+        processedEventIdSet.add(ticket.eventId);
+      } else {
+        isError = true;
+        debugPrint('Error: Event invalid');
+        _ticketSet.remove(ticket);
+      }
+    }
+
+    if (isError){
+      _errorStream.announceMessage(ForiaNotification.message(MessageType.MESSAGE, myPassesLoadError, null,));
+    }
   }
 
   ///
@@ -142,7 +187,7 @@ class TicketProvider extends ChangeNotifier {
     debugPrint("Loaded ${tickets.length} tickets from offline database.");
     _ticketSet.clear();
     _ticketSet.addAll(tickets);
-    _eventSet.addAll(await _buildEventSet(tickets, false));
+    _eventSet.addAll(await _buildEventSetFromLocalDatabase(tickets));
     notifyListeners();
   }
 
@@ -212,15 +257,15 @@ class TicketProvider extends ChangeNotifier {
 
     RedemptionResult result;
     try {
-     result = await _ticketApi.redeemTicket(redemptionRequest);
+      result = await _ticketApi.redeemTicket(redemptionRequest);
     } on ApiException catch (ex, stackTrace) {
       debugPrint("### FORIA SERVER ERROR: redeemTicket ###");
       debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
-      errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
+      _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       throw new Exception(ex.message);
     } catch (e) {
       debugPrint("### NETWORK ERROR: redeemTicket Msg: ${e.toString()} ###");
-      errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
+      _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
       rethrow;
     }
 
@@ -242,7 +287,7 @@ class TicketProvider extends ChangeNotifier {
       return;
     }
 
-    if (! await _authUtils.isUserLoggedIn(true)) {
+    if (!await _authUtils.isUserLoggedIn(true)) {
       return;
     }
 
@@ -259,11 +304,11 @@ class TicketProvider extends ChangeNotifier {
     } on ApiException catch (ex, stackTrace) {
       debugPrint("### FORIA SERVER ERROR: registerToken ###");
       debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
-      errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
+      _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       return;
     } catch (e) {
       debugPrint("### NETWORK ERROR: registerToken Msg: ${e.toString()} ###");
-      errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, textGenericError, null, null, null));
+      _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, textGenericError, null, null, null));
       return;
     }
 
@@ -294,11 +339,11 @@ class TicketProvider extends ChangeNotifier {
     } on ApiException catch (ex, stackTrace) {
       print("### FORIA SERVER ERROR: cancelTransfer ###");
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
-      errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
+      _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       rethrow;
     } catch (e) {
       debugPrint("### NETWORK ERROR: cancelTransfer Msg: ${e.toString()} ###");
-      errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
+      _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
       rethrow;
     }
 
@@ -325,7 +370,7 @@ class TicketProvider extends ChangeNotifier {
   Future<bool> transferTicket(final Ticket currentTicket, final String email) async {
 
     if (currentTicket == null || email == null) {
-      errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, null, null));
+      _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, null, null));
       throw new Exception('null passed to transferTicket method');
     }
 
@@ -343,30 +388,29 @@ class TicketProvider extends ChangeNotifier {
     } on ApiException catch (ex, stackTrace) {
       debugPrint("### FORIA SERVER ERROR: transferTicket ###");
       debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
-      errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
+      _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       throw ex;
     } catch (e) {
       debugPrint("### NETWORK ERROR: transferTicket Msg: ${e.toString()} ###");
-      errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
+      _errorStream.announceError(
+          ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
       throw e;
     }
 
     _ticketSet.remove(currentTicket); //Remove stale ticket. Status is out of date.
 
     if (updatedTicket != null) {
-
       _ticketSet.add(updatedTicket);
-      errorStream.announceMessage(ForiaNotification.message(MessageType.MESSAGE, textTransferPending, null));
+      _errorStream.announceMessage(ForiaNotification.message(MessageType.MESSAGE, textTransferPending, null));
       debugPrint('Ticket Id: ${currentTicket.id} submitted for transfer. New status: ${updatedTicket.status}');
-
     } else {
-      errorStream.announceMessage(ForiaNotification.message(MessageType.MESSAGE, textTransferComplete, null));
+      _errorStream.announceMessage(ForiaNotification.message(MessageType.MESSAGE, textTransferComplete, null));
       debugPrint('Ticket Id: ${currentTicket.id} completed transfer. Ticket removed for user.');
     }
 
     await _databaseUtils.storeTicketSet(_ticketSet);
 
-    if(getTicketsForEventId(currentTicket.eventId).isEmpty){
+    if (getTicketsForEventId(currentTicket.eventId).isEmpty) {
       _eventSet.removeWhere((event) => event.id == currentTicket.eventId);
       notifyListeners();
       return true;
@@ -403,11 +447,11 @@ class TicketProvider extends ChangeNotifier {
       } on ApiException catch (ex, stackTrace) {
         debugPrint("### FORIA SERVER ERROR: activateTicket ###");
         debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
-        errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
+        _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
         rethrow;
       } catch (e) {
         debugPrint("### NETWORK ERROR: activateTicket Msg: ${e.toString()} ###");
-        errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
+        _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
         rethrow;
       }
 
@@ -447,7 +491,8 @@ class TicketProvider extends ChangeNotifier {
       final String loadedTicketSecretHashHex = sha512.convert(loadedTicketSecretBytes).toString();
 
       if (loadedTicketSecretHashHex != actualTicketSecretHex) {
-        debugPrint('Server ticketId: ${ticket.id} hash: $actualTicketSecretHex does not equal stored hash: $loadedTicketSecretHashHex');
+        debugPrint('Server ticketId: ${ticket
+            .id} hash: $actualTicketSecretHex does not equal stored hash: $loadedTicketSecretHashHex');
         return true;
       }
     }
@@ -459,14 +504,13 @@ class TicketProvider extends ChangeNotifier {
   ///
   /// Create a list of unique events for the set of user tickets.
   ///
-  Future<Set<Event>> _buildEventSet(Set<Ticket> tickets, bool forceRefresh) async {
-
+  Future<Set<Event>> _buildEventSetFromLocalDatabase(Set<Ticket> tickets) async {
     Set<Event> events = Set<Event>();
 
     Set<String> processedEventIdSet = new HashSet();
     for (Ticket ticket in tickets) {
       if (!processedEventIdSet.contains(ticket.eventId)) {
-        Event event = forceRefresh ? await fetchEventByIdViaNetwork(ticket.eventId) : await fetchEventByIdViaDatabase(ticket.eventId);
+        Event event = await fetchEventByIdViaDatabase(ticket.eventId);
         events.add(event);
         processedEventIdSet.add(ticket.eventId);
       }
@@ -499,7 +543,7 @@ class TicketProvider extends ChangeNotifier {
     } on ApiException catch (ex, stackTrace) {
       print("### FORIA SERVER ERROR: getEventById ###");
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
-      errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
+      _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       rethrow;
     }
 
@@ -526,5 +570,60 @@ class TicketProvider extends ChangeNotifier {
     }
     debugPrint("EventId: $eventId loaded from offline database.");
     return event;
+  }
+
+  ///
+  /// If any variables related to an event are null, method returns false
+  ///
+  bool _isValidTicket(Ticket ticket) {
+    if (ticket == null) {
+      _errorStream.reportError('Error in ticket_provider: A ticket is null', null);
+      return false;
+    }
+    if (ticket.id == null) {
+      _errorStream.reportError('Error in ticket_provider: A ticket ID is null', null);
+      return false;
+    }
+    if (ticket.status == null) {
+      _errorStream.reportError('Error in ticket_provider: Ticket ID ${ticket.id} has status null', null);
+      return false;
+    }
+    if (ticket.ticketTypeConfig == null) {
+      _errorStream.reportError('Error in ticket_provider: Ticket ID ${ticket.id} has ticketTypeConfig null', null);
+      return false;
+    }
+    if (ticket.ticketTypeConfig.name == null) {
+      _errorStream.reportError('Error in ticket_provider: Ticket ID ${ticket.id} has ticketTypeConfig.name null', null);
+      return false;
+    }
+    return true;
+  }
+
+  ///
+  /// If any variables related to an event are null, method returns false
+  /// T
+  ///
+  bool _isValidEvent(Event event) {
+    if (event == null) {
+      _errorStream.reportError('Error in event_provider: An Event is null',null);
+      return false;
+    }
+    if (event.id == null) {
+      _errorStream.reportError('Error in event_provider: An Event ID is null',null);
+      return false;
+    }
+    if (event.startTime == null) {
+      _errorStream.reportError('Error in event_provider: Event ID ${event.id} has startTime null',null);
+      return false;
+    }
+    if (event.address == null) {
+      _errorStream.reportError('Error in event_provider: Event ID ${event.id} has address null',null);
+      return false;
+    }
+    if (event.imageUrl == null) {
+      _errorStream.reportError('Error in event_provider: Event ID ${event.id} has imageUrl null',null);
+      return false;
+    }
+    return true;
   }
 }
