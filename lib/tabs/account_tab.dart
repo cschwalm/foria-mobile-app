@@ -15,6 +15,7 @@ import '../widgets/settings_item.dart';
 class AccountTab extends StatelessWidget {
 
   final AuthUtils _authUtils = GetIt.instance<AuthUtils>();
+  final MessageStream errorStream = GetIt.instance<MessageStream>();
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +38,7 @@ class AccountTab extends StatelessWidget {
 
     Widget accountInfo;
     if (user == null || user.firstName == null || user.lastName == null || user.email == null) {
+      errorStream.reportError('Error: user name or email is null',null);
       accountInfo = SizedBox(height: 20);
     } else {
       accountInfo = Row(children: <Widget>[
