@@ -38,6 +38,10 @@ const String scanTickets = 'Scan Tickets';
 
 const String scanToRedeemTitle = 'Ready To Scan';
 
+const String switchToVenue = 'Switch to venue account';
+
+const String switchToRegAccount = 'Switch to ticketholder account';
+
 // Auth0 strings. //
 
 const String loginRegister = 'Sign Up / Sign In';
