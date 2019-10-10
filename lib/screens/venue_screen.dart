@@ -8,6 +8,7 @@ import 'package:foria/widgets/primary_button.dart';
 import 'package:foria/widgets/settings_item.dart';
 
 import '../utils/strings.dart';
+import 'home.dart';
 
 class VenueScreen extends StatelessWidget {
   static const routeName = '/venue-screen';
@@ -37,6 +38,14 @@ class VenueScreen extends StatelessWidget {
             content: SettingsNavigationIndicator(),
             onPress: () {
               contactSupport();
+            },
+          ),
+          MajorSettingItemDivider(),
+          SettingsItem(
+            label: switchToRegAccount,
+            content: SettingsNavigationIndicator(),
+            onPress: () {
+              Navigator.of(context).pushReplacementNamed(Home.routeName);
             },
           ),
           MajorSettingItemDivider(),

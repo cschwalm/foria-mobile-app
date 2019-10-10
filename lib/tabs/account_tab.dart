@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:foria/screens/venue_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/message_stream.dart';
@@ -34,7 +35,6 @@ class AccountTab extends StatelessWidget {
       );
     });
 
-
     Widget accountInfo;
     if (user == null || user.firstName == null || user.lastName == null || user.email == null) {
       accountInfo = SizedBox(height: 20);
@@ -65,6 +65,24 @@ class AccountTab extends StatelessWidget {
       ],);
     }
 
+    Widget venueButton;
+    if (_authUtils.isVenue != null && _authUtils.isVenue) {
+      venueButton = Column(
+        children: <Widget>[
+          MajorSettingItemDivider(),
+          SettingsItem(
+            label: switchToVenue,
+            content: SettingsNavigationIndicator(),
+            onPress: () {
+              Navigator.of(context).pushReplacementNamed(VenueScreen.routeName);
+            },
+          ),
+        ],
+      );
+    } else {
+      venueButton = Container();
+    }
+
     return Container(
       color: settingsBackgroundColor,
       child: Column(
@@ -90,6 +108,7 @@ class AccountTab extends StatelessWidget {
               contactSupport();
             },
           ),
+          venueButton,
           SettingItemDivider(),
           Expanded(
             child: Column(

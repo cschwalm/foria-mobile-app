@@ -36,11 +36,13 @@ class AuthUtils {
 
   /// Data from logged in user
   User _user;
+  bool _isVenue;
 
   ///
   /// May be null if user has not logged in.
   ///
   User get user => _user;
+  bool get isVenue => _isVenue;
 
   ///
   /// Returns API client for use in Foria API libs.
@@ -201,6 +203,7 @@ class AuthUtils {
 
     if (jwt == null) {
       debugPrint("ERROR: No token found in storage. Not able to check venue.");
+      _isVenue = false;
       return false;
     }
 
@@ -212,11 +215,13 @@ class AuthUtils {
       for (String scope in scopeArr) {
         if (scope == "write:venue_redeem") {
           debugPrint("User is acessing a venue account.");
+          _isVenue = true;
           return true;
         }
       }
     }
 
+    _isVenue = false;
     return false;
   }
 

@@ -42,7 +42,7 @@ class EventProvider extends ChangeNotifier {
   Future<List<Event>> getAllEvents() async {
 
     if (_eventMap.isNotEmpty) {
-      return _eventMap.values;
+      return _eventMap.values.toList();
     }
 
     if (_eventApi == null) {
