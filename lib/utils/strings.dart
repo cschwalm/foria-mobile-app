@@ -14,17 +14,21 @@ const String textConfirm = 'Confirm';
 
 const String textClose = 'Close';
 
-const String textError = 'Error';
-
 const String emailFieldText = 'Email';
 
+// Error strings. //
+
 const String textGenericError = 'Sorry, there was a problem. Please try again later.';
+
+const String myPassesLoadError = 'Sorry, there was a problem with one or more of your tickets.';
 
 const String netConnectionError = 'Internet connection failed. Please try again.';
 
 const String textOops = 'Oops! Something went wrong...';
 
 const String tryAgain = 'Try again';
+
+const String textError = 'Error';
 
 // Venue related strings. //
 

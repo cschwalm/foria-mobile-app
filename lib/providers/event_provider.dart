@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:foria/utils/auth_utils.dart';
-import 'package:foria/utils/database_utils.dart';
 import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria_flutter_client/api.dart';
@@ -16,16 +15,13 @@ import 'package:get_it/get_it.dart';
 class EventProvider extends ChangeNotifier {
 
   AuthUtils _authUtils;
-  DatabaseUtils _databaseUtils;
   EventApi _eventApi;
 
   final Map<String, Event> _eventMap = new Map<String, Event>();
   final MessageStream _errorStream = GetIt.instance<MessageStream>();
 
   EventProvider() {
-
     _authUtils = GetIt.instance<AuthUtils>();
-    _databaseUtils = GetIt.instance<DatabaseUtils>();
   }
 
   /// Returns an unmodifiable list that is safe to iterate over.
@@ -66,63 +62,68 @@ class EventProvider extends ChangeNotifier {
 
     //Cache results for future calls.
     for (Event event in events) {
+
+      if (!isValidEvent(event)) {
+        continue;
+      }
       _eventMap[event.id] = event;
     }
 
     debugPrint("${_eventMap.length} loaded from network to display to user.");
-    return events;
+    return _eventMap.values.toList();
   }
 
   ///
-  /// Loads event information specified by eventId via API.
-  /// Stores in local db for offline use.
+  /// If any fields related to an event are null, method returns false
   ///
-  /// Throws exception on network error.
-  ///
-  @visibleForTesting
-  Future<Event> fetchEventByIdViaNetwork(String eventId) async {
-
-    if (eventId == null || eventId.isEmpty) {
-      return null;
-    }
-
-    if (_eventApi == null) {
-      ApiClient foriaApiClient = await _authUtils.obtainForiaApiClient();
-      _eventApi = new EventApi(foriaApiClient);
-    }
-
-    Event event;
-    try {
-      event = await _eventApi.getEvent(eventId);
-    } on ApiException catch (ex, stackTrace) {
-      print("### FORIA SERVER ERROR: getEventById ###");
-      print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
-      _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
-      rethrow;
-    }
-
-    debugPrint("EventId: $eventId loaded from network.");
-    _databaseUtils.storeEvent(event);
-
-    return event;
-  }
-
-  ///
-  /// Loads event information specified by eventId via the database.
-  /// Throws an exception if not found.
-  ///
-  @visibleForTesting
-  Future<Event> fetchEventByIdViaDatabase(String eventId) async {
-
-    if (eventId == null || eventId.isEmpty) {
-      return null;
-    }
-
-    Event event = await _databaseUtils.getEvent(eventId);
+  bool isValidEvent(Event event) {
     if (event == null) {
-      throw new Exception('Expected eventId: $eventId not in local database.');
+      _errorStream.reportError('Error in event_provider: An Event is null',null);
+      return false;
     }
-    debugPrint("EventId: $eventId loaded from offline database.");
-    return event;
+    if (event.id == null) {
+      _errorStream.reportError('Error in event_provider: An Event ID is null',null);
+      return false;
+    }
+    if (event.startTime == null) {
+      _errorStream.reportError('Error in event_provider: Event ID ${event.id} has startTime null',null);
+      return false;
+    }
+    if (event.address == null) {
+      _errorStream.reportError('Error in event_provider: Event ID ${event.id} has address null',null);
+      return false;
+    }
+    if (event.imageUrl == null) {
+      _errorStream.reportError('Error in event_provider: Event ID ${event.id} has imageUrl null',null);
+      return false;
+    }
+    if (event.ticketTypeConfig == null) {
+      _errorStream.reportError('Error in event_provider: Event ID ${event.id} has ticketTypeConfig null',null);
+      return false;
+    }
+    if (event.ticketTypeConfig.isNotEmpty == null) {
+      _errorStream.reportError('Error in event_provider: Event ID ${event.id} has ticketTypeConfig list empty',null);
+      return false;
+    }
+    for (TicketTypeConfig tier in event.ticketTypeConfig) {
+
+      if (tier.amountRemaining == null) {
+        _errorStream.reportError('Error in event_provider: tier ID ${tier.id} has amount remaining null',null);
+        return false;
+      }
+      if (tier.price == null) {
+        _errorStream.reportError('Error in event_provider: tier ID ${tier.id} has price null',null);
+        return false;
+      }
+      if (tier.calculatedFee == null) {
+        _errorStream.reportError('Error on ExploreEventsTab: tier ID ${tier.id} has calculatedFee null',null);
+        return false;
+      }
+      if (tier.currency == null) {
+        _errorStream.reportError('Error in event_provider: tier ID ${tier.id} has currency null',null);
+        return false;
+      }
+    }
+    return true;
   }
 }

@@ -183,9 +183,7 @@ class EventList extends StatelessWidget {
               List<Widget> imageStack = new List<Widget>();
 
               imageStack.add(DiscoverEventImage(imageUrl));
-              if (ticketTiers != null && ticketTiers.isNotEmpty && ticketTiers[0].currency != null) {
-                 imageStack.add(PriceSticker(ticketTiers));
-              }
+              imageStack.add(PriceSticker(ticketTiers));
 
               return Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -283,15 +281,12 @@ class PriceSticker extends StatelessWidget {
 
       for (TicketTypeConfig tier in ticketTiers) {
 
-        if (tier.amountRemaining <= 0){
+        if (tier.amountRemaining <= 0) {
           continue;
         }
 
         double faceValue = double.tryParse(tier.price);
         double fee = double.tryParse(tier.calculatedFee);
-        if (faceValue == null || fee == null){
-          continue;
-        }
         double price = faceValue + fee;
 
         if (price < min) {
