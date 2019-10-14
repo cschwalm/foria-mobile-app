@@ -151,7 +151,7 @@ class AuthUtils {
   Future<void> logout() async {
     await DatabaseUtils.deleteDatabase();
     await _storage.deleteAll();
-    await _auth.webAuth.clearSession();
+    await _auth.webAuth.clearSession(federated: false);
     debugPrint("Logout called. Secrets deleted.");
 
     setupDependencies();
@@ -180,6 +180,13 @@ class AuthUtils {
       }
 
       await _storeAuthInfo(authInfo);
+
+      // Populates user info for first user login.
+      if (!await isUserLoggedIn(false)) {
+        debugPrint("User failed login check.");
+        showErrorAlert(context, loginError);
+        return;
+      }
 
       if (await doesUserHaveVenueAccess()) {
         Navigator.pushReplacementNamed(context, VenueScreen.routeName);
