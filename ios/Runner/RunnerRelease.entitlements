@@ -6,9 +6,6 @@
 	<string>development</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:foriatickets.com</string>
-		<string>applinks:events.foriatickets.com</string>
-		<string>applinks:events-test.foriatickets.com</string>
 		<string>applinks:foria.app.link</string>
 		<string>applinks:foria-alternate.app.link</string>
 	</array>
