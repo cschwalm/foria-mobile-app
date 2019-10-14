@@ -32,7 +32,7 @@ dependencies:
   flutter_secure_storage: 3.3.1
   font_awesome_flutter: ^8.0.1
   get_it: ^3.0.0+1
-  intl: ^0.16.0
+  intl: 0.15.8
   jose: ^0.1.2
   qr_flutter: ^2.1.0+55
   otp: 1.0.3
@@ -57,6 +57,9 @@ dependencies:
 
 dev_dependencies:
   mockito: ^4.1.0
+  flutter_driver:
+    sdk: flutter
+  test: any
   flutter_test:
     sdk: flutter
 
