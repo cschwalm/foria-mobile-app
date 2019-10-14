@@ -27,7 +27,6 @@ dependencies:
   firebase_core: ^0.4.0+9
   firebase_analytics: ^5.0.0
   firebase_messaging: ^5.1.6
-  flutter_auth0: ^0.5.0
   flutter_camera_ml_vision: ^2.2.1
   flutter_secure_storage: 3.3.1
   font_awesome_flutter: ^8.0.1
@@ -49,6 +48,11 @@ dependencies:
   path: ^1.6.2
   path_provider: ^1.1.0
   sembast: ^2.0.1
+
+  flutter_auth0:
+    version: ^0.5.0
+    git:
+      url: git@github.com:cschwalm/flutter-auth0.git
 
   foria_flutter_client:
     version: 1.6.0
