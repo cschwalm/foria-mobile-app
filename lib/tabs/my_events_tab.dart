@@ -478,9 +478,12 @@ class _EmailVerificationConflictState extends State<EmailVerificationConflict> {
 
               await widget._mainButtonCallback();
 
-              setState(() {
-                _isCheckingVerification = false;
-              });
+              if (mounted) {
+                setState(() {
+                  _isCheckingVerification = false;
+                });
+              }
+
             },
           ),
         ],
