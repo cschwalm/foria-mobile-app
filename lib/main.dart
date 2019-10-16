@@ -125,8 +125,8 @@ void mainDelegate() {
 void setupDependencies() {
 
   GetIt.instance.reset();
-  GetIt.instance.registerSingleton<MessageStream>(new MessageStream());
   GetIt.instance.registerSingleton<AuthUtils>(new AuthUtils());
+  GetIt.instance.registerSingleton<MessageStream>(new MessageStream());
   GetIt.instance.registerSingleton<DatabaseUtils>(new DatabaseUtils());
   GetIt.instance.registerSingleton<TicketProvider>(new TicketProvider());
   GetIt.instance.registerSingleton<EventProvider>(new EventProvider());
