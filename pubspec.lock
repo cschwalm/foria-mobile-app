@@ -166,7 +166,7 @@ packages:
       path: "."
       ref: HEAD
       resolved-ref: "00c8e640034b356a1ac5e77b6c88a20e6f4a196c"
-      url: "git@github.com:cschwalm/flutter-auth0.git"
+      url: "https://github.com/cschwalm/flutter-auth0.git"
     source: git
     version: "0.5.0"
   flutter_cache_manager:
