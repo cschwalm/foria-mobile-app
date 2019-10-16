@@ -276,12 +276,12 @@ class AuthUtils {
 
     // Setup user data.
     _user = new User();
-    user.id = jwt.claims.subject;
-    user.email = jwt.claims["email"];
-    user.firstName = jwt.claims["given_name"];
-    user.lastName = jwt.claims["family_name"];
+    _user.id = jwt.claims.subject;
+    _user.email = jwt.claims["email"];
+    _user.firstName = jwt.claims["given_name"];
+    _user.lastName = jwt.claims["family_name"];
 
-    _analytics.setUserId(user.id);
+    _analytics.setUserId(_user.id);
     return true;
   }
 
