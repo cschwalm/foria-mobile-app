@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/primary_button.dart';
+import 'package:get_it/get_it.dart';
 
 class Login extends StatelessWidget {
   static const routeName = '/login';
+  final AuthUtils _authUtils = GetIt.instance<AuthUtils>();
   static const String loginScaffoldKey = 'login_scaffold_key';
-  final AuthUtils _authUtils = new AuthUtils();
 
   @override
   Widget build(BuildContext context) {

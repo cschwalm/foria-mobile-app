@@ -6,6 +6,7 @@ import 'package:foria/utils/constants.dart';
 import 'package:foria/widgets/contact_support.dart';
 import 'package:foria/widgets/primary_button.dart';
 import 'package:foria/widgets/settings_item.dart';
+import 'package:get_it/get_it.dart';
 
 import '../utils/strings.dart';
 import 'home.dart';
@@ -13,7 +14,7 @@ import 'home.dart';
 class VenueScreen extends StatelessWidget {
   static const routeName = '/venue-screen';
 
-  final AuthUtils _authUtils = new AuthUtils();
+  final AuthUtils _authUtils = GetIt.instance<AuthUtils>();
 
   @override
   Widget build(BuildContext context) {

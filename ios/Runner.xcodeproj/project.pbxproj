@@ -18,8 +18,8 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
-		9D8B3E1C2311D12200E15B01 /* BuildFile in Resources */ = {isa = PBXBuildFile; };
-		9D8B3E1E2311D22700E15B01 /* BuildFile in Resources */ = {isa = PBXBuildFile; };
+		9D8B3E1C2311D12200E15B01 /* (null) in Resources */ = {isa = PBXBuildFile; };
+		9D8B3E1E2311D22700E15B01 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		9DEA02562311D333004C3123 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9DEA02552311D333004C3123 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
@@ -60,6 +60,7 @@
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9D52DD1822F7698F001343B9 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		9DEA02552311D333004C3123 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		9DF7F3F8235438E7007FF67D /* RunnerRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RunnerRelease.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,6 +120,7 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				9DF7F3F8235438E7007FF67D /* RunnerRelease.entitlements */,
 				9DEA02552311D333004C3123 /* GoogleService-Info.plist */,
 				9D52DD1822F7698F001343B9 /* Runner.entitlements */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
@@ -225,10 +227,10 @@
 			files = (
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
-				9D8B3E1C2311D12200E15B01 /* BuildFile in Resources */,
+				9D8B3E1C2311D12200E15B01 /* (null) in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
-				9D8B3E1E2311D22700E15B01 /* BuildFile in Resources */,
+				9D8B3E1E2311D22700E15B01 /* (null) in Resources */,
 				9DEA02562311D333004C3123 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -593,7 +595,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Runner/RunnerRelease.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = J3N63Z87C9;
 				ENABLE_BITCODE = NO;

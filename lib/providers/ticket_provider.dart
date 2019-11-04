@@ -166,7 +166,7 @@ class TicketProvider extends ChangeNotifier {
       } else {
         isError = true;
         debugPrint('Error: Event invalid');
-        _ticketSet.remove(ticket);
+        _ticketSet.removeWhere((t) => t.id == ticket.id);
       }
     }
 
@@ -349,7 +349,7 @@ class TicketProvider extends ChangeNotifier {
       rethrow;
     }
 
-    _ticketSet.remove(currentTicket); //Remove stale ticket. Status is out of date.
+    _ticketSet.removeWhere((ticket) => ticket.id == currentTicket.id); //Remove stale ticket. Status is out of date.
 
     currentTicket.status = 'ACTIVE';
     _ticketSet.add(currentTicket);
@@ -399,7 +399,7 @@ class TicketProvider extends ChangeNotifier {
       throw e;
     }
 
-    _ticketSet.remove(currentTicket); //Remove stale ticket. Status is out of date.
+    _ticketSet.removeWhere((ticket) => ticket.id == currentTicket.id); //Remove stale ticket. Status is out of date.
 
     if (updatedTicket != null) {
       _ticketSet.add(updatedTicket);

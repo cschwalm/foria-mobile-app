@@ -184,9 +184,11 @@ packages:
   flutter_auth0:
     dependency: "direct main"
     description:
-      name: flutter_auth0
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "00c8e640034b356a1ac5e77b6c88a20e6f4a196c"
+      url: "https://github.com/cschwalm/flutter-auth0.git"
+    source: git
     version: "0.5.0"
   flutter_cache_manager:
     dependency: transitive

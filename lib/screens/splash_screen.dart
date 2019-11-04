@@ -44,7 +44,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     final AuthUtils authUtils = GetIt.instance<AuthUtils>();
 
     if (!await authUtils.isUserLoggedIn(true)) {
-    navigatorKey.currentState.pushReplacementNamed(Login.routeName);
+      navigatorKey.currentState.pushReplacementNamed(Login.routeName);
     } else if (await authUtils.doesUserHaveVenueAccess()) {
       navigatorKey.currentState.pushReplacementNamed(VenueScreen.routeName);
     } else {
