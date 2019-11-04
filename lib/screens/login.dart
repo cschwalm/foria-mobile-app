@@ -8,10 +8,12 @@ import 'package:get_it/get_it.dart';
 class Login extends StatelessWidget {
   static const routeName = '/login';
   final AuthUtils _authUtils = GetIt.instance<AuthUtils>();
+  static const String loginScaffoldKey = 'login_scaffold_key';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: Key(loginScaffoldKey),
         backgroundColor: Colors.white,
         body: Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 50),

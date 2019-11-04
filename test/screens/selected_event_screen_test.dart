@@ -14,7 +14,6 @@ class MockMessageStream extends Mock implements MessageStream {}
 class MockStream extends Mock implements Stream<ForiaNotification> {}
 
 final SelectedTicketProvider selectedTicketProviderMock = new MockSelectedTicketProvider();
-final MessageStream messageStreamMock = new MockMessageStream();
 final MockStream mockStream = new MockStream();
 
 void main() {

@@ -90,6 +90,8 @@ class _PassBodyState extends State<PassBody> {
     super.initState();
   }
 
+  static const String myPassesList = 'my_passes_list';
+
   @override
   Widget build(BuildContext context) {
 
@@ -137,6 +139,7 @@ class _PassBodyState extends State<PassBody> {
               ),
             Expanded(
               child: PageView.builder(
+                key: Key(myPassesList),
                 // store this controller in a State to save the carousel scroll position
                 controller: PageController(viewportFraction: viewportFraction),
                 itemCount: _passCount,
@@ -161,6 +164,8 @@ class PassCard extends StatelessWidget {
   final int _passCount;
 
   PassCard(this._index, this._passCount);
+
+  static const passCardKey = 'pass_card_key';
 
   @override
   Widget build(BuildContext context) {
@@ -210,6 +215,7 @@ class PassCard extends StatelessWidget {
     }
 
     return Card(
+      key: Key(passCardKey+_index.toString()),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
