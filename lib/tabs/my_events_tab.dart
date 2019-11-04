@@ -272,6 +272,8 @@ class EventCard extends StatelessWidget {
   final Function _refreshFunction;
   EventCard(this._refreshFunction);
 
+  static const String eventCardKey = 'event_card_key';
+
   @override
   Widget build(BuildContext context) {
     final eventData = Provider.of<TicketProvider>(context, listen: true);
@@ -289,7 +291,7 @@ class EventCard extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
                 child: GestureDetector(
-                  key: Key(eventData.eventList[index].id),
+                  key: Key(eventCardKey+index.toString()),
                   onTap: () async {
                     final result = await Navigator.of(context).pushNamed(
                       MyTicketsScreen.routeName,

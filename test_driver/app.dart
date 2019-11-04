@@ -1,5 +1,5 @@
 import 'package:flutter_driver/driver_extension.dart';
-import 'package:foria/main_staging.dart' as app;
+import 'package:foria/main_integration_test.dart' as app;
 
 void main() {
   // This line enables the extension.

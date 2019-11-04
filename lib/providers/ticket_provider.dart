@@ -91,8 +91,10 @@ class TicketProvider extends ChangeNotifier {
     try {
       tickets = (await _userApi.getTickets()).toSet();
     } on ApiException catch (ex, stackTrace) {
-      print("### FORIA SERVER ERROR: getTickets ###");
-      print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+
+      debugPrint("### FORIA SERVER ERROR: getTickets ###");
+      debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      debugPrint(stackTrace.toString());
 
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
 

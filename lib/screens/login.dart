@@ -6,12 +6,13 @@ import 'package:foria/widgets/primary_button.dart';
 
 class Login extends StatelessWidget {
   static const routeName = '/login';
+  static const String loginScaffoldKey = 'login_scaffold_key';
   final AuthUtils _authUtils = new AuthUtils();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: Key('Login Screen Scaffold'),
+        key: Key(loginScaffoldKey),
         backgroundColor: Colors.white,
         body: Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 50),

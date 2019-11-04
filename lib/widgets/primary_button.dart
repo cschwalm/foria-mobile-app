@@ -45,10 +45,12 @@ class PrimaryButton extends StatelessWidget {
       ],
     );
   }
+  static const deviceConflictKey = 'device_conflict_key';
 
   @override
   Widget build(BuildContext context) {
     return CupertinoButton(
+      key: Key(deviceConflictKey),
       minSize: minSize,
       padding: EdgeInsets.zero,
       color: Theme.of(context).primaryColor,
