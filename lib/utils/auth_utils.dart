@@ -194,8 +194,8 @@ class AuthUtils {
         Navigator.pushReplacementNamed(context, Home.routeName);
       }
     }).catchError((err) async {
-      debugPrint('Auth Error: ${err.toString()}');
-      showErrorAlert(context, loginError, _auth.webAuth.clearSession);
+      debugPrint('Auth Error: $err');
+      showErrorAlert(context, loginError);
     });
   }
 
