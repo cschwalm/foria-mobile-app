@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
 /// Shows the user a generic error message.
-void showErrorAlert(BuildContext context, String error) {
+void showErrorAlert(BuildContext context, String error, [Function dismissAction]) {
 
   Widget okButton = FlatButton(
 
     child: Text("OK"),
-    onPressed: () {
+    onPressed: () async {
+      if (dismissAction != null) {
+        await dismissAction();
+      }
       Navigator.of(context).pop();
     },
   );

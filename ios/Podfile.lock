@@ -185,7 +185,7 @@ DEPENDENCIES:
   - wakelock (from `.symlinks/plugins/wakelock/ios`)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  https://github.com/CocoaPods/Specs.git:
     - Firebase
     - FirebaseAnalytics
     - FirebaseAnalyticsInterop
@@ -241,13 +241,13 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/wakelock/ios"
 
 SPEC CHECKSUMS:
-  camera: d56ad165545ae5a0ffb892376033760a969c68c8
-  device_info: 3ebad48f726348f69abd802f3334a8d1ed795fbd
+  camera: 38cc83ae9a5667bb5a71c7d9edaf60a91920fd4e
+  device_info: cbf09d2ec12aa7110e0b09fabe54b5bd6c8efe74
   Firebase: 9cbe4e5b5eaafa05dc932be58b7c8c3820d71e88
-  firebase_analytics: 32e04b548ece5c04c9798cbf393a7884f0b21951
+  firebase_analytics: 045e7ebe7b8a4d27357168072868ff082dca15a6
   firebase_core: ae55ea92448ec8675d325da4db22cf3b4d58a54d
   firebase_messaging: 0d5c04cc40f58bd4bf7f2992c91050f9bc01bec3
-  firebase_ml_vision: af45e6730db9be6b6fa2a50292899f65ecfa8777
+  firebase_ml_vision: 9906bb7622851854989f1e37a726802102422a4d
   FirebaseAnalytics: 843c7f64a8f9c79f0d03281197ebe7bb1d58d477
   FirebaseAnalyticsInterop: d48b6ab67bcf016a05e55b71fc39c61c0cb6b7f3
   FirebaseCore: e9d9bd1dae61c1e82bc1e0e617a9d832392086a0
@@ -271,13 +271,13 @@ SPEC CHECKSUMS:
   GoogleUtilities: 9c2c544202301110b29f7974a82e77fdcf12bf51
   GTMSessionFetcher: 61bb0f61a4cb560030f1222021178008a5727a23
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
-  package_info: 78cabb3c322943c55d39676f4a5bfc748c01d055
-  path_provider: f96fff6166a8867510d2c25fdcc346327cc4b259
+  package_info: 48b108e75b8802c2d5e126f208ef540561c98aef
+  path_provider: fb74bd0465e96b594bb3b5088ee4a4e7bb1f2a9d
   Protobuf: 67fb42ba613def994e61854de2b3164f13790cc4
   sqflite: ff1d9da63c06588cc8d1faf7256d741f16989d5a
-  url_launcher: 0067ddb8f10d36786672aa0722a21717dba3a298
+  url_launcher: a1c0cc845906122c4784c542523d8cacbded5626
   wakelock: da5012e206ec8978df58d8642e4cdd4fe506185f
 
 PODFILE CHECKSUM: 7b7e10821d604486aed501ac1d023f863345de98
 
-COCOAPODS: 1.7.5
+COCOAPODS: 1.8.4
