@@ -50,12 +50,10 @@ dependencies:
   sembast: ^2.0.1
 
   flutter_auth0:
-    version: ^0.5.0
     git:
       url: https://github.com/cschwalm/flutter-auth0.git
 
   foria_flutter_client:
-    version: 1.6.0
     git:
       url: ssh://git@bitbucket.org/foriatickets/foria-flutter-client.git
 

@@ -32,7 +32,7 @@ apply plugin: 'com.android.application'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     lintOptions {
         disable 'InvalidPackage'
@@ -57,10 +57,7 @@ android {
             signingConfig signingConfigs.release
 
             minifyEnabled true
-            useProguard false
             debuggable false
-
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
