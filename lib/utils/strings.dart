@@ -47,8 +47,8 @@ const String switchToRegAccount = 'Switch to ticketholder account';
 const String loginRegister = 'Sign Up / Sign In';
 
 const String loginError = "There was an issue logging into your account. " +
-    "Please check your internet connection and try again. " +
-    "Try clicking verification link from the welcome email and/or contact support listed in the app store.";
+    "Please first check your internet connection. " +
+    "If you haven't verified your email, please click the verification link in the Foria welcome email. If you still have an issue, email support@foriatickets.com";
 
 const String emailConfirmationRequired = 'Email Confirmation Required';
 
