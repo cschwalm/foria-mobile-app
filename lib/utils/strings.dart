@@ -48,7 +48,7 @@ const String loginRegister = 'Sign Up / Sign In';
 
 const String loginError = "There was an issue logging into your account. " +
     "Please check your internet connection and try again. " +
-    "If the issue continues, contact support listed in the app store.";
+    "Try clicking verification link from the welcome email and/or contact support listed in the app store.";
 
 const String emailConfirmationRequired = 'Email Confirmation Required';
 
