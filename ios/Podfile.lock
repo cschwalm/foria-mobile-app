@@ -185,7 +185,7 @@ DEPENDENCIES:
   - wakelock (from `.symlinks/plugins/wakelock/ios`)
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
+  https://github.com/cocoapods/specs.git:
     - Firebase
     - FirebaseAnalytics
     - FirebaseAnalyticsInterop
@@ -280,4 +280,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 7b7e10821d604486aed501ac1d023f863345de98
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.7.5
