@@ -15,8 +15,8 @@ class SelectedTicketProvider extends ChangeNotifier {
 
   final Event _event;
 
-  final int _refreshInterval = 30;
-  final int _otpLength = 6;
+  static const int _refreshInterval = 30; //OTP_TIME_STEP
+  static const int _otpLength = 6;
 
   final Duration _tick = Duration(seconds: 1);
   final Map<String, String> _barcodeTextMap = new Map<String, String>();
@@ -25,15 +25,16 @@ class SelectedTicketProvider extends ChangeNotifier {
   DatabaseUtils _databaseUtils;
   TicketProvider _ticketProvider;
 
-  int _secondsRemaining = 0;
+  int _secondsRemaining = _refreshInterval - ( (DateTime.now().millisecondsSinceEpoch ~/ 1000) % _refreshInterval);
   Timer _timer;
 
   SelectedTicketProvider(this._event) {
-    _refreshBarcodes(_timer);
-    _timer = Timer.periodic(_tick, _refreshBarcodes);
 
     _databaseUtils = GetIt.instance<DatabaseUtils>();
     _ticketProvider = GetIt.instance<TicketProvider>();
+
+    _refreshBarcodes(null);
+    _timer = Timer.periodic(_tick, _refreshBarcodes);
   }
 
   @override
@@ -119,14 +120,14 @@ class SelectedTicketProvider extends ChangeNotifier {
       return;
     }
 
-    if (_secondsRemaining <= 0) {
+    if (_secondsRemaining <= 0 || timer == null) {
 
       final Set<Ticket> tickets = _ticketProvider.getTicketsForEventId(_event.id);
       for (final Ticket ticket in tickets) {
 
         final String barcodeText = await _getTicketString(ticket);
         _barcodeTextMap[ticket.id] = barcodeText;
-        _secondsRemaining = 30;
+        _secondsRemaining = _refreshInterval - ( (DateTime.now().millisecondsSinceEpoch ~/ 1000) % _refreshInterval);
       }
       debugPrint('${tickets.length} tickets barcodes updated.');
 
