@@ -94,7 +94,7 @@ const String ticketLoadingFailure = 'It looks like you\'re currently offline.\n\
 
 const String foriaPass = 'Foria Pass';
 
-const String screenshotWarning = 'Warning: QR code refreshes, so screenshots will NOT work';
+const String screenshotWarning = 'Warning: Screenshots NOT valid';
 
 const String passRefresh = 'seconds until refresh';
 
