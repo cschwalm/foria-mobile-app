@@ -206,7 +206,15 @@ class PassCard extends StatelessWidget {
       width: 220,
       child: barcodeContent,
     ));
-    barcodeList.add(SizedBox(height: 10));
+    barcodeList.add(SizedBox(height: 5));
+    barcodeList.add(
+        Text(
+          screenshotWarning,
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.red),
+    ));
+    barcodeList.add(SizedBox(height: 5));
+
 
     if(showTimer){
       barcodeList.add(PassRefresh(selectedTicketProvider.secondsRemaining,passRefreshHeight));
