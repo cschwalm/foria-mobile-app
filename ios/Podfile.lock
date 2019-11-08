@@ -244,10 +244,10 @@ SPEC CHECKSUMS:
   camera: 38cc83ae9a5667bb5a71c7d9edaf60a91920fd4e
   device_info: cbf09d2ec12aa7110e0b09fabe54b5bd6c8efe74
   Firebase: 9cbe4e5b5eaafa05dc932be58b7c8c3820d71e88
-  firebase_analytics: 045e7ebe7b8a4d27357168072868ff082dca15a6
-  firebase_core: ae55ea92448ec8675d325da4db22cf3b4d58a54d
-  firebase_messaging: 0d5c04cc40f58bd4bf7f2992c91050f9bc01bec3
-  firebase_ml_vision: 9906bb7622851854989f1e37a726802102422a4d
+  firebase_analytics: 2f3ab38886ff9d915b076d5aae2f964dc5ce7549
+  firebase_core: ebf6a934345d646bf7820a6685427bb3741f01ed
+  firebase_messaging: b8543d17dd9825f4f24a585477f77db103e5228e
+  firebase_ml_vision: e375046a4edc975d93abd164bcae2c7b5bde03e2
   FirebaseAnalytics: 843c7f64a8f9c79f0d03281197ebe7bb1d58d477
   FirebaseAnalyticsInterop: d48b6ab67bcf016a05e55b71fc39c61c0cb6b7f3
   FirebaseCore: e9d9bd1dae61c1e82bc1e0e617a9d832392086a0

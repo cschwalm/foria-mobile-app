@@ -89,6 +89,14 @@ class EventProvider extends ChangeNotifier {
       _errorStream.reportError('Error in event_provider: Event ID ${event.id} has startTime null',null);
       return false;
     }
+    if (event.endTime == null) {
+      _errorStream.reportError('Error in event_provider: Event ID ${event.id} has endTime null',null);
+      return false;
+    }
+    if (DateTime.now().isAfter(event.endTime)) {
+      _errorStream.reportError('Error in event_provider: Event ID ${event.id} has startTime null',null);
+      return false;
+    }
     if (event.address == null) {
       _errorStream.reportError('Error in event_provider: Event ID ${event.id} has address null',null);
       return false;
@@ -101,7 +109,7 @@ class EventProvider extends ChangeNotifier {
       _errorStream.reportError('Error in event_provider: Event ID ${event.id} has ticketTypeConfig null',null);
       return false;
     }
-    if (event.ticketTypeConfig.isNotEmpty == null) {
+    if (event.ticketTypeConfig.isEmpty) {
       _errorStream.reportError('Error in event_provider: Event ID ${event.id} has ticketTypeConfig list empty',null);
       return false;
     }
