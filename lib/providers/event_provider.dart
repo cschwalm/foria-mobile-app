@@ -89,7 +89,11 @@ class EventProvider extends ChangeNotifier {
       _errorStream.reportError('Error in event_provider: Event ID ${event.id} has startTime null',null);
       return false;
     }
-    if (event.endTime.isBefore(DateTime.now())) {
+    if (event.endTime == null) {
+      _errorStream.reportError('Error in event_provider: Event ID ${event.id} has endTime null',null);
+      return false;
+    }
+    if (DateTime.now().isAfter(event.endTime)) {
       _errorStream.reportError('Error in event_provider: Event ID ${event.id} has startTime null',null);
       return false;
     }

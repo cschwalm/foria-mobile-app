@@ -121,6 +121,7 @@ enum _FakeEventType {
   NULL_EVENT,
   NULL_EVENT_ID,
   NULL_START_TIME,
+  NULL_END_TIME,
   PAST_END_TIME,
   NULL_ADDRESS,
   NULL_IMAGE_URL,
@@ -174,6 +175,11 @@ Event _buildFakeEvent(_FakeEventType _fakeEventType) {
     Event pastEndTime = validEvent;
     pastEndTime.startTime = null;
     return pastEndTime;
+  }
+  if(_fakeEventType == _FakeEventType.NULL_END_TIME){
+    Event nullEndTime = validEvent;
+    nullEndTime.endTime = null;
+    return nullEndTime;
   }
   if(_fakeEventType == _FakeEventType.PAST_END_TIME){
     Event pastEndTime = validEvent;

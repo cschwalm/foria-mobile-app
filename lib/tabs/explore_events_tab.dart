@@ -286,8 +286,7 @@ class PriceSticker extends StatelessWidget {
         }
 
         double faceValue = double.tryParse(tier.price);
-        double fee = double.tryParse(tier.calculatedFee);
-        double price = faceValue + fee;
+        double price = faceValue;
 
         if (price < min) {
           min = price;
