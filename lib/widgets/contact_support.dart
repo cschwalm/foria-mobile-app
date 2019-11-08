@@ -1,6 +1,5 @@
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:foria/utils/message_stream.dart';
-
 import 'package:foria/utils/strings.dart';
 import 'package:get_it/get_it.dart';
 
@@ -17,6 +16,5 @@ Future<void> contactSupport() async {
     messageStream.announceMessage(ForiaNotification.message(MessageType.MESSAGE, supportEmailSent, null));
   } catch (error) {
     messageStream.announceMessage(ForiaNotification.message(MessageType.MESSAGE, supportEmailFailed, null));
-    rethrow;
   }
 }
