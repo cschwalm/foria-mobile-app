@@ -68,6 +68,10 @@ const String supportEmailAddress = "support@foriatickets.com";
 
 const String supportEmailSubject = "Foria Support";
 
+const String supportEmailSent = 'Support email sent';
+
+const String supportEmailFailed = 'Error with your email client. Please email support@foriatickets.com';
+
 // my_events_tab Strings. //
 
 const String noEvents = 'You don\'t have any \nupcoming events';
