@@ -90,11 +90,13 @@ const String imageUnavailable = 'Image unavailable';
 const String ticketLoadingFailure = 'It looks like you\'re currently offline.\n\n'
     'Don\'t worry, we\'re using an offline copy of your tickets. As long as you haven\'t transferred or sold your tickets, they will be valid.';
 
-// selected_event_screen Strings. //
+// my_tickets_screen Strings. //
 
-const String foriaPass ='Foria Pass';
+const String foriaPass = 'Foria Pass';
 
-const String passRefresh ='seconds until refresh';
+const String screenshotWarning = 'Warning: QR code refreshes, so screenshots will NOT work';
+
+const String passRefresh = 'seconds until refresh';
 
 const String passOptions = 'Pass Options';
 
