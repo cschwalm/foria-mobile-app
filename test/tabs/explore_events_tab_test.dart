@@ -80,7 +80,7 @@ void main() {
 List<Event> _fakeEventWithTierPrice() {
   List<Event> events = new List<Event>();
   TicketTypeConfig exampleTier = new TicketTypeConfig();
-  exampleTier.price = '1.00';
+  exampleTier.price = '2.00';
   exampleTier.currency = 'USD';
   exampleTier.amountRemaining = 1;
   exampleTier.calculatedFee = '1.00';
@@ -112,7 +112,7 @@ List<Event> _fakeEventWithTierPrice() {
 List<Event> _fakeEventSoldOut() {
   List<Event> events = new List<Event>();
   TicketTypeConfig exampleTier = new TicketTypeConfig();
-  exampleTier.price = '1.00';
+  exampleTier.price = '2.00';
   exampleTier.currency = 'USD';
   exampleTier.amountRemaining = 0;
   exampleTier.calculatedFee = '1.00';
@@ -129,6 +129,7 @@ List<Event> _fakeEventSoldOut() {
   event.id = 'TestEvent';
   event.description = 'test description';
   event.startTime = DateTime.now();
+  event.endTime = DateTime(2200);
   event.imageUrl = null;
   event.ticketTypeConfig = new List<TicketTypeConfig>();
   event.ticketTypeConfig.add(exampleTier);
