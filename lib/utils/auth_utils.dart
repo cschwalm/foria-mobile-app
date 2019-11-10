@@ -8,7 +8,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foria/main.dart';
 import 'package:foria/screens/home.dart';
 import 'package:foria/screens/login.dart';
-import 'package:foria/screens/venue_screen.dart';
+import 'package:foria/screens/organizer_home_screen.dart';
 import 'package:foria/utils/database_utils.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
@@ -189,7 +189,7 @@ class AuthUtils {
       }
 
       if (await doesUserHaveVenueAccess()) {
-        Navigator.pushReplacementNamed(context, VenueScreen.routeName);
+        Navigator.pushReplacementNamed(context, OrganizerHomeScreen.routeName);
       } else {
         Navigator.pushReplacementNamed(context, Home.routeName);
       }

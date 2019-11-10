@@ -8,10 +8,12 @@ import 'package:flutter/services.dart' show DeviceOrientation, SystemChrome;
 import 'package:flutter/services.dart';
 import 'package:foria/providers/event_provider.dart';
 import 'package:foria/providers/ticket_provider.dart';
+import 'package:foria/screens/attendee_list_screen.dart';
+import 'package:foria/screens/organizer_events_screen.dart';
 import 'package:foria/screens/splash_screen.dart';
 import 'package:foria/screens/ticket_scan_screen.dart';
 import 'package:foria/screens/transfer_screen.dart';
-import 'package:foria/screens/venue_screen.dart';
+import 'package:foria/screens/organizer_home_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/database_utils.dart';
@@ -85,8 +87,16 @@ void mainDelegate() {
                   return MaterialPageRoute(builder: (context) => TicketScanScreen(), settings: settings);
                   break;
 
-                case VenueScreen.routeName:
-                  return MaterialPageRoute(builder: (context) => VenueScreen(), settings: settings);
+                case OrganizerHomeScreen.routeName:
+                  return MaterialPageRoute(builder: (context) => OrganizerHomeScreen(), settings: settings);
+                  break;
+
+                case OrganizerEventsScreen.routeName:
+                  return MaterialPageRoute(builder: (context) => OrganizerEventsScreen(), settings: settings);
+                  break;
+
+                case AttendeeListScreen.routeName:
+                  return MaterialPageRoute(builder: (context) => AttendeeListScreen(), settings: settings);
                   break;
 
                 case TransferScreen.routeName:

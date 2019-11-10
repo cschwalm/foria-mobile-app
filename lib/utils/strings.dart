@@ -30,13 +30,21 @@ const String tryAgain = 'Try again';
 
 const String textError = 'Error';
 
-// Venue related strings. //
+// Organizer related strings. //
 
 const String venueAccount = 'Venue Account';
+
+const String selectEvent = 'Select An Event';
 
 const String scanTickets = 'Scan Tickets';
 
 const String scanToRedeemTitle = 'Ready To Scan';
+
+const String attendeeCheckIn = 'Attendee Check-in';
+
+const String checkInText = 'Check-in';
+
+const String ticketsSold = '# Tickets Sold: ';
 
 const String switchToVenue = 'Switch to venue account';
 

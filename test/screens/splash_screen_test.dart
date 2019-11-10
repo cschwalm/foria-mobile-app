@@ -4,7 +4,7 @@ import 'package:foria/main.dart';
 import 'package:foria/screens/home.dart';
 import 'package:foria/screens/login.dart';
 import 'package:foria/screens/splash_screen.dart';
-import 'package:foria/screens/venue_screen.dart';
+import 'package:foria/screens/organizer_home_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/message_stream.dart';
 import 'package:get_it/get_it.dart';
@@ -48,13 +48,13 @@ void main() {
       home: SplashScreen(),
       navigatorKey: navigatorKey,
       routes: {
-        VenueScreen.routeName: (context) => VenueScreen(),
+        OrganizerHomeScreen.routeName: (context) => OrganizerHomeScreen(),
       },
     ));
 
     await tester.pumpAndSettle();
 
-    expect(find.byType(VenueScreen), findsOneWidget);
+    expect(find.byType(OrganizerHomeScreen), findsOneWidget);
 
   });
 

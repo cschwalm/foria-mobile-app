@@ -7,6 +7,8 @@ const String calendarImage = 'assets/ui_elements/calendar-icon.png';
 
 const String refreshIcon = 'assets/ui_elements/refresh-icon.png';
 
+const String scanButton = 'assets/ui_elements/scan-button.png';
+
 const String greyScannerSquare = 'assets/ui_elements/grey-scanner-square.png';
 
 const String redScannerSquare = 'assets/ui_elements/red-scanner-square.png';
