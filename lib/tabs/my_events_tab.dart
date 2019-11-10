@@ -516,13 +516,13 @@ class MissingTicket extends StatelessWidget {
               content: Column(
                 children: <Widget>[
                   Text(
-                    noEvents,
+                    noTickets,
                     style: Theme.of(context).textTheme.title,
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 25),
                   Text(
-                    noTickets,
+                    noEvents,
                     style: Theme.of(context).textTheme.body1,
                     textAlign: TextAlign.center,
                   ),

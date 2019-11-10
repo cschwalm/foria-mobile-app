@@ -82,9 +82,9 @@ const String supportEmailFailed = 'Error with your email client. Please email su
 
 // my_events_tab Strings. //
 
-const String noEvents = 'You don\'t have any \nupcoming events';
+const String noEvents = 'It seems that you don\'t have any \nupcoming events';
 
-const String noTickets = 'If you recently purchased tickets, pull down to refresh';
+const String noTickets = 'Pull down to refresh';
 
 const String otherwiseContact = 'Otherwise, Contact Us';
 
