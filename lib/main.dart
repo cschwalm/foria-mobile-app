@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show DeviceOrientation, SystemChrome;
 import 'package:flutter/services.dart';
+import 'package:foria/main_staging.dart' as staging;
 import 'package:foria/providers/event_provider.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/screens/splash_screen.dart';
@@ -25,6 +26,10 @@ import 'screens/my_tickets_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final FirebaseAnalytics analytics = FirebaseAnalytics();
+
+void main() {
+  staging.main();
+}
 
 void mainDelegate() {
   SystemChrome.setPreferredOrientations([
