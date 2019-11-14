@@ -74,6 +74,35 @@ class EventProvider extends ChangeNotifier {
   }
 
   ///
+  /// Returns a list of Attendees for a specific eventId from the server.
+  /// Results are not cached
+  ///
+  Future<List<Attendee>> getAttendeesForEvent(final String eventId) async {
+
+    if (_eventApi == null) {
+      ApiClient foriaApiClient = await _authUtils.obtainForiaApiClient();
+      _eventApi = new EventApi(foriaApiClient);
+    }
+
+    List<Attendee> attendees;
+    try {
+      attendees = await _eventApi.getAttendeesForEvent(eventId);
+    } on ApiException catch (ex, stackTrace) {
+      print("### FORIA SERVER ERROR: getAllEvents ###");
+      print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
+      rethrow;
+    } catch (ex, stackTrace) {
+      print("### UNKNOWN ERROR: getAllEvents Msg: ${ex.toString()} ###");
+      _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, netConnectionError, null, ex, stackTrace));
+      rethrow;
+    }
+
+    debugPrint("${attendees.length} attendees loaded from network to display to user.");
+    return attendees;
+  }
+
+  ///
   /// If any fields related to an event are null, method returns false
   ///
   bool isValidEvent(Event event) {

@@ -44,7 +44,7 @@ const String attendeeCheckIn = 'Attendee Check-in';
 
 const String checkInText = 'Check-in';
 
-const String ticketsSold = '# Tickets Sold: ';
+const String ticketsSold = 'No. of Tickets Sold: ';
 
 const String switchToVenue = 'Switch to venue account';
 

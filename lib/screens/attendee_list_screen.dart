@@ -6,7 +6,6 @@ import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/settings_item.dart';
 import 'package:provider/provider.dart';
-import 'package:wakelock/wakelock.dart';
 
 ///
 /// Screen displays a list of all tickets to a particular event and a button to the scan screen.
@@ -27,12 +26,6 @@ class AttendeeListScreen extends StatefulWidget {
 class _AttendeeListScreenState extends State<AttendeeListScreen> {
 
 //  SelectedTicketProvider _selectedTicketProvider;
-
-  @override
-  void initState() {
-    Wakelock.enable();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,13 +86,6 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
 //        )
     );
   }
-
-  @override
-  void dispose() {
-//    _selectedTicketProvider.dispose();
-    Wakelock.disable();
-    super.dispose();
-  }
 }
 
 ///
@@ -124,7 +110,6 @@ class _AttendeeItemState extends State<AttendeeItem> {
   bool isLoading = false;
   String status;
   Widget child;
-
 
   @override
   Widget build(BuildContext context) {

@@ -202,7 +202,7 @@ class EventList extends StatelessWidget {
                   Container(
                     height: 150,
                     width: double.infinity,
-                    child:  DiscoverEventImage(imageUrl),
+                    child: DiscoverEventImage(imageUrl),
                   ),
                   sizedBoxH3,
                   Text(
