@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:foria/providers/selected_ticket_provider.dart';
+import 'package:foria/providers/event_provider.dart';
 import 'package:foria/screens/ticket_scan_screen.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/settings_item.dart';
+import 'package:foria_flutter_client/api.dart';
 import 'package:provider/provider.dart';
 
 ///
@@ -15,29 +16,74 @@ import 'package:provider/provider.dart';
 class AttendeeListScreen extends StatefulWidget {
 
   static const routeName = '/attendee-list-screen';
-//  final SelectedTicketProvider _selectedTicketProvider;
-//
-//  AttendeeListScreen([this._selectedTicketProvider]);
+  final String _eventId;
+
+  AttendeeListScreen([this._eventId]);
 
   @override
   _AttendeeListScreenState createState() => _AttendeeListScreenState();
 }
+enum _LoadingState {
+
+  INITIAL_LOAD,
+  NETWORK_ERROR,
+  EVENTS_LOADED,
+  NO_EVENTS_AVAILABLE
+}
 
 class _AttendeeListScreenState extends State<AttendeeListScreen> {
 
-//  SelectedTicketProvider _selectedTicketProvider;
+  String _eventId;
+  List<Attendee> _attendeeList;
+  _LoadingState _currentState;
+  EventProvider _eventProvider;
+
+  ///
+  /// Fires network call to load and cache events.
+  ///
+  Future<void> _loadAttendees(String eventId) async {
+
+    try {
+      _attendeeList = await _eventProvider.getAttendeesForEvent(eventId);
+      setState(() {
+        if (_attendeeList == null || _attendeeList.isEmpty) {
+          _currentState = _LoadingState.NO_EVENTS_AVAILABLE;
+        } else {
+          _currentState = _LoadingState.EVENTS_LOADED;
+        }
+      });
+    } catch (e) {
+      setState(() {
+        _currentState = _LoadingState.NETWORK_ERROR;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
 
-//    final Map<String, dynamic> args = ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
-//    if (_selectedTicketProvider == null) {
-//      if (args == null || args['event'] == null) {
-//        _selectedTicketProvider = widget._selectedTicketProvider;
-//      } else {
-//        _selectedTicketProvider = new SelectedTicketProvider(args['event']);
-//      }
-//    }
+    final Map<String, dynamic> args = ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
+    if (widget._eventId == null) {
+      if (args == null || args['eventId'] == null) {
+        _eventId = widget._eventId;
+      } else {
+        _eventId = args['eventId'];
+      }
+    }
+
+
+    Widget child;
+    if (_currentState == _LoadingState.INITIAL_LOAD) {
+      child = Center(child: CupertinoActivityIndicator(radius: 15));
+      _loadAttendees();
+    } else if (_currentState == _LoadingState.EVENTS_LOADED) {
+      child = EventList();
+    } else if (_currentState == _LoadingState.NO_EVENTS_AVAILABLE) {
+      child = NoEvent();
+    } else {
+      child = ErrorTryAgainText(() => _loadAttendees());
+    }
+    
     //TODO: add refresh indicator
     return Scaffold(
       appBar: AppBar(
@@ -58,32 +104,30 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
             ),
         ),
         body:
-//        ChangeNotifierProvider<SelectedTicketProvider>.value(
-//          value: _selectedTicketProvider,
-//          child:
-          SafeArea(
+        Provider<List<Attendee>>.value(
+          value: _attendeeList,
+          child: SafeArea(
             child: Column(
               children: <Widget>[
                 SizedBox(height: 20),
                 Text(
-                  ticketsSold + '123', //TODO:link this
+                  ticketsSold + _attendeeList.length.toString(), //TODO:link this
                   style: Theme.of(context).textTheme.headline,
                 ),
                 SizedBox(height: 20),
                 MajorSettingItemDivider(),
                 Expanded(
                   child: ListView.separated(
-                    itemCount: 20, //TODO:link this
+                    itemCount: _attendeeList.length, //TODO:link this
                     separatorBuilder: (BuildContext context, int index) => Divider(height: 0,),
                     itemBuilder: (context, index) {
-                      String ticketId = '12345'; //TODO:pull ticketId from provider
-                      return AttendeeItem(ticketId,index);
+                      return AttendeeItem(index);
                     }),
                 ),
               ],
             ),
           ),
-//        )
+        )
     );
   }
 }
@@ -94,10 +138,9 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
 ///
 class AttendeeItem extends StatefulWidget {
 
-  final String ticketId;
   final int index;
 
-  AttendeeItem(this.ticketId, this.index); //TODO:remove once provider is hooked up
+  AttendeeItem(this.index); //TODO:remove once provider is hooked up
 
   @override
   _AttendeeItemState createState() => _AttendeeItemState();
@@ -107,35 +150,32 @@ class AttendeeItem extends StatefulWidget {
 class _AttendeeItemState extends State<AttendeeItem> {
 
   static const double _rowHeight = 70.0;
-  bool isLoading = false;
-  String status;
+  bool _isLoading = false;
   Widget child;
 
-  @override
-  Widget build(BuildContext context) {
-
-    Widget attendeeText = Column(
+  Column _attendeeText (String name, String ticketType) {
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Stetson, Billy', //TODO:link this
+          name,
           style: Theme.of(context).textTheme.title,
         ),
         Text(
-          'General Admission', //TODO:link this
+          ticketType,
           style: Theme.of(context).textTheme.body2,
         ),
       ],
     );
+  }
 
-    if (widget.index.isEven) { //TODO:remove once provider is hooked up
-      status = 'REDEEMED';
-    } else {
-      isLoading = false;
-      status = '1';
-    }
+  @override
+  Widget build(BuildContext context) {
+    Attendee attendee = Provider.of<List<Attendee>>(context)[widget.index];
+    String formattedName = attendee.lastName + ', ' + attendee.firstName;
+    String status = attendee.ticket.status;
 
-    if (isLoading) {
+    if (_isLoading) {
       child = Container(
         child: Center(child: CupertinoActivityIndicator()),
         color: settingsBackgroundColor,
@@ -152,7 +192,7 @@ class _AttendeeItemState extends State<AttendeeItem> {
             width: 10,
           ),
           SizedBox(width: 6),
-          attendeeText,
+          _attendeeText(formattedName, attendee.ticket.ticketTypeConfig.name),
         ],
       );
     } else {
@@ -163,16 +203,16 @@ class _AttendeeItemState extends State<AttendeeItem> {
             height: _rowHeight,
             width: 16,
           ),
-          attendeeText,
+          _attendeeText(formattedName, attendee.ticket.ticketTypeConfig.name),
           Expanded(child: Container(),),
           OutlineButton(
-            child: Text('Check-in',),
+            child: Text(checkInText),
             borderSide: BorderSide(
               color: constPrimaryColor,
             ),
             highlightedBorderColor: constPrimaryColor,
             textColor: constPrimaryColor,
-            onPressed: (){},
+            onPressed: () => status = ticketStatusRedeemed,
           ),
           SizedBox(width: 16),
         ],

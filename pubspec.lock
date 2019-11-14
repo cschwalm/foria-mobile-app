@@ -42,7 +42,7 @@ packages:
       name: base32
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.4"
   boolean_selector:
     dependency: transitive
     description:
@@ -289,7 +289,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: d3ca06776a6bf476f9911ff0e38c052d6a7d0b3e
+      resolved-ref: "92dd2b9fdfa4b819e5f6dfc5c23026e65eb363d5"
       url: "ssh://git@bitbucket.org/foriatickets/foria-flutter-client.git"
     source: git
     version: "1.6.0"
@@ -750,7 +750,7 @@ packages:
       name: uuid
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.2"
+    version: "2.0.4"
   vector_math:
     dependency: transitive
     description:

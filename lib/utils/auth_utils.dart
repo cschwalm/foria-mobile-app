@@ -169,7 +169,7 @@ class AuthUtils {
 
     Map<String, dynamic> options = new Map<String, dynamic>();
     options['audience'] = Configuration.auth0Audience;
-    options['scope'] = 'openid profile email offline_access write:venue_redeem';
+    options['scope'] = 'openid profile email offline_access write:venue_redeem read:venue';
 
     await _auth.webAuth.authorize(options).then((authInfo) async {
 

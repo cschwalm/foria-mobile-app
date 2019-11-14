@@ -8,6 +8,7 @@ import 'package:flutter/services.dart' show DeviceOrientation, SystemChrome;
 import 'package:flutter/services.dart';
 import 'package:foria/providers/event_provider.dart';
 import 'package:foria/providers/ticket_provider.dart';
+import 'package:foria/providers/venue_provider.dart';
 import 'package:foria/screens/attendee_list_screen.dart';
 import 'package:foria/screens/organizer_events_screen.dart';
 import 'package:foria/screens/splash_screen.dart';
@@ -140,4 +141,5 @@ void setupDependencies() {
   GetIt.instance.registerSingleton<DatabaseUtils>(new DatabaseUtils());
   GetIt.instance.registerSingleton<TicketProvider>(new TicketProvider());
   GetIt.instance.registerSingleton<EventProvider>(new EventProvider());
+  GetIt.instance.registerSingleton<VenueProvider>(new VenueProvider());
 }

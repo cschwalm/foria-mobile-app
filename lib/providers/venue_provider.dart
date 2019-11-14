@@ -17,11 +17,15 @@ class VenueProvider extends ChangeNotifier {
   AuthUtils _authUtils;
   VenueApi _venueApi;
 
+  final Map<String, Event> _venueEventMap = new Map<String, Event>();
   final MessageStream _errorStream = GetIt.instance<MessageStream>();
 
   VenueProvider() {
     _authUtils = GetIt.instance<AuthUtils>();
   }
+
+  /// Returns an unmodifiable list that is safe to iterate over.
+  List<Event> get venueEvents => List.unmodifiable(_venueEventMap.values);
 
   set venueApi(VenueApi value) {
     _venueApi = value;
@@ -33,36 +37,37 @@ class VenueProvider extends ChangeNotifier {
   ///
   Future<List<Event>> getAllVenuesEvents() async {
 
-    List<Event> venueEvents;
-    List<Venue> venues;
-
-
     if (_venueApi == null) {
       ApiClient foriaApiClient = await _authUtils.obtainForiaApiClient();
       _venueApi = new VenueApi(foriaApiClient);
     }
 
+    List<Venue> venues;
     try {
       venues = await _venueApi.getAllVenues();
     } on ApiException catch (ex, stackTrace) {
-      print("### FORIA SERVER ERROR: getAllVenues ###");
-      print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      debugPrint("### FORIA SERVER ERROR: getAllVenues ###");
+      debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       rethrow;
     } catch (ex, stackTrace) {
-      print("### UNKNOWN ERROR: getAllVenues Msg: ${ex.toString()} ###");
+      debugPrint("### UNKNOWN ERROR: getAllVenues Msg: ${ex.toString()} ###");
+      debugPrint(stackTrace.toString());
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, netConnectionError, null, ex, stackTrace));
       rethrow;
     }
 
+    //Cache results for future calls.
     for (Venue venue in venues) {
 
       for (Event event in venue.events) {
-        venueEvents.add(event);
+        _venueEventMap[event.id] = event;
       }
     }
 
-    debugPrint("${venueEvents.length} venueEvents loaded from network to display to user.");
-    return venueEvents;
+    notifyListeners();
+
+    debugPrint("${_venueEventMap.length} venueEvents loaded from network to display to user.");
+    return _venueEventMap.values.toList();
   }
 }

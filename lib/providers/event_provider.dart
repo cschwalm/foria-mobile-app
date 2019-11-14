@@ -69,6 +69,8 @@ class EventProvider extends ChangeNotifier {
       _eventMap[event.id] = event;
     }
 
+    notifyListeners();
+
     debugPrint("${_eventMap.length} loaded from network to display to user.");
     return _eventMap.values.toList();
   }
