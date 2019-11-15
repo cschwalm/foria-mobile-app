@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show DeviceOrientation, SystemChrome;
 import 'package:flutter/services.dart';
+import 'package:foria/providers/attendee_provider.dart';
 import 'package:foria/providers/event_provider.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/providers/venue_provider.dart';
@@ -64,7 +65,7 @@ void mainDelegate() {
                 body2: TextStyle(fontSize: 14.0, color: textGreyColor),
                 display1: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold, color: Colors.black),
                 headline: TextStyle(
-                  fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.black, fontFamily: 'Rubik',),
+                  fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.black),
               ),
             ),
             navigatorObservers: [
@@ -142,4 +143,6 @@ void setupDependencies() {
   GetIt.instance.registerSingleton<TicketProvider>(new TicketProvider());
   GetIt.instance.registerSingleton<EventProvider>(new EventProvider());
   GetIt.instance.registerSingleton<VenueProvider>(new VenueProvider());
+  GetIt.instance.registerSingleton<AttendeeProvider>(new AttendeeProvider());
+
 }

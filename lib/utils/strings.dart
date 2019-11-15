@@ -24,7 +24,7 @@ const String myPassesLoadError = 'Sorry, there was a problem with one or more of
 
 const String netConnectionError = 'Internet connection failed. Please try again.';
 
-const String textOops = 'Oops! Something went wrong...';
+const String textOops = 'Oops! Something went wrong...\nPlease check your internet connection';
 
 const String tryAgain = 'Try again';
 
@@ -44,7 +44,11 @@ const String attendeeCheckIn = 'Attendee Check-in';
 
 const String checkInText = 'Check-in';
 
-const String ticketsSold = 'No. of Tickets Sold: ';
+const String confirmCheckIn = 'Confirm Check-in';
+
+const String thisNonReversible = 'This is non-reversible';
+
+const String ticketsSold = 'Tickets Sold: ';
 
 const String switchToVenue = 'Switch to venue account';
 
@@ -101,6 +105,8 @@ const String imageUnavailable = 'Image unavailable';
 
 const String ticketLoadingFailure = 'It looks like you\'re currently offline.\n\n'
     'Don\'t worry, we\'re using an offline copy of your tickets. As long as you haven\'t transferred or sold your tickets, they will be valid.';
+
+const String eventsLoadingFailure = 'It looks like you\'re currently offline.\n\nPlease try again later.';
 
 // my_tickets_screen Strings. //
 
@@ -175,6 +181,8 @@ const String ticketStatusCanceledFraud = 'CANCELED_FRAUD';
 // discover_events_tab Strings. //
 
 const String noEventsAvailable = 'There aren\'t any events available at the moment. Please check back later';
+
+const String noAttendeesAvailable = 'There aren\'t any attendees at the moment. Please check back later';
 
 const String textSoldOut = 'SOLD OUT';
 

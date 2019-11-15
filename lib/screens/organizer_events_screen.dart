@@ -4,9 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:foria/providers/venue_provider.dart';
 import 'package:foria/screens/attendee_list_screen.dart';
 import 'package:foria/utils/constants.dart';
-import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
-import 'package:foria/widgets/errors/error_try_again_text.dart';
+import 'package:foria/widgets/errors/error_try_again_column.dart';
 import 'package:foria/widgets/errors/image_unavailable.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
@@ -63,6 +62,7 @@ class _OrganizerEventsScreenState extends State<OrganizerEventsScreen> with Auto
       setState(() {
         _currentState = _LoadingState.NETWORK_ERROR;
       });
+      debugPrint('getAllVenuesEvents network call failed. No events loaded.');
     }
   }
 
@@ -70,21 +70,6 @@ class _OrganizerEventsScreenState extends State<OrganizerEventsScreen> with Auto
   Widget build(BuildContext context) {
 
     super.build(context);
-
-
-    final MessageStream messageStream = GetIt.instance<MessageStream>();
-    messageStream.addListener((errorMessage) {
-      Scaffold.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: snackbarColor,
-            elevation: 0,
-            content: FlatButton(
-              child: Text(errorMessage.body),
-              onPressed: () => Scaffold.of(context).hideCurrentSnackBar(),
-            ),
-          )
-      );
-    });
 
     Widget child;
     if (_currentState == _LoadingState.INITIAL_LOAD) {
@@ -95,7 +80,7 @@ class _OrganizerEventsScreenState extends State<OrganizerEventsScreen> with Auto
     } else if (_currentState == _LoadingState.NO_EVENTS_AVAILABLE) {
       child = NoEvent();
     } else {
-      child = ErrorTryAgainText(() => _loadEvents());
+      child = ErrorTryAgainColumn(() => _loadEvents());
     }
 
     return ChangeNotifierProvider<VenueProvider>.value(

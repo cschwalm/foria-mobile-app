@@ -57,7 +57,6 @@ class EventProvider extends ChangeNotifier {
     } catch (ex, stackTrace) {
       print("### UNKNOWN ERROR: getAllEvents Msg: ${ex.toString()} ###");
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, netConnectionError, null, ex, stackTrace));
-      rethrow;
     }
 
     //Cache results for future calls.
@@ -90,14 +89,14 @@ class EventProvider extends ChangeNotifier {
     try {
       attendees = await _eventApi.getAttendeesForEvent(eventId);
     } on ApiException catch (ex, stackTrace) {
-      print("### FORIA SERVER ERROR: getAllEvents ###");
-      print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      debugPrint("### FORIA SERVER ERROR: getAttendeesForEvent ###");
+      debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       rethrow;
     } catch (ex, stackTrace) {
-      print("### UNKNOWN ERROR: getAllEvents Msg: ${ex.toString()} ###");
+      debugPrint("### UNKNOWN ERROR: getAttendeesForEvent Msg: ${ex.toString()} ###");
+      debugPrint(stackTrace.toString());
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, netConnectionError, null, ex, stackTrace));
-      rethrow;
     }
 
     debugPrint("${attendees.length} attendees loaded from network to display to user.");

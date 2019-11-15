@@ -52,9 +52,7 @@ class VenueProvider extends ChangeNotifier {
       rethrow;
     } catch (ex, stackTrace) {
       debugPrint("### UNKNOWN ERROR: getAllVenues Msg: ${ex.toString()} ###");
-      debugPrint(stackTrace.toString());
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, netConnectionError, null, ex, stackTrace));
-      rethrow;
     }
 
     //Cache results for future calls.

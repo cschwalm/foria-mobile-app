@@ -64,7 +64,7 @@ class ScanProcessor {
 
     if (_scanResult == ScanResult.ALLOW){
       isValid = true;
-      title = _ticketTypeName;
+      title = _ticketTypeName ?? 'Event Ticket';
       subtitle = passValid;
     } else if (_scanResult == ScanResult.DENY){
       isValid = false;
@@ -141,7 +141,7 @@ class ScanProcessor {
       return;
     }
 
-    _ticketTypeName = redemptionResult.ticket.ticketTypeConfig.name;
+    _ticketTypeName = redemptionResult?.ticket?.ticketTypeConfig?.name;
     if (redemptionResult.status == 'ALLOW') {
       _scanResult = ScanResult.ALLOW;
     } else {
