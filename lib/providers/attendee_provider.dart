@@ -16,7 +16,7 @@ class AttendeeProvider extends ChangeNotifier {
   /// This should be called after the network call to manually redeem a ticket
   /// Updates the local AttendeeList
   ///
-  void markAttendeeRedeemed(final Attendee attendee) {
+  void markAttendeeRedeemed (final Attendee attendee) {
 
     Attendee foundAttendee = _attendeeList.firstWhere((a) => a.ticketId == attendee.ticketId);
     foundAttendee.ticket.status = ticketStatusRedeemed;

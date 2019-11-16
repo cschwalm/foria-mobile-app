@@ -99,8 +99,45 @@ class EventProvider extends ChangeNotifier {
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, netConnectionError, null, ex, stackTrace));
     }
 
+    for (int i = 0; i < attendees.length; i++) {
+      if (!isValidAttendee(attendees[i])) {
+        attendees.removeAt(i);
+      }
+    }
+
     debugPrint("${attendees.length} attendees loaded from network to display to user.");
     return attendees;
+  }
+
+  ///
+  /// If any fields related to an event are null, method returns false
+  ///
+  bool isValidAttendee(Attendee attendee) {
+    if (attendee == null) {
+      _errorStream.reportError('Error in event_provider: An Attendee is null',null);
+      return false;
+    }
+    if (attendee.ticketId == null) {
+      _errorStream.reportError('Error in event_provider: An Attendee ticket ID is null',null);
+      return false;
+    }
+    if (attendee.ticket == null) {
+      _errorStream.reportError('Error in event_provider: An Attendee ticket is null',null);
+      return false;
+    }
+    if (attendee.firstName == null) {
+      _errorStream.reportError('Error in event_provider: An Attendee fistName for ticketId ${attendee.ticketId} null',null);
+      return false;
+    }
+    if (attendee.lastName == null) {
+      _errorStream.reportError('Error in event_provider: An Attendee lastName for ticketId ${attendee.ticketId} null',null);
+      return false;
+    }
+    if (attendee.userId == null) {
+      _errorStream.reportError('Error in event_provider: An Attendee userName for ticketId ${attendee.ticketId} null',null);
+      return false;
+    }
+    return true;
   }
 
   ///

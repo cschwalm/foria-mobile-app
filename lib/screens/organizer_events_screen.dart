@@ -7,6 +7,7 @@ import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/error_try_again_column.dart';
 import 'package:foria/widgets/errors/image_unavailable.dart';
+import 'package:foria/widgets/no_events_column.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
@@ -76,9 +77,9 @@ class _OrganizerEventsScreenState extends State<OrganizerEventsScreen> with Auto
       child = Center(child: CupertinoActivityIndicator(radius: 15));
       _loadEvents();
     } else if (_currentState == _LoadingState.EVENTS_LOADED) {
-      child = EventList();
+      child = OrganizerEventList();
     } else if (_currentState == _LoadingState.NO_EVENTS_AVAILABLE) {
-      child = NoEvent();
+      child = NoEventsColumn();
     } else {
       child = ErrorTryAgainColumn(() => _loadEvents());
     }
@@ -98,37 +99,9 @@ class _OrganizerEventsScreenState extends State<OrganizerEventsScreen> with Auto
 }
 
 ///
-/// Shown if events API returned no results.
-///
-class NoEvent extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        children: <Widget>[
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Text(noEventsAvailable,
-                  style: Theme.of(context).textTheme.title,
-                  textAlign: TextAlign.center,),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}
-
-///
 /// Creates a list view containing all the events.
 ///
-class EventList extends StatelessWidget {
+class OrganizerEventList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {

@@ -15,11 +15,7 @@ void showPopUpConfirm(BuildContext context, String title, String body,[Function 
         child: Text("Yes"),
         onPressed: () async {
           if (function != null) {
-            try {
-              await function();
-            } catch (e) {
-              Navigator.of(context).pop();
-            }
+            await function();
           }
           Navigator.of(context).pop();
         },

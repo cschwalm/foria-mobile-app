@@ -5,8 +5,10 @@ import 'package:foria/providers/event_provider.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/screens/ticket_scan_screen.dart';
 import 'package:foria/utils/constants.dart';
+import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/error_try_again_column.dart';
+import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria/widgets/settings_item.dart';
 import 'package:foria/widgets/show_pop_up_confirm.dart';
 import 'package:foria_flutter_client/api.dart';
@@ -255,22 +257,13 @@ class _AttendeeItemState extends State<AttendeeItem> {
   Widget build(BuildContext context) {
     final attendeeData = Provider.of<AttendeeProvider>(context, listen: true);
     Attendee attendee = attendeeData.attendeeList[widget.index];
-    String formattedName = attendee.lastName + ', ' + attendee.firstName;
+    String formattedName = attendee.lastName.trim() + ', ' + attendee.firstName.trim();
     status = attendee.ticket.status;
-//    final MessageStream messageStream = GetIt.instance<MessageStream>();
-//
-//    messageStream.addListener((errorMessage) {
-//      Scaffold.of(context).showSnackBar(
-//          SnackBar(
-//            backgroundColor: snackbarColor,
-//            elevation: 0,
-//            content: FlatButton(
-//              child: Text(errorMessage.body),
-//              onPressed: () => Scaffold.of(context).hideCurrentSnackBar(),
-//            ),
-//          )
-//      );
-//    });
+    final MessageStream messageStream = GetIt.instance<MessageStream>();
+
+    messageStream.addListener((errorMessage) {
+      showErrorAlert(context, offlineError);
+    });
 
     if (_isLoading) {
       child = Container(
@@ -282,6 +275,7 @@ class _AttendeeItemState extends State<AttendeeItem> {
     } else if (status == ticketStatusRedeemed){
       child = Row(
         crossAxisAlignment: CrossAxisAlignment.center,
+        key: Key('redeemed attendee'),
         children: <Widget>[
           Container(
             color: Colors.green,
@@ -310,13 +304,7 @@ class _AttendeeItemState extends State<AttendeeItem> {
             highlightedBorderColor: constPrimaryColor,
             textColor: constPrimaryColor,
             onPressed: () {
-              showPopUpConfirm(context, confirmCheckIn, thisNonReversible, () {
-                try {
-                  _manualRedeemTicket(attendee);
-                } catch (ex) {
-                  //Do nothing.
-                }
-              });
+              showPopUpConfirm(context, confirmCheckIn, thisNonReversible, () => _manualRedeemTicket(attendee));
             }
           ),
           SizedBox(width: 16),
@@ -331,29 +319,29 @@ class _AttendeeItemState extends State<AttendeeItem> {
   ///
   Future<void> _manualRedeemTicket(Attendee attendee) async {
 
-    Ticket _result;
     final attendeeData = Provider.of<AttendeeProvider>(context, listen: true);
 
-    try {
+    setState(() {
+      _isLoading = true;
+    });
 
-      setState(() {
-        _isLoading = true;
-      });
+    _ticketProvider.manualRedeemTicket(attendee.ticket.id).then((ticket) {
 
-      _result = await _ticketProvider.manualRedeemTicket(attendee.ticket.id);
-
-      if (_result.status == ticketStatusRedeemed) {
+      if (ticket.status == ticketStatusRedeemed) {
         attendeeData.markAttendeeRedeemed(attendee);
       } else {
         debugPrint('Manual Ticket Redeem failed for ticket id: ${attendee.ticket.id}');
       }
 
+    }).catchError((e) {
+
+      debugPrint('Manual Ticket Redeem failed for ticket id: ${attendee.ticket.id}');
+
+    }).whenComplete((){
+
       setState(() {
         _isLoading = false;
       });
-    } catch (e) {
-      debugPrint('Manual Ticket Redeem failed for ticket id: ${attendee.ticket.id}');
-      rethrow;
-    }
+    });
   }
 }

@@ -8,6 +8,7 @@ import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/configuration.dart';
 import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
+import 'package:foria/widgets/no_events_column.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
@@ -39,7 +40,7 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.byType(EventList), findsOneWidget);
+    expect(find.byType(PublicEventList), findsOneWidget);
     expect(find.text('\$2.00'), findsOneWidget);
   });
   
@@ -55,11 +56,11 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.byType(EventList), findsOneWidget);
+    expect(find.byType(PublicEventList), findsOneWidget);
     expect(find.text(textSoldOut), findsOneWidget);
   });
 
-  testWidgets('ExploreEventsTab displays NoEvent when no events are in list', (WidgetTester tester) async {
+  testWidgets('ExploreEventsTab displays NoEventsColumn when no events are in list', (WidgetTester tester) async {
 
     when(eventProviderMock.events).thenReturn(UnmodifiableListView(new List<Event>()));
     when(eventProviderMock.getAllEvents()).thenAnswer((_) async => new List<Event>());
@@ -70,7 +71,7 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.byType(NoEvent), findsOneWidget);
+    expect(find.byType(NoEventsColumn), findsOneWidget);
   });
 }
 

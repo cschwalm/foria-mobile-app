@@ -106,7 +106,7 @@ const String imageUnavailable = 'Image unavailable';
 const String ticketLoadingFailure = 'It looks like you\'re currently offline.\n\n'
     'Don\'t worry, we\'re using an offline copy of your tickets. As long as you haven\'t transferred or sold your tickets, they will be valid.';
 
-const String eventsLoadingFailure = 'It looks like you\'re currently offline.\n\nPlease try again later.';
+const String offlineError = 'An unknown error occured. Please check your internet connection.';
 
 // my_tickets_screen Strings. //
 
