@@ -10,7 +10,7 @@ class AttendeeProvider extends ChangeNotifier {
 
   List<Attendee> _attendeeList;
 
-  List<Attendee> get attendeeList => List.unmodifiable(_attendeeList);
+  List<Attendee> get attendeeList => _sortAttendeeList();
 
   ///
   /// This should be called after the network call to manually redeem a ticket
@@ -31,5 +31,29 @@ class AttendeeProvider extends ChangeNotifier {
 
     _attendeeList = aList;
     notifyListeners();
+  }
+
+  ///
+  /// Sort the list by last name and then first name.
+  /// Tie breaker is ticketID.
+  ///
+  /// Returns a not mutable list.
+  ///
+  List<Attendee> _sortAttendeeList() {
+
+    _attendeeList.sort( (a, b) {
+
+      if (a.lastName.toLowerCase().compareTo(b.lastName.toLowerCase()) != 0) {
+        return a.lastName.toLowerCase().compareTo(b.lastName.toLowerCase());
+      }
+
+      if (a.firstName.compareTo(b.firstName) != 0) {
+        return a.firstName.toLowerCase().compareTo(b.firstName.toLowerCase());
+      }
+
+      return a.ticketId.compareTo(b.ticketId);
+    });
+
+    return List.unmodifiable(_attendeeList);
   }
 }
