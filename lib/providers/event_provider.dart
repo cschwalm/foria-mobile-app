@@ -57,7 +57,6 @@ class EventProvider extends ChangeNotifier {
     } catch (ex, stackTrace) {
       print("### UNKNOWN ERROR: getAllEvents Msg: ${ex.toString()} ###");
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, netConnectionError, null, ex, stackTrace));
-      rethrow;
     }
 
     //Cache results for future calls.
@@ -69,8 +68,77 @@ class EventProvider extends ChangeNotifier {
       _eventMap[event.id] = event;
     }
 
+    notifyListeners();
+
     debugPrint("${_eventMap.length} loaded from network to display to user.");
     return _eventMap.values.toList();
+  }
+
+  ///
+  /// Returns a list of Attendees for a specific eventId from the server.
+  /// Results are not cached
+  ///
+  Future<List<Attendee>> getAttendeesForEvent(final String eventId) async {
+
+    if (_eventApi == null) {
+      ApiClient foriaApiClient = await _authUtils.obtainForiaApiClient();
+      _eventApi = new EventApi(foriaApiClient);
+    }
+
+    List<Attendee> attendees;
+    try {
+      attendees = await _eventApi.getAttendeesForEvent(eventId);
+    } on ApiException catch (ex, stackTrace) {
+      debugPrint("### FORIA SERVER ERROR: getAttendeesForEvent ###");
+      debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
+      rethrow;
+    } catch (ex, stackTrace) {
+      debugPrint("### UNKNOWN ERROR: getAttendeesForEvent Msg: ${ex.toString()} ###");
+      debugPrint(stackTrace.toString());
+      _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, netConnectionError, null, ex, stackTrace));
+    }
+
+    for (int i = 0; i < attendees.length; i++) {
+      if (!isValidAttendee(attendees[i])) {
+        attendees.removeAt(i);
+      }
+    }
+
+    debugPrint("${attendees.length} attendees loaded from network to display to user.");
+    return attendees;
+  }
+
+  ///
+  /// If any fields related to an event are null, method returns false
+  ///
+  bool isValidAttendee(Attendee attendee) {
+
+    if (attendee == null) {
+      _errorStream.reportError('Error in event_provider: An Attendee is null', null);
+      return false;
+    }
+    if (attendee.ticketId == null) {
+      _errorStream.reportError('Error in event_provider: An Attendee ticket ID is null', null);
+      return false;
+    }
+    if (attendee.ticket == null) {
+      _errorStream.reportError('Error in event_provider: An Attendee ticket is null', null);
+      return false;
+    }
+    if (attendee.firstName == null) {
+      _errorStream.reportError('Error in event_provider: An Attendee fistName for ticketId ${attendee.ticketId} null', null);
+      return false;
+    }
+    if (attendee.lastName == null) {
+      _errorStream.reportError('Error in event_provider: An Attendee lastName for ticketId ${attendee.ticketId} null', null);
+      return false;
+    }
+    if (attendee.userId == null) {
+      _errorStream.reportError('Error in event_provider: An Attendee userName for ticketId ${attendee.ticketId} null', null);
+      return false;
+    }
+    return true;
   }
 
   ///

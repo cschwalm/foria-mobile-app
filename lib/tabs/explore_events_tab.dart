@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/providers/event_provider.dart';
@@ -6,7 +5,8 @@ import 'package:foria/utils/configuration.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
-import 'package:foria/widgets/errors/image_unavailable.dart';
+import 'package:foria/widgets/discover_event_image.dart';
+import 'package:foria/widgets/no_events_column.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
@@ -120,9 +120,9 @@ class _ExploreEventsTabState extends State<ExploreEventsTab> with AutomaticKeepA
       child = CupertinoActivityIndicator(radius: 15);
       _loadEvents();
     } else if (_currentState == _LoadingState.EVENTS_LOADED) {
-      child = EventList();
+      child = PublicEventList();
     } else if (_currentState == _LoadingState.NO_EVENTS_AVAILABLE) {
-      child = NoEvent();
+      child = NoEventsColumn();
     } else {
       child = _error();
     }
@@ -132,37 +132,9 @@ class _ExploreEventsTabState extends State<ExploreEventsTab> with AutomaticKeepA
 }
 
 ///
-/// Shown if events API returned no results.
-///
-class NoEvent extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        children: <Widget>[
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Text(noEventsAvailable,
-                  style: Theme.of(context).textTheme.title,
-                  textAlign: TextAlign.center,),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}
-
-///
 /// Creates a list view containing all the events.
 ///
-class EventList extends StatelessWidget {
+class PublicEventList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
@@ -227,38 +199,6 @@ class EventList extends StatelessWidget {
                 ),
               );
             });
-  }
-}
-
-///
-/// Cached image for the event
-///
-class DiscoverEventImage extends StatelessWidget {
-
-  final String _imageUrl;
-
-  DiscoverEventImage(this._imageUrl);
-
-  @override
-  Widget build(BuildContext context) {
-    return _imageUrl == null ? Container() : CachedNetworkImage(
-      placeholder: (context, url) =>
-          CupertinoActivityIndicator(),
-      errorWidget: (context, url, error) {
-        return ImageUnavailable();
-      },
-      imageUrl: _imageUrl,
-      imageBuilder: (context, imageProvider) =>
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(2)),
-              image: DecorationImage(
-                image: imageProvider,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-    );
   }
 }
 

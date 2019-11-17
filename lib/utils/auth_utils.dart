@@ -8,7 +8,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foria/main.dart';
 import 'package:foria/screens/home.dart';
 import 'package:foria/screens/login.dart';
-import 'package:foria/screens/venue_screen.dart';
+import 'package:foria/screens/organizer_home_screen.dart';
 import 'package:foria/utils/database_utils.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
@@ -169,7 +169,7 @@ class AuthUtils {
 
     Map<String, dynamic> options = new Map<String, dynamic>();
     options['audience'] = Configuration.auth0Audience;
-    options['scope'] = 'openid profile email offline_access write:venue_redeem';
+    options['scope'] = 'openid profile email offline_access write:venue_redeem read:venue';
 
     await _auth.webAuth.authorize(options).then((authInfo) async {
 
@@ -189,7 +189,7 @@ class AuthUtils {
       }
 
       if (await doesUserHaveVenueAccess()) {
-        Navigator.pushReplacementNamed(context, VenueScreen.routeName);
+        Navigator.pushReplacementNamed(context, OrganizerHomeScreen.routeName);
       } else {
         Navigator.pushReplacementNamed(context, Home.routeName);
       }

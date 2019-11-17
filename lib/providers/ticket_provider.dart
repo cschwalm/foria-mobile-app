@@ -276,6 +276,41 @@ class TicketProvider extends ChangeNotifier {
   }
 
   ///
+  /// Manually redeems a user ticket for an authenticated venue device without the scanner.
+  ///
+  /// If there is no exception and the returned Ticket status is REDEEMED,
+  /// the ticket has been redeemed in the backend system.
+  ///
+  Future<Ticket> manualRedeemTicket(final String ticketId) async {
+
+    if (ticketId == null) {
+      return null;
+    }
+
+    if (_ticketApi == null) {
+      ApiClient foriaApiClient = await _authUtils.obtainForiaApiClient();
+      _ticketApi = new TicketApi(foriaApiClient);
+    }
+
+    Ticket result;
+    try {
+      result = await _ticketApi.manualRedeemTicket(ticketId);
+    } on ApiException catch (ex, stackTrace) {
+      debugPrint("### FORIA SERVER ERROR: manualRedeemTicket ###");
+      debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
+      throw new Exception(ex.message);
+    } catch (e) {
+      debugPrint("### NETWORK ERROR: manualRedeemTicket Msg: ${e.toString()} ###");
+      _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
+      rethrow;
+    }
+
+    debugPrint("TicketId: $ticketId reedeemed. manualRedeemTicket resulted in ticket status: ${result.status}");
+    return result;
+  }
+
+  ///
   /// Stores the FCM token in Foria database. This should only be called for new tokens.
   ///
   void registerDeviceToken(final String token) async {

@@ -186,7 +186,7 @@ class MajorSettingItemDivider extends StatelessWidget {
         SettingItemDivider(),
         Container(
           color: settingsBackgroundColor,
-          height: 10,
+          height: 20,
         ),
         SettingItemDivider(),
       ],

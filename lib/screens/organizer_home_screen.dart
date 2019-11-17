@@ -1,18 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:foria/screens/ticket_scan_screen.dart';
+import 'package:foria/screens/organizer_events_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/widgets/contact_support.dart';
-import 'package:foria/widgets/primary_button.dart';
 import 'package:foria/widgets/settings_item.dart';
 import 'package:get_it/get_it.dart';
 
 import '../utils/strings.dart';
 import 'home.dart';
 
-class VenueScreen extends StatelessWidget {
-  static const routeName = '/venue-screen';
+///
+/// Organizer screen that provides buttons for Attendee Check-in, Logout, switch to fan screen, FAQ, Contact Us
+///
+class OrganizerHomeScreen extends StatelessWidget {
+  static const routeName = '/organizer-screen';
 
   final AuthUtils _authUtils = GetIt.instance<AuthUtils>();
 
@@ -52,29 +54,21 @@ class VenueScreen extends StatelessWidget {
           MajorSettingItemDivider(),
           SettingsItem(
             label: textLogout,
-            labelTextStyle: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold,color: Theme.of(context).primaryColor),
             content: SettingsNavigationIndicator(),
             onPress: () {
               _authUtils.logout();
             },
           ),
-          SettingItemDivider(),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.fromLTRB(16, 0, 16, 40),
-                  child: PrimaryButton(
-                    text: scanTickets,
-                    onPress: () {
-                      Navigator.pushNamed(context, TicketScanScreen.routeName);
-                    },
-                  ),
-                ),
-              ],
-            ),
+          MajorSettingItemDivider(),
+          SettingsItem(
+            label: attendeeCheckIn,
+            labelTextStyle: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold,color: Theme.of(context).primaryColor),
+            content: SettingsNavigationIndicator(),
+            onPress: () {
+              Navigator.of(context).pushNamed(OrganizerEventsScreen.routeName);
+            },
           ),
+          SettingItemDivider(),
         ],
       ),
     );

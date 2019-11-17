@@ -24,19 +24,31 @@ const String myPassesLoadError = 'Sorry, there was a problem with one or more of
 
 const String netConnectionError = 'Internet connection failed. Please try again.';
 
-const String textOops = 'Oops! Something went wrong...';
+const String textOops = 'Oops! Something went wrong...\nPlease check your internet connection';
 
 const String tryAgain = 'Try again';
 
 const String textError = 'Error';
 
-// Venue related strings. //
+// Organizer related strings. //
 
 const String venueAccount = 'Venue Account';
+
+const String selectEvent = 'Select An Event';
 
 const String scanTickets = 'Scan Tickets';
 
 const String scanToRedeemTitle = 'Ready To Scan';
+
+const String attendeeCheckIn = 'Attendee Check-in';
+
+const String checkInText = 'Check-in';
+
+const String confirmCheckIn = 'Confirm Check-in';
+
+const String thisNonReversible = 'This is non-reversible';
+
+const String ticketsSold = 'Tickets Sold: ';
 
 const String switchToVenue = 'Switch to venue account';
 
@@ -74,9 +86,9 @@ const String supportEmailFailed = 'Error with your email client. Please email su
 
 // my_events_tab Strings. //
 
-const String noEvents = 'You don\'t have any \nupcoming events';
+const String noEvents = 'It seems that you don\'t have any \nupcoming events';
 
-const String noTickets = 'If you recently purchased tickets, pull down to refresh';
+const String noTickets = 'Pull down to refresh';
 
 const String otherwiseContact = 'Otherwise, Contact Us';
 
@@ -93,6 +105,8 @@ const String imageUnavailable = 'Image unavailable';
 
 const String ticketLoadingFailure = 'It looks like you\'re currently offline.\n\n'
     'Don\'t worry, we\'re using an offline copy of your tickets. As long as you haven\'t transferred or sold your tickets, they will be valid.';
+
+const String offlineError = 'An unknown error occured. Please check your internet connection.';
 
 // my_tickets_screen Strings. //
 
@@ -167,6 +181,8 @@ const String ticketStatusCanceledFraud = 'CANCELED_FRAUD';
 // discover_events_tab Strings. //
 
 const String noEventsAvailable = 'There aren\'t any events available at the moment. Please check back later';
+
+const String noAttendeesAvailable = 'There aren\'t any attendees at the moment. Please check back later';
 
 const String textSoldOut = 'SOLD OUT';
 

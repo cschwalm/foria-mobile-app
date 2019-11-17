@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:foria/screens/venue_screen.dart';
+import 'package:foria/screens/organizer_home_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/message_stream.dart';
@@ -76,7 +76,7 @@ class AccountTab extends StatelessWidget {
             label: switchToVenue,
             content: SettingsNavigationIndicator(),
             onPress: () {
-              Navigator.of(context).pushReplacementNamed(VenueScreen.routeName);
+              Navigator.of(context).pushReplacementNamed(OrganizerHomeScreen.routeName);
             },
           ),
         ],
