@@ -293,8 +293,7 @@ class _AttendeeItemState extends State<AttendeeItem> {
             height: _rowHeight,
             width: 16,
           ),
-          _attendeeText(formattedName, attendee.ticket.ticketTypeConfig.name),
-          Expanded(child: Container(),),
+          Expanded(child: _attendeeText(formattedName, attendee.ticket.ticketTypeConfig.name)),
           OutlineButton(
               child: Text(checkInText),
               borderSide: BorderSide(

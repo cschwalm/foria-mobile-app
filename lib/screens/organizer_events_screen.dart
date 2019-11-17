@@ -1,12 +1,11 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/providers/venue_provider.dart';
 import 'package:foria/screens/attendee_list_screen.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/strings.dart';
+import 'package:foria/widgets/discover_event_image.dart';
 import 'package:foria/widgets/errors/error_try_again_column.dart';
-import 'package:foria/widgets/errors/image_unavailable.dart';
 import 'package:foria/widgets/no_events_column.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
@@ -158,37 +157,5 @@ class OrganizerEventList extends StatelessWidget {
             ),
           );
         });
-  }
-}
-
-///
-/// Cached image for the event
-///
-class DiscoverEventImage extends StatelessWidget {
-
-  final String _imageUrl;
-
-  DiscoverEventImage(this._imageUrl);
-
-  @override
-  Widget build(BuildContext context) {
-    return _imageUrl == null ? Container() : CachedNetworkImage(
-      placeholder: (context, url) =>
-          CupertinoActivityIndicator(),
-      errorWidget: (context, url, error) {
-        return ImageUnavailable();
-      },
-      imageUrl: _imageUrl,
-      imageBuilder: (context, imageProvider) =>
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(2)),
-              image: DecorationImage(
-                image: imageProvider,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-    );
   }
 }
