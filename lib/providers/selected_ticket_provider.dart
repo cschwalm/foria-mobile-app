@@ -6,6 +6,7 @@ import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/database_utils.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
+import 'package:ntp/ntp.dart';
 import 'package:otp/otp.dart';
 
 ///
@@ -27,6 +28,7 @@ class SelectedTicketProvider extends ChangeNotifier {
 
   int _secondsRemaining = _refreshInterval - ( (DateTime.now().millisecondsSinceEpoch ~/ 1000) % _refreshInterval);
   Timer _timer;
+  int _timeOffset = 0;
 
   SelectedTicketProvider(this._event) {
 
@@ -35,6 +37,14 @@ class SelectedTicketProvider extends ChangeNotifier {
 
     _refreshBarcodes(null);
     _timer = Timer.periodic(_tick, _refreshBarcodes);
+
+    //Calculate time offset for OTP generation.
+    NTP.getNtpOffset().then((offset) {
+      debugPrint('Calculated NTP time offset: $offset milliseconds.');
+      _timeOffset = offset;
+      final DateTime offsetDateTime = DateTime.now().add(new Duration(milliseconds: _timeOffset));
+      _secondsRemaining = _refreshInterval - ( (offsetDateTime.millisecondsSinceEpoch ~/ 1000) % _refreshInterval);
+    });
   }
 
   @override
@@ -100,8 +110,9 @@ class SelectedTicketProvider extends ChangeNotifier {
      throw Exception('Failed to load ticket secret for ticketId: ${ticket.id}');
    }
 
+   final DateTime offsetDateTime = DateTime.now().add(new Duration(milliseconds: _timeOffset));
    final int otp = OTP.generateTOTPCode(
-       ticketSecret, DateTime.now().millisecondsSinceEpoch, length: _otpLength, interval: _refreshInterval
+       ticketSecret, offsetDateTime.millisecondsSinceEpoch, length: _otpLength, interval: _refreshInterval
    );
 
    RedemptionRequest redemptionRequest = new RedemptionRequest();
@@ -127,7 +138,9 @@ class SelectedTicketProvider extends ChangeNotifier {
 
         final String barcodeText = await _getTicketString(ticket);
         _barcodeTextMap[ticket.id] = barcodeText;
-        _secondsRemaining = _refreshInterval - ( (DateTime.now().millisecondsSinceEpoch ~/ 1000) % _refreshInterval);
+
+        final DateTime offsetDateTime = DateTime.now().add(new Duration(milliseconds: _timeOffset));
+        _secondsRemaining = _refreshInterval - ( (offsetDateTime.millisecondsSinceEpoch ~/ 1000) % _refreshInterval);
       }
       debugPrint('${tickets.length} tickets barcodes updated.');
 

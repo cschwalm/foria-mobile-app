@@ -1,16 +1,19 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/constants.dart';
+import 'package:foria/utils/firebase_events.dart';
 import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/image_unavailable.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria/widgets/primary_button.dart';
 import 'package:get_it/get_it.dart';
+import 'package:ntp/ntp.dart';
 import 'package:provider/provider.dart';
 
 import '../screens/my_tickets_screen.dart';
@@ -107,6 +110,10 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
         final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
         firebaseMessaging.requestNotificationPermissions();
         firebaseMessaging.getToken().then((token) => _ticketProvider.registerDeviceToken(token));
+
+        //Display pop-up if user has incorrect clock time.
+        _preformUserTimeCheck(context);
+
         break;
     }
 
@@ -260,6 +267,24 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
     return finalStateWidget;
   }
 
+  ///
+  /// Calculate the offset from the device and the NTP pool.
+  /// If greater than 30 seconds (OTP TIME STEP), display a warning to user.
+  ///
+  void _preformUserTimeCheck(BuildContext context) async {
+
+    //Check user's device time
+    NTP.getNtpOffset().then((offset) {
+
+      debugPrint('Calculated NTP time offset: $offset milliseconds.');
+
+      if (offset.abs() >= 30000) {
+        showErrorAlert(context, badPhoneTime);
+        FirebaseAnalytics().logEvent(name: BAD_USER_TIME, parameters: {'offset': offset.abs()});
+      }
+    });
+  }
+
   @override
   bool get wantKeepAlive => true;
 }
@@ -293,6 +318,7 @@ class EventCard extends StatelessWidget {
                 child: GestureDetector(
                   key: Key(eventCardKey+index.toString()),
                   onTap: () async {
+                    FirebaseAnalytics().logEvent(name: TICKETS_VIEWED, parameters: {'eventId': eventData.eventList[index].id});
                     final result = await Navigator.of(context).pushNamed(
                       MyTicketsScreen.routeName,
                       arguments: {
