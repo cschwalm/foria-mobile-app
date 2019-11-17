@@ -187,3 +187,17 @@ const String noAttendeesAvailable = 'There aren\'t any attendees at the moment. 
 const String textSoldOut = 'SOLD OUT';
 
 const String textFreeEvent = 'FREE';
+
+// intro_screen Strings. //
+
+const String introToForia = 'Introduction to Foria';
+
+const String introForiaButtonOne = 'Goodbye Fraud!';
+
+const String introForiaButtonTwo = 'It’s Party Time!';
+
+const String screenshotCheckbox = 'I understand screenshots don’t work';
+
+const String introForiaHeaderOne = 'No Screenshots = No Fraud';
+
+const String introForiaHeaderTwo = 'Seamless Transfers';

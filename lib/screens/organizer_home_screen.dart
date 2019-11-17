@@ -6,6 +6,7 @@ import 'package:foria/utils/constants.dart';
 import 'package:foria/widgets/contact_support.dart';
 import 'package:foria/widgets/settings_item.dart';
 import 'package:get_it/get_it.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../utils/strings.dart';
 import 'home.dart';
@@ -33,7 +34,13 @@ class OrganizerHomeScreen extends StatelessWidget {
           SettingsItem(
             label: FAQ,
             content: SettingsNavigationIndicator(),
-            onPress: () {},
+            onPress: () async {
+              if (await canLaunch(FAQUrl)) {
+                await launch(FAQUrl);
+              } else {
+                print("Failed to load FAQ URL.");
+              }
+            },
           ),
           SettingItemDivider(),
           SettingsItem(
