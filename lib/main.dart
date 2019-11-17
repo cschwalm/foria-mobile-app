@@ -12,6 +12,8 @@ import 'package:foria/providers/event_provider.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/providers/venue_provider.dart';
 import 'package:foria/screens/attendee_list_screen.dart';
+import 'package:foria/screens/intro_screen_one.dart';
+import 'package:foria/screens/intro_screen_two.dart';
 import 'package:foria/screens/organizer_events_screen.dart';
 import 'package:foria/screens/splash_screen.dart';
 import 'package:foria/screens/ticket_scan_screen.dart';
@@ -79,11 +81,19 @@ void mainDelegate() {
             onGenerateRoute: (RouteSettings settings) {
               switch (settings.name) {
                 case Home.routeName:
-                  return MaterialPageRoute(builder: (context) => Home(), settings: settings);
+                  return MaterialPageRoute(builder: (context) => IntroScreenOne(), settings: settings);
                   break;
 
                 case Login.routeName:
                   return CustomNoTransition(builder: (context) => Login(), settings: settings);
+                  break;
+
+                case IntroScreenOne.routeName:
+                  return CustomNoTransition(builder: (context) => IntroScreenOne(), settings: settings);
+                  break;
+
+                case IntroScreenTwo.routeName:
+                  return CustomNoTransition(builder: (context) => IntroScreenTwo(), settings: settings);
                   break;
 
                 case MyTicketsScreen.routeName:
