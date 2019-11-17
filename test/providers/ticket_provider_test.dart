@@ -197,6 +197,25 @@ void main() {
 
     expect(actual.length, equals(1));
   });
+
+  test("test markTicketManualRedeemed", () async {
+
+    List<Ticket> tickets = new List<Ticket>();
+    tickets.add(_buildFakeTickets()[0]);
+
+    Ticket mockTicket = _buildFakeTickets()[0];
+    mockTicket.status = 'REDEEMED';
+
+    final TicketApi ticketApi = new MockTicketApi();
+    ticketProvider.ticketApi = ticketApi;
+
+    when(ticketApi.manualRedeemTicket(tickets[0].id)).thenAnswer((_) async => mockTicket);
+
+    Ticket actual = await ticketProvider.manualRedeemTicket(tickets[0].id);
+
+    expect(actual, isNotNull);
+    expect(actual.status, equals('REDEEMED'));
+  });
 }
 
 ///

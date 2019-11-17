@@ -113,28 +113,29 @@ class EventProvider extends ChangeNotifier {
   /// If any fields related to an event are null, method returns false
   ///
   bool isValidAttendee(Attendee attendee) {
+
     if (attendee == null) {
-      _errorStream.reportError('Error in event_provider: An Attendee is null',null);
+      _errorStream.reportError('Error in event_provider: An Attendee is null', null);
       return false;
     }
     if (attendee.ticketId == null) {
-      _errorStream.reportError('Error in event_provider: An Attendee ticket ID is null',null);
+      _errorStream.reportError('Error in event_provider: An Attendee ticket ID is null', null);
       return false;
     }
     if (attendee.ticket == null) {
-      _errorStream.reportError('Error in event_provider: An Attendee ticket is null',null);
+      _errorStream.reportError('Error in event_provider: An Attendee ticket is null', null);
       return false;
     }
     if (attendee.firstName == null) {
-      _errorStream.reportError('Error in event_provider: An Attendee fistName for ticketId ${attendee.ticketId} null',null);
+      _errorStream.reportError('Error in event_provider: An Attendee fistName for ticketId ${attendee.ticketId} null', null);
       return false;
     }
     if (attendee.lastName == null) {
-      _errorStream.reportError('Error in event_provider: An Attendee lastName for ticketId ${attendee.ticketId} null',null);
+      _errorStream.reportError('Error in event_provider: An Attendee lastName for ticketId ${attendee.ticketId} null', null);
       return false;
     }
     if (attendee.userId == null) {
-      _errorStream.reportError('Error in event_provider: An Attendee userName for ticketId ${attendee.ticketId} null',null);
+      _errorStream.reportError('Error in event_provider: An Attendee userName for ticketId ${attendee.ticketId} null', null);
       return false;
     }
     return true;

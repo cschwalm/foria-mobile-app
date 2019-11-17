@@ -68,14 +68,18 @@ void main() {
   });
 
   testWidgets('AttendeeListScren manual ticket redeem test', (WidgetTester tester) async { //TODO: remove or fix
-    final List<Attendee> attendees = _fakeAttendeeList();
+    final List<Attendee> attendees = _fakeAttendeeList().where((e) => e.userId == '0').toList();
     final findCheckInButton = find.byType(OutlineButton);
-    final Ticket testTicket = new Ticket();
-    testTicket.status = ticketStatusRedeemed;
 
     when(eventProviderMock.getAttendeesForEvent(argThat(anything))).thenAnswer((_) async => attendees);
     when(attendeeProviderMock.attendeeList).thenReturn(UnmodifiableListView(attendees));
-    when(ticketProviderMock.manualRedeemTicket(argThat(anything))).thenAnswer((_) async => testTicket);
+    when(ticketProviderMock.manualRedeemTicket(argThat(anything))).thenAnswer((_) async {
+
+      final Ticket testTicket = attendees[0].ticket;
+      testTicket.status = ticketStatusRedeemed;
+
+      return testTicket;
+    });
 
     await tester.pumpWidget(MaterialApp(
       home: AttendeeListScreen('sample event id'),
@@ -83,13 +87,13 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(findCheckInButton, findsWidgets);
+    expect(findCheckInButton, findsOneWidget);
 
     await tester.tap(findCheckInButton);
 
     await tester.pumpAndSettle();
 
-    expect(find.text('Yes'), findsWidgets);
+    expect(find.text('Yes'), findsOneWidget);
 
     await tester.tap(find.text('Yes'));
 

@@ -79,7 +79,7 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
   ///
   /// Shown if there are no attendees in list
   ///
-  Widget _noAttendees () {
+  Widget _noAttendees() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
@@ -100,7 +100,7 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
     );
   }
 
-  Widget _basicScaffold (Widget child) {
+  Widget _basicScaffold(Widget child) {
     return Scaffold(
         appBar: AppBar(
           title: Text(checkInText),
@@ -150,7 +150,7 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
 /// Scaffold to display ticket sales and scan button. Attendee list items are children
 ///
 class AttendeeListScaffold extends StatelessWidget {
-  
+
   @override
   Widget build(BuildContext context) {
     final attendeeData = Provider.of<AttendeeProvider>(context, listen: true);
@@ -175,35 +175,35 @@ class AttendeeListScaffold extends StatelessWidget {
           ),
         ),
         body: SafeArea(
-            child: Column(
-              children: <Widget>[
-                SizedBox(height: 20),
-                Text(
-                  ticketsSold + attendeeList.length.toString(),
-                  style: Theme.of(context).textTheme.headline,
-                ),
-                SizedBox(height: 20),
-                MajorSettingItemDivider(),
-                Expanded(
-                  child: ListView.separated(
-                      itemCount: attendeeList.length,
-                      separatorBuilder: (BuildContext context, int index) => Divider(height: 0),
-                      itemBuilder: (context, index) {
-                        if (attendeeList.length == index + 1) {
-                          return Column(
-                            children: <Widget>[
-                              AttendeeItem(index),
-                              Divider(height: 0),
-                              SizedBox(height: 70)
-                            ],
-                          );
-                        }
-                        return AttendeeItem(index);
-                      }),
-                ),
-              ],
-            ),
-          )
+          child: Column(
+            children: <Widget>[
+              SizedBox(height: 20),
+              Text(
+                ticketsSold + attendeeList.length.toString(),
+                style: Theme.of(context).textTheme.headline,
+              ),
+              SizedBox(height: 20),
+              MajorSettingItemDivider(),
+              Expanded(
+                child: ListView.separated(
+                    itemCount: attendeeList.length,
+                    separatorBuilder: (BuildContext context, int index) => Divider(height: 0),
+                    itemBuilder: (context, index) {
+                      if (attendeeList.length == index + 1) {
+                        return Column(
+                          children: <Widget>[
+                            AttendeeItem(index),
+                            Divider(height: 0),
+                            SizedBox(height: 70)
+                          ],
+                        );
+                      }
+                      return AttendeeItem(index);
+                    }),
+              ),
+            ],
+          ),
+        )
     );
   }
 }
@@ -220,7 +220,6 @@ class AttendeeItem extends StatefulWidget {
 
   @override
   _AttendeeItemState createState() => _AttendeeItemState();
-
 }
 
 class _AttendeeItemState extends State<AttendeeItem> {
@@ -297,15 +296,15 @@ class _AttendeeItemState extends State<AttendeeItem> {
           _attendeeText(formattedName, attendee.ticket.ticketTypeConfig.name),
           Expanded(child: Container(),),
           OutlineButton(
-            child: Text(checkInText),
-            borderSide: BorderSide(
-              color: constPrimaryColor,
-            ),
-            highlightedBorderColor: constPrimaryColor,
-            textColor: constPrimaryColor,
-            onPressed: () {
-              showPopUpConfirm(context, confirmCheckIn, thisNonReversible, () => _manualRedeemTicket(attendee));
-            }
+              child: Text(checkInText),
+              borderSide: BorderSide(
+                color: constPrimaryColor,
+              ),
+              highlightedBorderColor: constPrimaryColor,
+              textColor: constPrimaryColor,
+              onPressed: () {
+                showPopUpConfirm(context, confirmCheckIn, thisNonReversible, () => _manualRedeemTicket(attendee));
+              }
           ),
           SizedBox(width: 16),
         ],

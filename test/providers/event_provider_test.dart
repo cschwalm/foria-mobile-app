@@ -22,6 +22,7 @@ void main() {
   final _channel = MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
   final MessageStream messageStream = new MockMessageStream();
   final DatabaseUtils databaseUtils = new MockDatabaseUtils();
+  final EventApi eventApi = new MockEventApi();
 
   GetIt.instance.registerSingleton<AuthUtils>(new MockAuthUtils());
   GetIt.instance.registerSingleton<MessageStream>(messageStream);
@@ -30,6 +31,8 @@ void main() {
   final EventProvider eventProvider = new EventProvider();
 
   setUp(() {
+
+    eventProvider.eventApi = eventApi;
 
     when(mockStream.listen((_) => null)).thenAnswer((_) => null);
 
@@ -113,6 +116,16 @@ void main() {
     expect(actual, equals(false));
   });
 
+  test("getAttendees list test", () async {
+
+    final String eventId = '123456';
+    List<Attendee> mockList = buildAttendeeList();
+
+    when(eventApi.getAttendeesForEvent(eventId)).thenAnswer((_) async => mockList);
+
+    List<Attendee> actual = await eventProvider.getAttendeesForEvent(eventId);
+    expect(mockList.length, equals(actual.length));
+  });
 }
 
 enum _FakeEventType {
@@ -236,5 +249,24 @@ Event _buildFakeEvent(_FakeEventType _fakeEventType) {
   }
 
   return validEvent;
+}
 
+///
+/// Builds fake list of attendees with ACTIVE status for testing.
+///
+List<Attendee> buildAttendeeList() {
+
+  List<Attendee> list = new List<Attendee>();
+
+  Attendee attendeeMock = new Attendee();
+  attendeeMock.userId = 'user_id';
+  attendeeMock.firstName = 'John';
+  attendeeMock.lastName = 'Smith';
+  attendeeMock.ticketId = '123456';
+  attendeeMock.ticket = new Ticket();
+  attendeeMock.ticket.id = '123456';
+  attendeeMock.ticket.status = 'ACTIVE';
+  list.add(attendeeMock);
+
+  return list;
 }
