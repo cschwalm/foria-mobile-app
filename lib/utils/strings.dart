@@ -160,7 +160,7 @@ const String passInvalidInfo = 'Pass already redeemed or transferred';
 
 const String barcodeInvalid = 'Invalid Barcode';
 
-const String barcodeInvalidInfo = 'Not a foria pass';
+const String barcodeInvalidInfo = 'Not a Foria pass';
 
 const String camPermissionRequired = 'Camera permission required';
 
