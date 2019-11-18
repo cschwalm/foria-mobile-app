@@ -37,7 +37,7 @@ class _IntroScreenTwoState extends State<IntroScreenTwo> {
                 TextSpan(text: 'You can’t send screenshots to friends, but '),
                 TextSpan(text: 'transfers are a breeze!\n\n', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
                 TextSpan(text: 'Simply click the transfer button below the Foria Pass barcode and enter your ' +
-                    'friend’s email.\n\nPlease note that your friend will need the Foria App to receive Foria Passes.'),
+                    'friend’s email.\n\nPlease note that your friend must create a Foria account to accept your transfer'),
               ],
             ),
           )
