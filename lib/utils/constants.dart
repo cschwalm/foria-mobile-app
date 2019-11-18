@@ -19,6 +19,7 @@ const String transferPendingImage = 'assets/ui_elements/transfer-pending-image.p
 
 const String introQrGif = 'assets/ui_elements/intro_qr_gif.gif';
 
+const String introTransferImage = 'assets/ui_elements/intro-transfer-image.jpg';
 
 // Theme formatting. //
 

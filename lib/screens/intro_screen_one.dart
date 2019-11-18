@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:foria/screens/intro_screen_two.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/strings.dart';
+import 'package:foria/widgets/intro_screen_image.dart';
 import 'package:foria/widgets/primary_button.dart';
 import 'package:foria/widgets/settings_item.dart';
 
@@ -56,62 +57,7 @@ class _IntroScreenOneState extends State<IntroScreenOne> {
       body: SafeArea(
         child: Column(
           children: <Widget>[
-            Stack(
-              alignment: Alignment.topCenter,
-              children: <Widget>[
-                Container(
-                  decoration: BoxDecoration(
-                    // Box decoration takes a gradient
-                    gradient: LinearGradient(
-                      // Where the linear gradient begins and ends
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      // Add one stop for each color. Stops should increase from 0 to 1
-                      colors: [
-                        constPrimaryColor,
-                        constPrimaryLight,
-                      ],
-                    ),
-                  ),
-                  width: double.infinity,
-                  height: 230,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(0,20,0,0),
-                    child: Center(
-                      child: Image.asset(
-                        introQrGif,
-                        width: 150,
-                        height: 150,
-                      ),
-                    ),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    SizedBox(height: 40,),
-                    Container(
-                      height: 10,
-                      width: 10,
-                      decoration: new BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    SizedBox(width: 20,),
-                    Container(
-                      height: 10,
-                      width: 10,
-                      decoration: new BoxDecoration(
-                        color: Colors.grey[350],
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ],
-                ),
-
-              ],
-            ),
+            IntroScreenImage(introQrGif,150,150),
             Expanded(child: _bodyText()),
             SettingItemDivider(),
             CheckboxListTile(
@@ -129,7 +75,7 @@ class _IntroScreenOneState extends State<IntroScreenOne> {
               child: PrimaryButton(
                 text: introForiaButtonOne,
                 isActive: isChecked,
-                onPress: () => Navigator.of(context).pushNamed(IntroScreenTwo.routeName),
+                onPress: isChecked ? () => Navigator.of(context).pushNamed(IntroScreenTwo.routeName) : null,
               ),
             )
           ],
