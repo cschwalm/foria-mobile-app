@@ -6,7 +6,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_auth0/flutter_auth0.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foria/main.dart';
-import 'package:foria/screens/home.dart';
+import 'package:foria/screens/intro_screen_one.dart';
 import 'package:foria/screens/login.dart';
 import 'package:foria/screens/organizer_home_screen.dart';
 import 'package:foria/utils/database_utils.dart';
@@ -191,7 +191,7 @@ class AuthUtils {
       if (await doesUserHaveVenueAccess()) {
         Navigator.pushReplacementNamed(context, OrganizerHomeScreen.routeName);
       } else {
-        Navigator.pushReplacementNamed(context, Home.routeName);
+        Navigator.pushReplacementNamed(context, IntroScreenOne.routeName);
       }
     }).catchError((err) async {
       debugPrint('Auth Error: ${err.toString()}');

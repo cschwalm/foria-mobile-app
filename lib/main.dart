@@ -81,7 +81,7 @@ void mainDelegate() {
             onGenerateRoute: (RouteSettings settings) {
               switch (settings.name) {
                 case Home.routeName:
-                  return MaterialPageRoute(builder: (context) => IntroScreenOne(), settings: settings);
+                  return MaterialPageRoute(builder: (context) => Home(), settings: settings);
                   break;
 
                 case Login.routeName:
