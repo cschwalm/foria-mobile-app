@@ -212,9 +212,11 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
     await _authUtils.forceTokenRefresh();
     bool isEmailVerified = await _authUtils.isUserEmailVerified();
 
-      if (isEmailVerified) {
-        _loadTicketsAndSetState();
-      }
+    if (isEmailVerified) {
+      _loadTicketsAndSetState();
+    } else {
+      showErrorAlert(context, 'Your email is not verified. Please click the \"Confirm Email\" button from our email titled \"Action Required: Verify Your Foria Email\". Thanks!');
+    }
   }
 
   ///

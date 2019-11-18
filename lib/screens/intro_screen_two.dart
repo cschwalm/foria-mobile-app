@@ -5,6 +5,7 @@ import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/intro_screen_image.dart';
 import 'package:foria/widgets/primary_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'home.dart';
 
@@ -59,7 +60,11 @@ class _IntroScreenTwoState extends State<IntroScreenTwo> {
               padding: const EdgeInsets.all(16.0),
               child: PrimaryButton(
                 text: introForiaButtonTwo,
-                onPress: () => Navigator.of(context).pushNamed(Home.routeName),
+                onPress: () async {
+                  SharedPreferences pref = await SharedPreferences.getInstance();
+                  pref.setBool('viewedForiaIntro', true);
+                  Navigator.of(context).pushNamed(Home.routeName);
+                }
               ),
             )
           ],
