@@ -17,8 +17,13 @@ const String greenScannerSquare = 'assets/ui_elements/green-scanner-square.png';
 
 const String transferPendingImage = 'assets/ui_elements/transfer-pending-image.png';
 
+const String introQrGif = 'assets/ui_elements/intro_qr_gif.gif';
+
+const String introTransferImage = 'assets/ui_elements/intro-transfer-image.jpg';
 
 // Theme formatting. //
+
+const Color constPrimaryLight = Color(0xFFFF69B4);
 
 const Color constPrimaryColor = Color(0xFFFF0266);
 

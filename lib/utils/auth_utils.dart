@@ -7,6 +7,7 @@ import 'package:flutter_auth0/flutter_auth0.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foria/main.dart';
 import 'package:foria/screens/home.dart';
+import 'package:foria/screens/intro_screen_one.dart';
 import 'package:foria/screens/login.dart';
 import 'package:foria/screens/organizer_home_screen.dart';
 import 'package:foria/utils/database_utils.dart';
@@ -14,6 +15,7 @@ import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:jose/jose.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'configuration.dart';
 
@@ -188,10 +190,17 @@ class AuthUtils {
         return;
       }
 
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      if (pref.getBool('viewedForiaIntro') == null) {
+        pref.setBool('viewedForiaIntro', false);
+      }
+
       if (await doesUserHaveVenueAccess()) {
         Navigator.pushReplacementNamed(context, OrganizerHomeScreen.routeName);
-      } else {
+      } else if (pref.getBool('viewedForiaIntro')) {
         Navigator.pushReplacementNamed(context, Home.routeName);
+      } else {
+        Navigator.pushReplacementNamed(context, IntroScreenOne.routeName);
       }
     }).catchError((err) async {
       debugPrint('Auth Error: ${err.toString()}');
