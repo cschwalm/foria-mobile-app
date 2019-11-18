@@ -108,6 +108,8 @@ const String ticketLoadingFailure = 'It looks like you\'re currently offline.\n\
 
 const String offlineError = 'An unknown error occured. Please check your internet connection.';
 
+const String badPhoneTime = 'Your phone\'s clock is off by more than 30 seconds. This may impact ticket scanning if you go offline. \n Please go to Time/Date settings on your phone and turn on automatic time syncing.';
+
 // my_tickets_screen Strings. //
 
 const String foriaPass = 'Foria Pass';

@@ -1,8 +1,10 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/providers/event_provider.dart';
 import 'package:foria/utils/configuration.dart';
 import 'package:foria/utils/constants.dart';
+import 'package:foria/utils/firebase_events.dart';
 import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/discover_event_image.dart';
@@ -163,6 +165,7 @@ class PublicEventList extends StatelessWidget {
                   key: Key(eventData.events[index].id),
                   onTap: () async {
                     if (await canLaunch(eventUrl)) {
+                      FirebaseAnalytics().logEvent(name: EVENT_LISTING_VIEWED, parameters: {'eventUrl': eventUrl});
                       await launch(eventUrl);
                     } else {
                       print("Failed to load eventUrl");

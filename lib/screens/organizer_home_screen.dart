@@ -31,19 +31,12 @@ class OrganizerHomeScreen extends StatelessWidget {
           SizedBox(height: 10,),
           SettingItemDivider(),
           SettingsItem(
-            label: FAQ,
-            content: SettingsNavigationIndicator(),
-            onPress: () {},
-          ),
-          SettingItemDivider(),
-          SettingsItem(
             label: contactUs,
             content: SettingsNavigationIndicator(),
             onPress: () {
               contactSupport();
             },
           ),
-          MajorSettingItemDivider(),
           SettingsItem(
             label: switchToRegAccount,
             content: SettingsNavigationIndicator(),

@@ -1,8 +1,10 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/screens/organizer_home_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/constants.dart';
+import 'package:foria/utils/firebase_events.dart';
 import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/primary_button.dart';
@@ -96,6 +98,7 @@ class AccountTab extends StatelessWidget {
             content: SettingsNavigationIndicator(),
             onPress: () async {
               if (await canLaunch(FAQUrl)) {
+                FirebaseAnalytics().logEvent(name: FAQ_VIEWED);
                 await launch(FAQUrl);
               } else {
                 print("Failed to load FAQ URL.");
