@@ -136,7 +136,7 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
     result.then((_) async {
 
       //Display pop-up if user has incorrect clock time.
-      _timeOffset = await _preformUserTimeCheck(context);
+      await _preformUserTimeCheck(context);
 
       setState(() {
         _isTicketsLoaded = true;
@@ -178,7 +178,7 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
       await ticketProvider.loadUserDataFromNetwork();
 
       //Recalculate offset on refresh.
-      _timeOffset = await _preformUserTimeCheck(context);
+      await _preformUserTimeCheck(context);
 
       setState(() {
         if (ticketProvider.ticketsActiveOnOtherDevice) {
@@ -280,18 +280,24 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
   /// Calculate the offset from the device and the NTP pool.
   /// If greater than 30 seconds (OTP TIME STEP), display a warning to user.
   ///
-  Future<int> _preformUserTimeCheck(BuildContext context) async {
+  Future<void> _preformUserTimeCheck(BuildContext context) async {
 
     //Check user's device time
-    int offset = await NTP.getNtpOffset();
-    debugPrint('Calculated NTP time offset: $offset milliseconds.');
+    await NTP.getNtpOffset()
+        .timeout(Duration(seconds: 2))
+        .then((offset) {
 
-    if (offset.abs() >= 30000) {
-      showErrorAlert(context, badPhoneTime);
-      FirebaseAnalytics().logEvent(name: BAD_USER_TIME, parameters: {'offset': offset.abs()});
-    }
+          debugPrint('Calculated NTP time offset: $offset milliseconds.');
+          this._timeOffset = offset;
 
-    return offset;
+          if (offset.abs() >= 30000) {
+            showErrorAlert(context, badPhoneTime);
+            FirebaseAnalytics().logEvent(name: BAD_USER_TIME, parameters: {'offset': offset.abs()});
+          }
+
+        }).catchError((err) {
+          debugPrint('Error attempting to load NTP value. Skipping. Msg: $err');
+    });
   }
 
   @override
