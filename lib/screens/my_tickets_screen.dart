@@ -47,10 +47,10 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
 
     final Map<String, dynamic> args = ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
     if (_selectedTicketProvider == null) {
-      if (args == null || args['event'] == null) {
+      if (args == null || args['event'] == null || args['timeOffset'] == null) {
         _selectedTicketProvider = widget._selectedTicketProvider;
       } else {
-        _selectedTicketProvider = new SelectedTicketProvider(args['event']);
+        _selectedTicketProvider = new SelectedTicketProvider(args['event'], args['timeOffset']);
       }
     }
 
@@ -83,12 +83,6 @@ class PassBody extends StatefulWidget {
 }
 
 class _PassBodyState extends State<PassBody> {
-
-  @override
-  void initState() {
-
-    super.initState();
-  }
 
   static const String myPassesList = 'my_passes_list';
 

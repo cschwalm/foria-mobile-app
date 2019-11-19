@@ -6,7 +6,6 @@ import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/database_utils.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
-import 'package:ntp/ntp.dart';
 import 'package:otp/otp.dart';
 
 ///
@@ -30,21 +29,13 @@ class SelectedTicketProvider extends ChangeNotifier {
   Timer _timer;
   int _timeOffset = 0;
 
-  SelectedTicketProvider(this._event) {
+  SelectedTicketProvider(this._event, this._timeOffset) {
 
     _databaseUtils = GetIt.instance<DatabaseUtils>();
     _ticketProvider = GetIt.instance<TicketProvider>();
 
     _refreshBarcodes(null);
     _timer = Timer.periodic(_tick, _refreshBarcodes);
-
-    //Calculate time offset for OTP generation.
-    NTP.getNtpOffset().then((offset) {
-      debugPrint('Calculated NTP time offset: $offset milliseconds.');
-      _timeOffset = offset;
-      final DateTime offsetDateTime = DateTime.now().add(new Duration(milliseconds: _timeOffset));
-      _secondsRemaining = _refreshInterval - ( (offsetDateTime.millisecondsSinceEpoch ~/ 1000) % _refreshInterval);
-    });
   }
 
   @override
