@@ -49,6 +49,8 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
   bool _isTicketsLoaded;
   bool _isTicketsReactivateLoading;
 
+  int _timeOffset = 0;
+
   @override
   void initState() {
 
@@ -111,13 +113,10 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
         firebaseMessaging.requestNotificationPermissions();
         firebaseMessaging.getToken().then((token) => _ticketProvider.registerDeviceToken(token));
 
-        //Display pop-up if user has incorrect clock time.
-        _preformUserTimeCheck(context);
-
         break;
     }
 
-    return ChangeNotifierProvider.value(
+    return ChangeNotifierProvider<TicketProvider>.value(
         value: _ticketProvider,
         child: determineFinalWidget()
     );
@@ -134,12 +133,17 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
     //Email is verified. Load tickets and stop spinner when completed.
     TicketProvider ticketProvider = _ticketProvider;
     Future<void> result = ticketProvider.loadUserDataFromNetwork();
-    result.then((_) {
+    result.then((_) async {
+
+      //Display pop-up if user has incorrect clock time.
+      _timeOffset = await _preformUserTimeCheck(context);
+
       setState(() {
         _isTicketsLoaded = true;
 
         //Check if tickets are active on this device only if online.
         if (!ticketProvider.ticketsActiveOnOtherDevice) {
+
           _currentState = _LoadingState.DONE;
         } else {
           _currentState = _LoadingState.DEVICE_CHECK;
@@ -172,6 +176,9 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
     TicketProvider ticketProvider = _ticketProvider;
     try {
       await ticketProvider.loadUserDataFromNetwork();
+
+      //Recalculate offset on refresh.
+      _timeOffset = await _preformUserTimeCheck(context);
 
       setState(() {
         if (ticketProvider.ticketsActiveOnOtherDevice) {
@@ -263,7 +270,7 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
     } else if (_ticketProvider.eventList.length <= 0) {
       finalStateWidget = MissingTicket(_awaitTicketLoad);
     } else {
-      finalStateWidget = EventCard(_awaitTicketLoad);
+      finalStateWidget = EventCard(_awaitTicketLoad, _timeOffset);
     }
 
     return finalStateWidget;
@@ -273,18 +280,18 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
   /// Calculate the offset from the device and the NTP pool.
   /// If greater than 30 seconds (OTP TIME STEP), display a warning to user.
   ///
-  void _preformUserTimeCheck(BuildContext context) async {
+  Future<int> _preformUserTimeCheck(BuildContext context) async {
 
     //Check user's device time
-    NTP.getNtpOffset().then((offset) {
+    int offset = await NTP.getNtpOffset();
+    debugPrint('Calculated NTP time offset: $offset milliseconds.');
 
-      debugPrint('Calculated NTP time offset: $offset milliseconds.');
+    if (offset.abs() >= 30000) {
+      showErrorAlert(context, badPhoneTime);
+      FirebaseAnalytics().logEvent(name: BAD_USER_TIME, parameters: {'offset': offset.abs()});
+    }
 
-      if (offset.abs() >= 30000) {
-        showErrorAlert(context, badPhoneTime);
-        FirebaseAnalytics().logEvent(name: BAD_USER_TIME, parameters: {'offset': offset.abs()});
-      }
-    });
+    return offset;
   }
 
   @override
@@ -297,7 +304,8 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
 class EventCard extends StatelessWidget {
 
   final Function _refreshFunction;
-  EventCard(this._refreshFunction);
+  final int _timeOffset;
+  EventCard(this._refreshFunction, this._timeOffset);
 
   static const String eventCardKey = 'event_card_key';
 
@@ -325,7 +333,8 @@ class EventCard extends StatelessWidget {
                       MyTicketsScreen.routeName,
                       arguments: {
                         'event': eventData.eventList[index],
-                        'tickets': eventData.getTicketsForEventId(eventData.eventList[index].id)
+                        'tickets': eventData.getTicketsForEventId(eventData.eventList[index].id),
+                        'timeOffset': _timeOffset
                       },
                     );
                     final MessageStream messageStream = GetIt.instance<MessageStream>();
