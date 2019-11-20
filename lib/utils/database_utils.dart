@@ -45,16 +45,30 @@ class DatabaseUtils {
     String cryptoKey = await _storage.read(key: _dbCryptoKeyRef);
     if (cryptoKey == null) {
 
+      await databaseFactoryIo.deleteDatabase(dbPath); //Delete if new key is set.
       cryptoKey = base64Url.encode(List<int>.generate(32, (i) => _random.nextInt(256)));
       await _storage.write(key: _dbCryptoKeyRef, value: cryptoKey);
       debugPrint("Created and stored databse crypto key. Database has been initialized at: $dbPath");
-    } else {
-      debugPrint("Database has been loaded from: $dbPath");
     }
 
     // Initialize the encryption codec with a generated key.
     final SembastCodec codec = getEncryptSembastCodec(password: cryptoKey);
-    _db = await databaseFactoryIo.openDatabase(dbPath, version: _dbVersionCode, codec: codec);
+    await databaseFactoryIo.openDatabase(dbPath, version: _dbVersionCode, codec: codec)
+        .then( (db) {
+
+          _db = db;
+          debugPrint("Database has been loaded from: $dbPath");
+
+        }).catchError((err) async {
+
+          //If we fail to open database. Delete it and create a new one from scratch.
+          await databaseFactoryIo.deleteDatabase(dbPath);
+          cryptoKey = base64Url.encode(List<int>.generate(32, (i) => _random.nextInt(256)));
+          await _storage.write(key: _dbCryptoKeyRef, value: cryptoKey);
+          final SembastCodec codec = getEncryptSembastCodec(password: cryptoKey);
+          _db = await databaseFactoryIo.openDatabase(dbPath, version: _dbVersionCode, codec: codec);
+          debugPrint("Failed to open existing database. New database has been initialized at: $dbPath");
+        });
   }
 
   ///
