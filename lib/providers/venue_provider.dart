@@ -46,6 +46,13 @@ class VenueProvider extends ChangeNotifier {
     try {
       venues = await _venueApi.getAllVenues();
     } on ApiException catch (ex, stackTrace) {
+
+      if (ex.code == 403) {
+        debugPrint("### NO PERMISSION: venue:read scope MISSING ###");
+        await _authUtils.logout();
+        return null;
+      }
+
       debugPrint("### FORIA SERVER ERROR: getAllVenues ###");
       debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
