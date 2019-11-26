@@ -35,12 +35,10 @@ class _IntroScreenOneState extends State<IntroScreenOne> {
           style: Theme.of(context).textTheme.body1,
           children: <TextSpan>[
             TextSpan(text: 'To eliminate fraud, '),
-            TextSpan(text: 'screenshots ', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
-            TextSpan(text: 'of Foria Passes are '),
-            TextSpan(text: 'not valid ', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+            TextSpan(text: 'screenshots are not valid ', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
             TextSpan(text: 'and will be denied.\n\nForia uses rotating barcodes that change every 30 seconds.\n\n'),
-            TextSpan(text: 'You can rest assured that every Foria Pass in this app is '),
-            TextSpan(text: 'authentic.', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+            TextSpan(text: 'You can rest assured that '),
+            TextSpan(text: 'every Foria Pass is authentic.', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
           ],
         ),
       )
@@ -58,7 +56,7 @@ class _IntroScreenOneState extends State<IntroScreenOne> {
         child: Column(
           children: <Widget>[
             IntroScreenImage(introQrGif,150,150),
-            Expanded(child: _bodyText()),
+            Expanded(child: SingleChildScrollView(child: _bodyText())),
             SettingItemDivider(),
             CheckboxListTile(
               title: Text(screenshotCheckbox),

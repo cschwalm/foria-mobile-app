@@ -8,6 +8,7 @@ import 'package:foria/widgets/primary_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'home.dart';
+import 'login.dart';
 
 class IntroScreenTwo extends StatefulWidget {
   
@@ -55,7 +56,7 @@ class _IntroScreenTwoState extends State<IntroScreenTwo> {
         child: Column(
           children: <Widget>[
             IntroScreenImage(introTransferImage, 150, 170),
-            Expanded(child: _bodyText()),
+            Expanded(child: SingleChildScrollView(child: _bodyText())),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: PrimaryButton(
@@ -63,7 +64,7 @@ class _IntroScreenTwoState extends State<IntroScreenTwo> {
                 onPress: () async {
                   SharedPreferences pref = await SharedPreferences.getInstance();
                   pref.setBool('viewedForiaIntro', true);
-                  Navigator.of(context).pushNamed(Home.routeName);
+                  Navigator.of(context).pushNamedAndRemoveUntil(Home.routeName,ModalRoute.withName(Login.routeName));
                 }
               ),
             )
