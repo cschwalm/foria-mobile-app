@@ -95,7 +95,6 @@ class EventProvider extends ChangeNotifier {
       rethrow;
     } catch (ex, stackTrace) {
       debugPrint("### UNKNOWN ERROR: getAttendeesForEvent Msg: ${ex.toString()} ###");
-      debugPrint(stackTrace.toString());
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, netConnectionError, null, ex, stackTrace));
     }
 
