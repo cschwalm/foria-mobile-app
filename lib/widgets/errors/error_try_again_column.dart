@@ -51,10 +51,12 @@ class _ErrorTryAgainColumnState extends State<ErrorTryAgainColumn> {
                       });
 
                       await widget.function();
-                      
-                      setState(() {
-                        _isLoading = false;
-                      });
+
+                      if (mounted) {
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      }
                     },
                   )
                 ],

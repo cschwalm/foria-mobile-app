@@ -55,7 +55,7 @@ class EventProvider extends ChangeNotifier {
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       rethrow;
     } catch (ex, stackTrace) {
-      print("### UNKNOWN ERROR: getAllEvents Msg: ${ex.toString()} ###");
+      debugPrint("### NETWORK ERROR: getAllEvents Msg: ${ex.toString()} ###");
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, netConnectionError, null, ex, stackTrace));
     }
 
@@ -94,8 +94,7 @@ class EventProvider extends ChangeNotifier {
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       rethrow;
     } catch (ex, stackTrace) {
-      debugPrint("### UNKNOWN ERROR: getAttendeesForEvent Msg: ${ex.toString()} ###");
-      debugPrint(stackTrace.toString());
+      debugPrint("### NETWORK ERROR: getAttendeesForEvent Msg: ${ex.toString()} ###");
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, netConnectionError, null, ex, stackTrace));
     }
 
