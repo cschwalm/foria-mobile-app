@@ -105,7 +105,7 @@ class TicketProvider extends ChangeNotifier {
       }
       rethrow;
     } catch (e) {
-      print("### UNKNOWN ERROR: getTickets Msg: ${e.toString()} ###");
+      debugPrint("### NETWORK ERROR: getTickets Msg: ${e.toString()} ###");
       rethrow;
     }
 
@@ -265,9 +265,9 @@ class TicketProvider extends ChangeNotifier {
       debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       throw new Exception(ex.message);
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint("### NETWORK ERROR: redeemTicket Msg: ${e.toString()} ###");
-      _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
+      _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, stackTrace));
       rethrow;
     }
 
@@ -300,9 +300,9 @@ class TicketProvider extends ChangeNotifier {
       debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       throw new Exception(ex.message);
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint("### NETWORK ERROR: manualRedeemTicket Msg: ${e.toString()} ###");
-      _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
+      _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, stackTrace));
       rethrow;
     }
 
@@ -343,9 +343,9 @@ class TicketProvider extends ChangeNotifier {
       debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       return;
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint("### NETWORK ERROR: registerToken Msg: ${e.toString()} ###");
-      _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, textGenericError, null, null, null));
+      _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, textGenericError, null, null, stackTrace));
       return;
     }
 
@@ -378,9 +378,9 @@ class TicketProvider extends ChangeNotifier {
       print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       rethrow;
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint("### NETWORK ERROR: cancelTransfer Msg: ${e.toString()} ###");
-      _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
+      _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, stackTrace));
       rethrow;
     }
 
@@ -407,8 +407,9 @@ class TicketProvider extends ChangeNotifier {
   Future<bool> transferTicket(final Ticket currentTicket, final String email) async {
 
     if (currentTicket == null || email == null) {
-      _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, null, null));
-      throw new Exception('null passed to transferTicket method');
+      Exception ex = new Exception('null passed to transferTicket method');
+      _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, null));
+      throw ex;
     }
 
     if (_ticketApi == null) {
@@ -427,10 +428,10 @@ class TicketProvider extends ChangeNotifier {
       debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       throw ex;
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint("### NETWORK ERROR: transferTicket Msg: ${e.toString()} ###");
       _errorStream.announceError(
-          ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
+          ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, stackTrace));
       throw e;
     }
 
@@ -486,9 +487,9 @@ class TicketProvider extends ChangeNotifier {
         debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
         _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
         rethrow;
-      } catch (e) {
+      } catch (e, stackTrace) {
         debugPrint("### NETWORK ERROR: activateTicket Msg: ${e.toString()} ###");
-        _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, null));
+        _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, stackTrace));
         rethrow;
       }
 
