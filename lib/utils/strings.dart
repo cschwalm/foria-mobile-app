@@ -114,7 +114,9 @@ const String badPhoneTime = 'Your phone\'s clock is off by more than 30 seconds.
 
 const String foriaPass = 'Foria Pass';
 
-const String screenshotWarning = 'Warning: Screenshots NOT valid';
+const String screenshotWarning = 'Void if screen captured';
+
+const String screenshotTaken = 'Screenshots of Foria Passes are invalid and will fail to scan!';
 
 const String passRefresh = 'seconds until refresh';
 
@@ -198,7 +200,7 @@ const String introForiaButtonOne = 'Goodbye Fraud!';
 
 const String introForiaButtonTwo = 'It’s Party Time!';
 
-const String screenshotCheckbox = 'I understand screenshots don’t work';
+const String screenshotCheckbox = 'I understand screenshots don’t work.';
 
 const String introForiaHeaderOne = 'No Screenshots = No Fraud';
 

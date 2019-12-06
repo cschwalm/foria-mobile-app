@@ -1,17 +1,23 @@
+import 'dart:developer';
 import 'dart:io' show Platform;
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:foria/providers/selected_ticket_provider.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/screens/transfer_screen.dart';
 import 'package:foria/utils/constants.dart';
+import 'package:foria/utils/firebase_events.dart';
 import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
+import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria/widgets/primary_button.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -35,6 +41,7 @@ class MyTicketsScreen extends StatefulWidget {
 class _MyTicketsScreenState extends State<MyTicketsScreen> {
 
   SelectedTicketProvider _selectedTicketProvider;
+  static const MethodChannel screenshotChannel = const MethodChannel('foria.foriatickets.com/screenshot');
 
   @override
   void initState() {
@@ -53,6 +60,16 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
         _selectedTicketProvider = new SelectedTicketProvider(args['event'], args['timeOffset']);
       }
     }
+
+    //Listen on iOS platform channel for screenshot events.
+    screenshotChannel.setMethodCallHandler( (call) async {
+
+      if (call.method == screenshotAction) {
+        log('User attempted to screenshot a pass.');
+        FirebaseAnalytics().logEvent(name: PASS_SCREENSHOT);
+        showErrorAlert(context, screenshotTaken);
+      }
+    });
 
     return Scaffold(
         resizeToAvoidBottomPadding: false,
@@ -204,8 +221,8 @@ class PassCard extends StatelessWidget {
     barcodeList.add(
         Text(
           screenshotWarning,
+          style: Theme.of(context).textTheme.body2,
           textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.red),
     ));
     barcodeList.add(SizedBox(height: 5));
 
@@ -513,7 +530,7 @@ class _PassOptionsState extends State<PassOptions> {
     try {
       await ticketProvider.cancelTicketTransfer(_selectedTicket);
     } catch (ex) {
-      debugPrint('Transfer for ${_selectedTicket.id} failed');
+      log('Transfer for ${_selectedTicket.id} failed.', level: Level.WARNING.value);
     }
 
     setState(() {

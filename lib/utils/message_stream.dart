@@ -1,11 +1,12 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/configuration.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logging/logging.dart';
 import 'package:package_info/package_info.dart';
 import 'package:sentry/sentry.dart';
 
@@ -70,12 +71,12 @@ class MessageStream {
   void announceMessage(ForiaNotification notification) {
 
     if (_streamController.isPaused || _streamController.isClosed) {
-      debugPrint('Failed to write message to stream. Stream is paused/closed.');
+      log('Failed to write message to stream. Stream is paused/closed.');
       return;
     }
 
     if (!_streamController.hasListener) {
-      debugPrint('Failed to write message to stream. Stream has no listeners.');
+      log('Failed to write message to stream. Stream has no listeners.');
       return;
     }
 
@@ -95,12 +96,12 @@ class MessageStream {
     }
 
     if (_streamController.isPaused || _streamController.isClosed) {
-      debugPrint('Failed to write error to error stream. Stream is paused/closed.');
+      log('Failed to write error to error stream. Stream is paused/closed.');
       return;
     }
 
     if (!_streamController.hasListener) {
-      debugPrint('Failed to write error to error stream. Stream has no listeners.');
+      log('Failed to write error to error stream. Stream has no listeners.');
       return;
     }
 
@@ -157,11 +158,11 @@ class MessageStream {
           title = message['aps']['alert']['title'];
           body = message['aps']['alert']['body'];
         } else {
-          debugPrint('ERROR: Failed to parse notification');
+          log('ERROR: Failed to parse notification', level: Level.SEVERE.value);
           return;
         }
 
-        print("Received push notification: $message");
+        log("Received push notification: $message");
         final ForiaNotification foriaNotification = new ForiaNotification.message(MessageType.MESSAGE, body, title);
         announceMessage(foriaNotification);
       },

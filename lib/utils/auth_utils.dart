@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:jose/jose.dart';
+import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'configuration.dart';
@@ -81,7 +83,7 @@ class AuthUtils {
     String refreshToken = authInfo['refresh_token'];
 
     if (authToken == null || idToken == null) {
-      debugPrint("Returned tokens are null. Skipping secure storage.");
+      log("Returned tokens are null. Skipping secure storage.");
       throw new Exception("Returned tokens are null. Skipping secure storage.");
     }
 
@@ -93,13 +95,13 @@ class AuthUtils {
     }
 
     if (!isIdTokenValid || !isAuthTokenValid) {
-      debugPrint("Token vaidation failure!");
+      log("Token vaidation failure!");
       throw new Exception("Token failed validation.");
     } else {
       _storage.write(key: accessTokenKey, value: authToken);
       _storage.write(key: idTokenKey, value: idToken);
 
-      debugPrint("Tokens stored in secure storage.");
+      log("Tokens stored in secure storage.");
     }
   }
 
@@ -114,7 +116,7 @@ class AuthUtils {
     try {
       jwt = new JsonWebToken.unverified(encodedJwt);
     } catch (e) {
-      debugPrint("Failed to parse JWT! - Error: $e");
+      log("Failed to parse JWT! - Error: $e");
       return false;
     }
 
@@ -138,7 +140,7 @@ class AuthUtils {
     claims.validate(issuer: Uri.parse(Configuration.jwtIssuer), clientId: audience);
 
     if (violations.isNotEmpty) {
-      debugPrint("JWT Claim Violations: $violations");
+      log("JWT Claim Violations: $violations");
       return false;
     }
 
@@ -154,7 +156,7 @@ class AuthUtils {
     await DatabaseUtils.deleteDatabase();
     await _storage.deleteAll();
     await _auth.webAuth.clearSession(federated: false);
-    debugPrint("Logout called. Secrets deleted.");
+    log("Logout called. Secrets deleted.");
 
     setupDependencies();
     await navigatorKey.currentState.pushNamedAndRemoveUntil(Login.routeName, ModalRoute.withName('/'));
@@ -176,7 +178,7 @@ class AuthUtils {
     await _auth.webAuth.authorize(options).then((authInfo) async {
 
       if (authInfo == null || authInfo['access_token'] == null) {
-        debugPrint("Account Blocked. Tokens empty.");
+        log("Account Blocked. Tokens empty.");
         showErrorAlert(context, loginError);
         return;
       }
@@ -185,7 +187,7 @@ class AuthUtils {
 
       // Populates user info for first user login.
       if (!await isUserLoggedIn(false)) {
-        debugPrint("User failed login check.");
+        log("User failed login check.");
         showErrorAlert(context, loginError);
         return;
       }
@@ -203,7 +205,7 @@ class AuthUtils {
         Navigator.pushReplacementNamed(context, IntroScreenOne.routeName);
       }
     }).catchError((err) async {
-      debugPrint('Auth Error: ${err.toString()}');
+      log('Auth Error: ${err.toString()}');
       showErrorAlert(context, loginError, _auth.webAuth.clearSession);
     });
   }
@@ -218,7 +220,7 @@ class AuthUtils {
     JsonWebToken jwt = await _loadToken(accessTokenKey);
 
     if (jwt == null) {
-      debugPrint("ERROR: No token found in storage. Not able to check venue.");
+      log("ERROR: No token found in storage. Not able to check venue.", level: Level.WARNING.value);
       _isVenue = false;
       return false;
     }
@@ -230,7 +232,7 @@ class AuthUtils {
 
       for (String scope in scopeArr) {
         if (scope == "write:venue_redeem") {
-          debugPrint("User is acessing a venue account.");
+          log("User is acessing a venue account.");
           _isVenue = true;
           return true;
         }
@@ -245,13 +247,13 @@ class AuthUtils {
     JsonWebToken jwt = await _loadToken(idTokenKey);
 
     if (jwt == null) {
-      debugPrint("ERROR: No token found in storage. Not able to email verify.");
+      log("ERROR: No token found in storage. Not able to email verify.", level: Level.WARNING.value);
       return false;
     }
 
     Map<String, dynamic> claims = jwt.claims.toJson();
     if (!claims.containsKey("email_verified")) {
-      print("ERROR: email_verified claim missing. Is email scope set?");
+      log("ERROR: email_verified claim missing. Is email scope set?", level: Level.SEVERE.value);
       return false;
     }
 
@@ -269,7 +271,7 @@ class AuthUtils {
     JsonWebToken jwt = await _loadToken(idTokenKey);
 
     if (jwt == null) {
-      debugPrint("No token found in storage. User is not logged in.");
+      log("No token found in storage. User is not logged in.");
       return false;
     }
 
@@ -278,7 +280,7 @@ class AuthUtils {
       try {
         jwt = await forceTokenRefresh();
       } catch (ex) {
-        debugPrint("Exception caught refreshing token. Device might be offline. Msg: ${ex.toString()}");
+        log("Exception caught refreshing token. Device might be offline. Msg: ${ex.toString()}", level: Level.WARNING.value);
         return true;
       }
     }
@@ -302,7 +304,7 @@ class AuthUtils {
     String accessTokenStr = await _storage.read(key: tokenName);
 
     if (accessTokenStr == null) {
-      debugPrint("User is not logged in. No access token found.");
+      log("User is not logged in. No access token found.");
       return null;
     }
 
@@ -310,7 +312,7 @@ class AuthUtils {
     try {
       jwt = new JsonWebToken.unverified(accessTokenStr);
     } catch (e) {
-      debugPrint("Failed to parse JWT on login! - Error: $e");
+      log("Failed to parse JWT on login! - Error: $e", level: Level.WARNING.value);
       return null;
     }
 
@@ -328,7 +330,7 @@ class AuthUtils {
     String refreshToken = await _storage.read(key: refreshTokenKey);
 
     if (refreshToken == null) {
-      debugPrint("Refresh token is null when attempting refresh!");
+      log("Refresh token is null when attempting refresh!", level: Level.WARNING.value);
       throw new Exception("Refresh token is null when attempting refresh!");
     }
 
@@ -339,13 +341,13 @@ class AuthUtils {
     try {
       auth0Result = await _auth.auth.refreshToken(params);
     } catch (ex) {
-      print("ERROR: Refresh failed on Auth0 side.");
+      log("ERROR: Refresh failed on Auth0 side.", level: Level.WARNING.value);
       throw ex;
     }
 
     await _storeAuthInfo(auth0Result);
 
-    debugPrint("Token refresh complete.");
+    log("Token refresh complete.");
     return _loadToken(accessTokenKey);
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria_flutter_client/api.dart';
@@ -20,7 +22,7 @@ class AttendeeProvider extends ChangeNotifier {
 
     Attendee foundAttendee = _attendeeList.firstWhere((a) => a.ticketId == attendee.ticketId);
     foundAttendee.ticket.status = ticketStatusRedeemed;
-    debugPrint('Attendee status changed to ${attendee.ticket.status} for ticketId: ${attendee.ticket.id}');
+    log('Attendee status changed to ${attendee.ticket.status} for ticketId: ${attendee.ticket.id}');
     notifyListeners();
   }
 

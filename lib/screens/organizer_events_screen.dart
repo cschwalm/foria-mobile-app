@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/providers/venue_provider.dart';
@@ -9,6 +11,7 @@ import 'package:foria/widgets/errors/error_try_again_column.dart';
 import 'package:foria/widgets/no_events_column.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
 ///
@@ -62,7 +65,7 @@ class _OrganizerEventsScreenState extends State<OrganizerEventsScreen> with Auto
       setState(() {
         _currentState = _LoadingState.NETWORK_ERROR;
       });
-      debugPrint('getAllVenuesEvents network call failed. No events loaded.');
+      log('getAllVenuesEvents network call failed. No events loaded.', level: Level.WARNING.value);
     }
   }
 

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
@@ -15,15 +16,17 @@ import 'package:foria/screens/attendee_list_screen.dart';
 import 'package:foria/screens/intro_screen_one.dart';
 import 'package:foria/screens/intro_screen_two.dart';
 import 'package:foria/screens/organizer_events_screen.dart';
+import 'package:foria/screens/organizer_home_screen.dart';
 import 'package:foria/screens/splash_screen.dart';
 import 'package:foria/screens/ticket_scan_screen.dart';
 import 'package:foria/screens/transfer_screen.dart';
-import 'package:foria/screens/organizer_home_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/database_utils.dart';
 import 'package:foria/utils/message_stream.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logging/logging.dart';
+import 'package:quick_actions/quick_actions.dart';
 
 import 'navigation/CustomNoTransition.dart';
 import 'screens/home.dart';
@@ -135,8 +138,7 @@ void mainDelegate() {
     errorStream.reportError(error, stackTrace);
 
     //Report to Dev console
-    print('### UNHANDLED ERROR: $error ###');
-    print(stackTrace);
+    log('### UNHANDLED ERROR: $error ###', stackTrace: stackTrace, level: Level.SEVERE.value);
 
     // This captures errors reported by the Flutter framework.
     FlutterError.onError = (FlutterErrorDetails details) {
@@ -151,8 +153,10 @@ void mainDelegate() {
 ///
 void setupDependencies() {
 
+  final AuthUtils authUtils = new AuthUtils();
+
   GetIt.instance.reset();
-  GetIt.instance.registerSingleton<AuthUtils>(new AuthUtils());
+  GetIt.instance.registerSingleton<AuthUtils>(authUtils);
   GetIt.instance.registerSingleton<MessageStream>(new MessageStream());
   GetIt.instance.registerSingleton<DatabaseUtils>(new DatabaseUtils());
   GetIt.instance.registerSingleton<TicketProvider>(new TicketProvider());
@@ -160,4 +164,27 @@ void setupDependencies() {
   GetIt.instance.registerSingleton<VenueProvider>(new VenueProvider());
   GetIt.instance.registerSingleton<AttendeeProvider>(new AttendeeProvider());
 
+  //Configure shortcut access
+  final QuickActions quickActions = new QuickActions();
+
+  quickActions.initialize((shortcutType) async {
+    if (shortcutType == 'ACTION_SCAN') {
+      log('User opened app via quick action: $shortcutType');
+      if (await authUtils.isUserLoggedIn(true) && await authUtils.doesUserHaveVenueAccess()) {
+        navigatorKey.currentState.pushNamed(TicketScanScreen.routeName);
+      } else {
+        log('ERROR: User does not have venue access and attempted to open scan screen.', level: Level.WARNING.value);
+      }
+    }
+  });
+
+  //Only add the shortcut item after venue access has been verified.
+  authUtils.doesUserHaveVenueAccess().then( (isVenue) {
+
+    if (isVenue) {
+      final List<ShortcutItem> list = new List<ShortcutItem>();
+      list.add(const ShortcutItem(type: 'ACTION_SCAN', localizedTitle: 'Scan Tickets', icon: 'ic_action_scan'));
+      quickActions.setShortcutItems(list);
+    }
+  });
 }

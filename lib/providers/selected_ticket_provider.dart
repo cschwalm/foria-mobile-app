@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/database_utils.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logging/logging.dart';
 import 'package:otp/otp.dart';
 
 ///
@@ -97,7 +99,7 @@ class SelectedTicketProvider extends ChangeNotifier {
    }
 
    if (ticketSecret == null) {
-     debugPrint('Failed to load ticket secret for ticketId: ${ticket.id}');
+     log('Failed to load ticket secret for ticketId: ${ticket.id}', level: Level.WARNING.value);
      throw Exception('Failed to load ticket secret for ticketId: ${ticket.id}');
    }
 
@@ -133,7 +135,7 @@ class SelectedTicketProvider extends ChangeNotifier {
         final DateTime offsetDateTime = DateTime.now().add(new Duration(milliseconds: _timeOffset));
         _secondsRemaining = _refreshInterval - ( (offsetDateTime.millisecondsSinceEpoch ~/ 1000) % _refreshInterval);
       }
-      debugPrint('${tickets.length} tickets barcodes updated.');
+      log('${tickets.length} tickets barcodes updated.');
 
     } else {
       _secondsRemaining--;

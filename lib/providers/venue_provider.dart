@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:foria/utils/auth_utils.dart';
@@ -5,6 +7,7 @@ import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logging/logging.dart';
 
 ///
 /// Provides access to Venue related data from the Foria backend.
@@ -48,17 +51,17 @@ class VenueProvider extends ChangeNotifier {
     } on ApiException catch (ex, stackTrace) {
 
       if (ex.code == 403) {
-        debugPrint("### NO PERMISSION: venue:read scope MISSING ###");
+        log("### NO PERMISSION: venue:read scope MISSING ###", level: Level.SEVERE.value);
         await _authUtils.logout();
         return null;
       }
 
-      debugPrint("### FORIA SERVER ERROR: getAllVenues ###");
-      debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      log("### FORIA SERVER ERROR: getAllVenues ###", level: Level.WARNING.value);
+      log("HTTP Status Code: ${ex.code} - Error: ${ex.message}", level: Level.WARNING.value);
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       rethrow;
     } catch (ex, stackTrace) {
-      debugPrint("### NETWORK ERROR: getAllVenues Msg: ${ex.toString()} ###");
+      log("### NETWORK ERROR: getAllVenues Msg: ${ex.toString()} ###", level: Level.WARNING.value);
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, netConnectionError, null, ex, stackTrace));
     }
 
@@ -72,7 +75,7 @@ class VenueProvider extends ChangeNotifier {
 
     notifyListeners();
 
-    debugPrint("${_venueEventMap.length} venueEvents loaded from network to display to user.");
+    log("${_venueEventMap.length} venueEvents loaded from network to display to user.");
     return _venueEventMap.values.toList();
   }
 }

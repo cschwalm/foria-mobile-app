@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:firebase_ml_vision/firebase_ml_vision.dart';
-import 'package:flutter/material.dart';
 import 'package:foria/providers/ticket_provider.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logging/logging.dart';
 
 import 'constants.dart';
 
@@ -123,7 +124,7 @@ class ScanProcessor {
       final Map<String, dynamic> jsonMap = jsonDecode(barcodeText);
       request = RedemptionRequest.fromJson(jsonMap);
     } catch (ex) {
-      debugPrint('Failed to parse encoded barcode model.');
+      log('Failed to parse encoded barcode model.', level: Level.WARNING.value);
       _setErrorState();
       return;
     }
@@ -149,7 +150,7 @@ class ScanProcessor {
     }
 
     _previousBarcodeText = barcodeText;
-    debugPrint('Barcode processed.');
+    log('Barcode processed.');
   }
 
   ///
@@ -161,7 +162,7 @@ class ScanProcessor {
     _scanResult = null;
     _ticketTypeName = null;
 
-    debugPrint('Ticket scan data cleared.');
+    log('Ticket scan data cleared.');
     timer.cancel();
   }
 
@@ -175,7 +176,7 @@ class ScanProcessor {
 
     _previousBarcodeText = null;
     _isDuplicateBarcodeTimerRunning = false;
-    debugPrint('Previous barcode text cleared.');
+    log('Previous barcode text cleared.');
     timer.cancel();
   }
 
@@ -185,6 +186,5 @@ class ScanProcessor {
   void _setErrorState() {
 
     _scanResult = ScanResult.ERROR;
-    debugPrint('Failed to parse barcode.');
   }
 }
