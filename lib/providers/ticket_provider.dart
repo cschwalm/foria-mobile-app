@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
@@ -12,6 +13,7 @@ import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logging/logging.dart';
 
 ///
 /// Provides access to Ticket related data from the Foria backend.
@@ -92,26 +94,25 @@ class TicketProvider extends ChangeNotifier {
       tickets = (await _userApi.getTickets()).toSet();
     } on ApiException catch (ex, stackTrace) {
 
-      debugPrint("### FORIA SERVER ERROR: getTickets ###");
-      debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
-      debugPrint(stackTrace.toString());
+      log("### FORIA SERVER ERROR: getTickets ###", level: Level.WARNING.value);
+      log("HTTP Status Code: ${ex.code} - Error: ${ex.message}", level: Level.WARNING.value);
 
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
 
       if (ex.code == HttpStatus.unauthorized || ex.code == HttpStatus.forbidden) {
-        debugPrint('Logging user out due to bad token.');
+        log('Logging user out due to bad token.', level: Level.WARNING.value);
         await _authUtils.logout();
         return;
       }
       rethrow;
     } catch (e) {
-      debugPrint("### NETWORK ERROR: getTickets Msg: ${e.toString()} ###");
+      log("### NETWORK ERROR: getTickets Msg: ${e.toString()} ###", level: Level.WARNING.value);
       rethrow;
     }
 
     await checkAndSetDataFromNetwork(tickets);
 
-    debugPrint("Loaded ${_ticketSet.length} tickets from Foria API.");
+    log("Loaded ${_ticketSet.length} tickets from Foria API.");
 
     await _activateAllIssuedTickets(_ticketSet);
     await _databaseUtils.storeTicketSet(_ticketSet);
@@ -149,7 +150,7 @@ class TicketProvider extends ChangeNotifier {
         checkedTickets.add(ticket);
         _ticketSet.add(ticket);
       } else {
-        debugPrint('Error: Ticket invalid');
+        log('Error: Ticket invalid', level: Level.WARNING.value);
         isError = true;
       }
     }
@@ -165,7 +166,7 @@ class TicketProvider extends ChangeNotifier {
         processedEventIdSet.add(ticket.eventId);
       } else {
         isError = true;
-        debugPrint('Error: Event invalid');
+        log('Error: Event invalid', level: Level.WARNING.value);
         _ticketSet.removeWhere((t) => t.id == ticket.id);
       }
     }
@@ -182,11 +183,11 @@ class TicketProvider extends ChangeNotifier {
 
     Set<Ticket> tickets = await _databaseUtils.getAllTickets();
     if (tickets == null) {
-      debugPrint('No tickets stored in offline storage.');
+      log('No tickets stored in offline storage.', level: Level.WARNING.value);
       return;
     }
 
-    debugPrint("Loaded ${tickets.length} tickets from offline database.");
+    log("Loaded ${tickets.length} tickets from offline database.");
     _ticketSet.clear();
     _ticketSet.addAll(tickets);
     _eventSet.addAll(await _buildEventSetFromLocalDatabase(tickets));
@@ -219,11 +220,11 @@ class TicketProvider extends ChangeNotifier {
       try {
         result = await _ticketApi.reactivateTicket(ticket.id);
       } on ApiException catch (ex) {
-        debugPrint("### FORIA SERVER ERROR: reactivateTicket ###");
-        debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+        log("### FORIA SERVER ERROR: reactivateTicket ###", level: Level.WARNING.value);
+        log("HTTP Status Code: ${ex.code} - Error: ${ex.message}", level: Level.WARNING.value);
         throw new Exception(ex.message);
       } catch (e) {
-        debugPrint("### NETWORK ERROR: reactivateTicket Msg: ${e.toString()} ###");
+        log("### NETWORK ERROR: reactivateTicket Msg: ${e.toString()} ###", level: Level.WARNING.value);
         rethrow;
       }
 
@@ -235,7 +236,7 @@ class TicketProvider extends ChangeNotifier {
     _ticketSet.clear();
     _ticketSet.addAll(newTickets);
 
-    debugPrint('Reactivated ${newTickets.length} tickets.');
+    log('Reactivated ${newTickets.length} tickets.');
     _ticketsActiveOnOtherDevice = false;
     notifyListeners();
   }
@@ -261,17 +262,17 @@ class TicketProvider extends ChangeNotifier {
     try {
       result = await _ticketApi.redeemTicket(redemptionRequest);
     } on ApiException catch (ex, stackTrace) {
-      debugPrint("### FORIA SERVER ERROR: redeemTicket ###");
-      debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      log("### FORIA SERVER ERROR: redeemTicket ###", level: Level.WARNING.value);
+      log("HTTP Status Code: ${ex.code} - Error: ${ex.message}", level: Level.WARNING.value);
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       throw new Exception(ex.message);
     } catch (e, stackTrace) {
-      debugPrint("### NETWORK ERROR: redeemTicket Msg: ${e.toString()} ###");
+      log("### NETWORK ERROR: redeemTicket Msg: ${e.toString()} ###", level: Level.WARNING.value);
       _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, stackTrace));
       rethrow;
     }
 
-    debugPrint("TicketId: ${redemptionRequest.ticketId} reedeemed with result: ${result.status}");
+    log("TicketId: ${redemptionRequest.ticketId} reedeemed with result: ${result.status}");
     return result;
   }
 
@@ -296,17 +297,17 @@ class TicketProvider extends ChangeNotifier {
     try {
       result = await _ticketApi.manualRedeemTicket(ticketId);
     } on ApiException catch (ex, stackTrace) {
-      debugPrint("### FORIA SERVER ERROR: manualRedeemTicket ###");
-      debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      log("### FORIA SERVER ERROR: manualRedeemTicket ###", level: Level.WARNING.value);
+      log("HTTP Status Code: ${ex.code} - Error: ${ex.message}", level: Level.WARNING.value);
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       throw new Exception(ex.message);
     } catch (e, stackTrace) {
-      debugPrint("### NETWORK ERROR: manualRedeemTicket Msg: ${e.toString()} ###");
+      log("### NETWORK ERROR: manualRedeemTicket Msg: ${e.toString()} ###", level: Level.WARNING.value);
       _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, stackTrace));
       rethrow;
     }
 
-    debugPrint("TicketId: $ticketId reedeemed. manualRedeemTicket resulted in ticket status: ${result.status}");
+    log("TicketId: $ticketId reedeemed. manualRedeemTicket resulted in ticket status: ${result.status}");
     return result;
   }
 
@@ -339,18 +340,18 @@ class TicketProvider extends ChangeNotifier {
     try {
       await _userApi.registerToken(deviceToken);
     } on ApiException catch (ex, stackTrace) {
-      debugPrint("### FORIA SERVER ERROR: registerToken ###");
-      debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      log("### FORIA SERVER ERROR: registerToken ###", level: Level.WARNING.value);
+      log("HTTP Status Code: ${ex.code} - Error: ${ex.message}", level: Level.WARNING.value);
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       return;
     } catch (e, stackTrace) {
-      debugPrint("### NETWORK ERROR: registerToken Msg: ${e.toString()} ###");
+      log("### NETWORK ERROR: registerToken Msg: ${e.toString()} ###", level: Level.WARNING.value);
       _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, textGenericError, null, null, stackTrace));
       return;
     }
 
     await _secureStorage.write(key: _fcmTokenKey, value: token);
-    debugPrint("FCM token sucessfully registered on server: $token");
+    log("FCM token sucessfully registered on server: $token");
   }
 
   ///
@@ -374,12 +375,12 @@ class TicketProvider extends ChangeNotifier {
     try {
       await _ticketApi.cancelTransfer(currentTicket.id);
     } on ApiException catch (ex, stackTrace) {
-      print("### FORIA SERVER ERROR: cancelTransfer ###");
-      print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      log("### FORIA SERVER ERROR: cancelTransfer ###", level: Level.WARNING.value);
+      log("HTTP Status Code: ${ex.code} - Error: ${ex.message}", level: Level.WARNING.value);
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       rethrow;
     } catch (e, stackTrace) {
-      debugPrint("### NETWORK ERROR: cancelTransfer Msg: ${e.toString()} ###");
+      log("### NETWORK ERROR: cancelTransfer Msg: ${e.toString()} ###", level: Level.WARNING.value);
       _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, stackTrace));
       rethrow;
     }
@@ -392,7 +393,7 @@ class TicketProvider extends ChangeNotifier {
     await _databaseUtils.storeTicketSet(_ticketSet);
     notifyListeners();
 
-    debugPrint('Ticket Id: ${currentTicket.id} ticket transfer canceled. Ticket set to ACTIVE.');
+    log('Ticket Id: ${currentTicket.id} ticket transfer canceled. Ticket set to ACTIVE.');
   }
 
   ///
@@ -424,12 +425,12 @@ class TicketProvider extends ChangeNotifier {
     try {
       updatedTicket = await _ticketApi.transferTicket(currentTicket.id, transferRequest: transferRequest);
     } on ApiException catch (ex, stackTrace) {
-      debugPrint("### FORIA SERVER ERROR: transferTicket ###");
-      debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      log("### FORIA SERVER ERROR: transferTicket ###", level: Level.WARNING.value);
+      log("HTTP Status Code: ${ex.code} - Error: ${ex.message}", level: Level.WARNING.value);
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       throw ex;
     } catch (e, stackTrace) {
-      debugPrint("### NETWORK ERROR: transferTicket Msg: ${e.toString()} ###");
+      log("### NETWORK ERROR: transferTicket Msg: ${e.toString()} ###", level: Level.WARNING.value);
       _errorStream.announceError(
           ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, stackTrace));
       throw e;
@@ -440,10 +441,10 @@ class TicketProvider extends ChangeNotifier {
     if (updatedTicket != null) {
       _ticketSet.add(updatedTicket);
       _errorStream.announceMessage(ForiaNotification.message(MessageType.MESSAGE, textTransferPending, null));
-      debugPrint('Ticket Id: ${currentTicket.id} submitted for transfer. New status: ${updatedTicket.status}');
+      log('Ticket Id: ${currentTicket.id} submitted for transfer. New status: ${updatedTicket.status}');
     } else {
       _errorStream.announceMessage(ForiaNotification.message(MessageType.MESSAGE, textTransferComplete, null));
-      debugPrint('Ticket Id: ${currentTicket.id} completed transfer. Ticket removed for user.');
+      log('Ticket Id: ${currentTicket.id} completed transfer. Ticket removed for user.');
     }
 
     await _databaseUtils.storeTicketSet(_ticketSet);
@@ -483,12 +484,12 @@ class TicketProvider extends ChangeNotifier {
       try {
         result = await _ticketApi.activateTicket(ticket.id);
       } on ApiException catch (ex, stackTrace) {
-        debugPrint("### FORIA SERVER ERROR: activateTicket ###");
-        debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+        log("### FORIA SERVER ERROR: activateTicket ###", level: Level.WARNING.value);
+        log("HTTP Status Code: ${ex.code} - Error: ${ex.message}", level: Level.WARNING.value);
         _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
         rethrow;
       } catch (e, stackTrace) {
-        debugPrint("### NETWORK ERROR: activateTicket Msg: ${e.toString()} ###");
+        log("### NETWORK ERROR: activateTicket Msg: ${e.toString()} ###", level: Level.WARNING.value);
         _errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, netConnectionError, null, null, stackTrace));
         rethrow;
       }
@@ -501,7 +502,7 @@ class TicketProvider extends ChangeNotifier {
       await _databaseUtils.storeTicketSecret(ticket.id, ticketSecret);
     }
 
-    debugPrint('Activated $ticketsActivated tickets.');
+    log('Activated $ticketsActivated tickets.');
   }
 
   ///
@@ -513,7 +514,7 @@ class TicketProvider extends ChangeNotifier {
 
       //Only check tickets that are in active status.
       if (ticket.status != 'ACTIVE') {
-        debugPrint('Ticket with ticketId: ${ticket.id} is not ACTIVE. Skipping ticket secret check.');
+        log('Ticket with ticketId: ${ticket.id} is not ACTIVE. Skipping ticket secret check.');
         continue;
       }
 
@@ -521,7 +522,7 @@ class TicketProvider extends ChangeNotifier {
       final String loadedTicketSecret = await _databaseUtils.getTicketSecret(ticket.id);
 
       if (loadedTicketSecret == null) {
-        debugPrint('Failed to load ticket secret for ticketId: ${ticket.id}. Ticket is active on another device.');
+        log('Failed to load ticket secret for ticketId: ${ticket.id}. Ticket is active on another device.');
         return true;
       }
 
@@ -529,13 +530,13 @@ class TicketProvider extends ChangeNotifier {
       final String loadedTicketSecretHashHex = sha512.convert(loadedTicketSecretBytes).toString();
 
       if (loadedTicketSecretHashHex != actualTicketSecretHex) {
-        debugPrint('Server ticketId: ${ticket
+        log('Server ticketId: ${ticket
             .id} hash: $actualTicketSecretHex does not equal stored hash: $loadedTicketSecretHashHex');
         return true;
       }
     }
 
-    debugPrint('All tickets are ACTIVE and valid on this device.');
+    log('All tickets are ACTIVE and valid on this device.');
     return false;
   }
 
@@ -579,13 +580,13 @@ class TicketProvider extends ChangeNotifier {
     try {
       event = await _eventApi.getEvent(eventId);
     } on ApiException catch (ex, stackTrace) {
-      print("### FORIA SERVER ERROR: getEventById ###");
-      print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      log("### FORIA SERVER ERROR: getEventById ###", level: Level.WARNING.value);
+      log("HTTP Status Code: ${ex.code} - Error: ${ex.message}", level: Level.WARNING.value);
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       rethrow;
     }
 
-    debugPrint("EventId: $eventId loaded from network.");
+    log("EventId: $eventId loaded from network.");
     _databaseUtils.storeEvent(event);
 
     return event;
@@ -606,7 +607,7 @@ class TicketProvider extends ChangeNotifier {
     if (event == null) {
       throw new Exception('Expected eventId: $eventId not in local database.');
     }
-    debugPrint("EventId: $eventId loaded from offline database.");
+    log("EventId: $eventId loaded from offline database.");
     return event;
   }
 

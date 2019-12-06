@@ -1,10 +1,11 @@
 import 'dart:convert';
+import 'dart:developer' as logger;
 import 'dart:io';
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foria_flutter_client/api.dart';
+import 'package:logging/logging.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
@@ -48,7 +49,7 @@ class DatabaseUtils {
       await databaseFactoryIo.deleteDatabase(dbPath); //Delete if new key is set.
       cryptoKey = base64Url.encode(List<int>.generate(32, (i) => _random.nextInt(256)));
       await _storage.write(key: _dbCryptoKeyRef, value: cryptoKey);
-      debugPrint("Created and stored databse crypto key. Database has been initialized at: $dbPath");
+      logger.log("Created and stored databse crypto key. Database has been initialized at: $dbPath");
     }
 
     // Initialize the encryption codec with a generated key.
@@ -57,7 +58,7 @@ class DatabaseUtils {
         .then( (db) {
 
           _db = db;
-          debugPrint("Database has been loaded from: $dbPath");
+          logger.log("Database has been loaded from: $dbPath");
 
         }).catchError((err) async {
 
@@ -67,7 +68,7 @@ class DatabaseUtils {
           await _storage.write(key: _dbCryptoKeyRef, value: cryptoKey);
           final SembastCodec codec = getEncryptSembastCodec(password: cryptoKey);
           _db = await databaseFactoryIo.openDatabase(dbPath, version: _dbVersionCode, codec: codec);
-          debugPrint("Failed to open existing database. New database has been initialized at: $dbPath");
+          logger.log("Failed to open existing database. New database has been initialized at: $dbPath", level: Level.SEVERE.value);
         });
   }
 
@@ -83,7 +84,7 @@ class DatabaseUtils {
     final String dbPath = join(supportDir.path, _dbFilename);
 
     await databaseFactoryIo.deleteDatabase(dbPath);
-    debugPrint("Database has been DELETED at: $dbPath");
+    logger.log("Database has been DELETED at: $dbPath");
   }
 
   ///
@@ -121,7 +122,7 @@ class DatabaseUtils {
     Map<String, dynamic> json = await _eventStore.record(eventId).get(_db);
 
     if (json == null) {
-      print("Event not found with ID: $eventId");
+      logger.log("Event not found with ID: $eventId", level: Level.WARNING.value);
       return null;
     }
 
@@ -144,7 +145,7 @@ class DatabaseUtils {
     String eventId = event.id;
     Map<String, dynamic> json = event.toJson();
     await _eventStore.record(eventId).put(_db, json);
-    debugPrint("EventId: $eventId stored in database");
+    logger.log("EventId: $eventId stored in database");
   }
 
   ///
@@ -158,7 +159,7 @@ class DatabaseUtils {
 
     List<String> keys = await _ticketListStore.findKeys(_db);
     if (keys.isEmpty) {
-      debugPrint("No stored tickets in offline database.");
+      logger.log("No stored tickets in offline database.");
       return null;
     }
 
@@ -170,7 +171,7 @@ class DatabaseUtils {
       ticketSet.add(ticket);
     }
 
-    debugPrint('Loaded ${ticketSet.length} tickets from local storage.');
+    logger.log('Loaded ${ticketSet.length} tickets from local storage.');
     return ticketSet;
   }
 
@@ -188,7 +189,7 @@ class DatabaseUtils {
     }
 
     await _ticketSecretStore.record(ticketId).put(_db, ticketSecret);
-    debugPrint('Stored ticket secret with ticketId: $ticketId');
+    logger.log('Stored ticket secret with ticketId: $ticketId');
   }
 
   ///
@@ -205,7 +206,7 @@ class DatabaseUtils {
     }
 
     String ticketSecret = await _ticketSecretStore.record(ticketId).get(_db);
-    debugPrint('Obtained ticket secret from database for ticketId: $ticketId.');
+    logger.log('Obtained ticket secret from database for ticketId: $ticketId.');
 
     return ticketSecret;
   }
@@ -227,7 +228,7 @@ class DatabaseUtils {
     List<RecordSnapshot<String, dynamic>> json = await _ticketListStore.find(_db, finder: eventFinder);
 
     if (json == null) {
-      print("Tickets not found with eventI: $eventId");
+      logger.log("Tickets not found with eventI: $eventId");
       return null;
     }
 
@@ -239,7 +240,7 @@ class DatabaseUtils {
       ticketSet.add(ticket);
     }
 
-    debugPrint('Loaded ${ticketSet.length} tickets from local storage.');
+    logger.log('Loaded ${ticketSet.length} tickets from local storage.');
     return ticketSet;
   }
 
@@ -259,7 +260,7 @@ class DatabaseUtils {
       await _ticketListStore.record(ticket.id).put(_db, ticketJson);
     }
 
-    debugPrint('Purged $ticketsDeleted tickets in local storage.');
-    debugPrint('Stored ${ticketSet.length} tickets in local storage.');
+    logger.log('Purged $ticketsDeleted tickets in local storage.');
+    logger.log('Stored ${ticketSet.length} tickets in local storage.');
   }
 }

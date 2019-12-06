@@ -63,3 +63,6 @@ const String sentryDsn = 'https://6c60214971cd4a2f914ebac3a233155d@sentry.io/172
 // TextStyle //
 
 const TextStyle foriaBodyTwo = TextStyle(fontSize: 14.0, color: constPrimaryColor);
+
+// Platform Channel //
+const String screenshotAction = 'SCREENSHOT_TAKEN';

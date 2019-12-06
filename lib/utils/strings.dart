@@ -116,6 +116,8 @@ const String foriaPass = 'Foria Pass';
 
 const String screenshotWarning = 'Warning: Screenshots NOT valid';
 
+const String screenshotTaken = 'Screenshots of Foria Passes are invalid and will fail to scan!';
+
 const String passRefresh = 'seconds until refresh';
 
 const String passOptions = 'Pass Options';

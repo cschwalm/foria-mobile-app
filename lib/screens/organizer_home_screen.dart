@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/screens/organizer_events_screen.dart';
@@ -6,6 +8,7 @@ import 'package:foria/utils/constants.dart';
 import 'package:foria/widgets/contact_support.dart';
 import 'package:foria/widgets/settings_item.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logging/logging.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../utils/strings.dart';
@@ -38,7 +41,7 @@ class OrganizerHomeScreen extends StatelessWidget {
               if (await canLaunch(FAQUrl)) {
                 await launch(FAQUrl);
               } else {
-                print("Failed to load FAQ URL.");
+                log("Failed to load FAQ URL.", level: Level.WARNING.value);
               }
             },
           ),

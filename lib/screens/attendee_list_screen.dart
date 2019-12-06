@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/providers/attendee_provider.dart';
@@ -13,6 +15,7 @@ import 'package:foria/widgets/settings_item.dart';
 import 'package:foria/widgets/show_pop_up_confirm.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
 ///
@@ -328,12 +331,12 @@ class _AttendeeItemState extends State<AttendeeItem> {
       if (ticket.status == ticketStatusRedeemed) {
         attendeeData.markAttendeeRedeemed(attendee);
       } else {
-        debugPrint('Manual Ticket Redeem failed for ticket id: ${attendee.ticket.id}');
+        log('Manual Ticket Redeem failed for ticket id: ${attendee.ticket.id}', level: Level.SEVERE.value);
       }
 
     }).catchError((e) {
 
-      debugPrint('Manual Ticket Redeem failed for ticket id: ${attendee.ticket.id}');
+      log('Manual Ticket Redeem failed for ticket id: ${attendee.ticket.id}', level: Level.SEVERE.value);
 
     }).whenComplete((){
 

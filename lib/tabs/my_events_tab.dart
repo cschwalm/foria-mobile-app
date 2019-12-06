@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -13,6 +15,7 @@ import 'package:foria/widgets/errors/image_unavailable.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria/widgets/primary_button.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logging/logging.dart';
 import 'package:ntp/ntp.dart';
 import 'package:provider/provider.dart';
 
@@ -152,7 +155,7 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
       });
     }).catchError((error) {
 
-      print('getTickets network call failed. Loading from offline database.');
+      log('getTickets network call failed. Loading from offline database.', level: Level.WARNING.value);
       showErrorAlert(context, ticketLoadingFailure);
       ticketProvider.loadUserDataFromLocalDatabase().then((_) {
         setState(() {
@@ -182,7 +185,7 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
 
       setState(() {
         if (ticketProvider.ticketsActiveOnOtherDevice) {
-            debugPrint('Determined tickets are active on other device during refresh.');
+            log('Determined tickets are active on other device during refresh.');
             _currentState = _LoadingState.DEVICE_CHECK;
         } else {
           _currentState = _LoadingState.DONE;
@@ -190,7 +193,7 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
       });
 
     } catch (ex) {
-      print('getTickets network call failed during manual refresh. Loading from offline database.');
+      log('getTickets network call failed during manual refresh. Loading from offline database.', level: Level.WARNING.value);
 
       if (context != null) {
         showErrorAlert(context, ticketLoadingFailure);
@@ -287,7 +290,7 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
         .timeout(Duration(seconds: 2))
         .then((offset) {
 
-          debugPrint('Calculated NTP time offset: $offset milliseconds.');
+          log('Calculated NTP time offset: $offset milliseconds.');
           this._timeOffset = offset;
 
           if (offset.abs() >= 30000) {
@@ -296,7 +299,7 @@ class _MyEventsTabState extends State<MyEventsTab> with AutomaticKeepAliveClient
           }
 
         }).catchError((err) {
-          debugPrint('Error attempting to load NTP value. Skipping. Msg: $err');
+          log('Error attempting to load NTP value. Skipping. Msg: $err', level: Level.SEVERE.value);
     });
   }
 

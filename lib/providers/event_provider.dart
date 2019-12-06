@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:foria/utils/auth_utils.dart';
@@ -5,6 +7,7 @@ import 'package:foria/utils/message_stream.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logging/logging.dart';
 
 ///
 /// Provides access to Event related data from the Foria backend.
@@ -50,12 +53,12 @@ class EventProvider extends ChangeNotifier {
     try {
       events = await _eventApi.getAllEvents();
     } on ApiException catch (ex, stackTrace) {
-      print("### FORIA SERVER ERROR: getAllEvents ###");
-      print("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      log("### FORIA SERVER ERROR: getAllEvents ###", level: Level.WARNING.value);
+      log("HTTP Status Code: ${ex.code} - Error: ${ex.message}", level: Level.WARNING.value);
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       rethrow;
     } catch (ex, stackTrace) {
-      debugPrint("### NETWORK ERROR: getAllEvents Msg: ${ex.toString()} ###");
+      log("### NETWORK ERROR: getAllEvents Msg: ${ex.toString()} ###", level: Level.WARNING.value);
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, netConnectionError, null, ex, stackTrace));
     }
 
@@ -70,7 +73,7 @@ class EventProvider extends ChangeNotifier {
 
     notifyListeners();
 
-    debugPrint("${_eventMap.length} loaded from network to display to user.");
+    log("${_eventMap.length} loaded from network to display to user.");
     return _eventMap.values.toList();
   }
 
@@ -89,12 +92,12 @@ class EventProvider extends ChangeNotifier {
     try {
       attendees = await _eventApi.getAttendeesForEvent(eventId);
     } on ApiException catch (ex, stackTrace) {
-      debugPrint("### FORIA SERVER ERROR: getAttendeesForEvent ###");
-      debugPrint("HTTP Status Code: ${ex.code} - Error: ${ex.message}");
+      log("### FORIA SERVER ERROR: getAttendeesForEvent ###", level: Level.WARNING.value);
+      log("HTTP Status Code: ${ex.code} - Error: ${ex.message}", level: Level.WARNING.value);
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
       rethrow;
     } catch (ex, stackTrace) {
-      debugPrint("### NETWORK ERROR: getAttendeesForEvent Msg: ${ex.toString()} ###");
+      log("### NETWORK ERROR: getAttendeesForEvent Msg: ${ex.toString()} ###", level: Level.WARNING.value);
       _errorStream.announceError(ForiaNotification.error(MessageType.ERROR, netConnectionError, null, ex, stackTrace));
     }
 
@@ -104,7 +107,7 @@ class EventProvider extends ChangeNotifier {
       }
     }
 
-    debugPrint("${attendees.length} attendees loaded from network to display to user.");
+    log("${attendees.length} attendees loaded from network to display to user.");
     return attendees;
   }
 

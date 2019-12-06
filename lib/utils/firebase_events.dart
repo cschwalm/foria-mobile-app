@@ -11,3 +11,6 @@ const String EVENT_LISTING_VIEWED = 'EVENT_LISTING_VIEWED';
 
 /// Used for when user clicks FAQ in account tab.
 const String FAQ_VIEWED = 'FAQ_VIEWED';
+
+/// Used when iOS device attempts screenshot.
+const String PASS_SCREENSHOT = 'PASS_SCREENSHOT';

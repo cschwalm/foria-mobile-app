@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +14,7 @@ import 'package:foria/widgets/no_events_column.dart';
 import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -168,7 +171,7 @@ class PublicEventList extends StatelessWidget {
                       FirebaseAnalytics().logEvent(name: EVENT_LISTING_VIEWED, parameters: {'eventUrl': eventUrl});
                       await launch(eventUrl);
                     } else {
-                      print("Failed to load eventUrl");
+                      log("Failed to load eventUrl", level: Level.WARNING.value);
                     }
                   },
                   child: Column(
