@@ -221,6 +221,7 @@ class PassCard extends StatelessWidget {
     barcodeList.add(
         Text(
           screenshotWarning,
+          style: Theme.of(context).textTheme.body2,
           textAlign: TextAlign.center,
     ));
     barcodeList.add(SizedBox(height: 5));
