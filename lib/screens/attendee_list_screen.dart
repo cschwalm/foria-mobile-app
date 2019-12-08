@@ -149,12 +149,30 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
 ///
 /// Scaffold to display ticket sales and scan button. Attendee list items are children
 ///
-class AttendeeListScaffold extends StatelessWidget {
+class AttendeeListScaffold extends StatefulWidget {
+
+  @override
+  _AttendeeListScaffoldState createState() => _AttendeeListScaffoldState();
+}
+
+class _AttendeeListScaffoldState extends State<AttendeeListScaffold> {
+
+  TextEditingController editingController = TextEditingController();
+  AttendeeProvider _attendeeProvider;
+  List<Attendee> _filteredAttendeeList;
+
+  @override
+  void initState() {
+    _attendeeProvider = GetIt.instance<AttendeeProvider>();
+    _filteredAttendeeList = _attendeeProvider.attendeeList;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+
     final attendeeData = Provider.of<AttendeeProvider>(context, listen: true);
-    final List<Attendee> attendeeList = attendeeData.attendeeList;
+    final List<Attendee> allAttendees = attendeeData.attendeeList;
 
     return Scaffold(
         appBar: AppBar(
@@ -179,32 +197,64 @@ class AttendeeListScaffold extends StatelessWidget {
             children: <Widget>[
               SizedBox(height: 20),
               Text(
-                ticketsSold + attendeeList.length.toString(),
+                ticketsSold + allAttendees.length.toString(),
                 style: Theme.of(context).textTheme.headline,
+              ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      _filteredAttendeeList = _attendeeProvider.filterAttendeeList(value);
+                    });
+                  },
+                  controller: editingController,
+                  decoration: InputDecoration(
+                      labelText: "Search",
+                      hintText: "Search",
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(25.0)))),
+                ),
               ),
               SizedBox(height: 20),
               MajorSettingItemDivider(),
               Expanded(
-                child: ListView.separated(
-                    itemCount: attendeeList.length,
-                    separatorBuilder: (BuildContext context, int index) => Divider(height: 0),
-                    itemBuilder: (context, index) {
-                      if (attendeeList.length == index + 1) {
-                        return Column(
-                          children: <Widget>[
-                            AttendeeItem(index),
-                            Divider(height: 0),
-                            SizedBox(height: 70)
-                          ],
-                        );
-                      }
-                      return AttendeeItem(index);
-                    }),
+                child: Provider<List<Attendee>>.value(
+                  value: _filteredAttendeeList,
+                  child: new AttendeeListView(),
+                ),
               ),
             ],
           ),
         )
     );
+  }
+}
+
+class AttendeeListView extends StatelessWidget {
+  const AttendeeListView({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+        itemCount: Provider.of<List<Attendee>>(context).length,
+        separatorBuilder: (BuildContext context, int index) => Divider(height: 0),
+        itemBuilder: (context, index) {
+          if (Provider.of<List<Attendee>>(context).length == index + 1) {
+            return Column(
+              children: <Widget>[
+                AttendeeItem(index),
+                Divider(height: 0),
+                SizedBox(height: 70)
+              ],
+            );
+          }
+          return AttendeeItem(index);
+        });
   }
 }
 
@@ -227,12 +277,14 @@ class _AttendeeItemState extends State<AttendeeItem> {
   static const double _rowHeight = 70.0;
   bool _isLoading = false;
   TicketProvider _ticketProvider;
+  AttendeeProvider _attendeeProvider;
   Widget child;
   String status;
 
   @override
   void initState() {
     _ticketProvider = GetIt.instance<TicketProvider>();
+    _attendeeProvider = GetIt.instance<AttendeeProvider>();
     super.initState();
   }
 
@@ -254,8 +306,7 @@ class _AttendeeItemState extends State<AttendeeItem> {
 
   @override
   Widget build(BuildContext context) {
-    final attendeeData = Provider.of<AttendeeProvider>(context, listen: true);
-    Attendee attendee = attendeeData.attendeeList[widget.index];
+    Attendee attendee = Provider.of<List<Attendee>>(context)[widget.index];
     String formattedName = attendee.lastName.trim() + ', ' + attendee.firstName.trim();
     status = attendee.ticket.status;
     final MessageStream messageStream = GetIt.instance<MessageStream>();
