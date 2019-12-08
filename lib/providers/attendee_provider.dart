@@ -34,26 +34,6 @@ class AttendeeProvider extends ChangeNotifier {
   }
 
   ///
-  /// Filter the attendee list based on user input to the search bar
-  ///
-  List<Attendee> filterAttendeeList(String query) {
-
-    List<Attendee> _filteredAttendeeList;
-    if(query.isNotEmpty) {
-      _attendeeList.forEach((item) {
-        if(item.firstName.contains(query)) {
-          _filteredAttendeeList.add(item);
-        } else if(item.lastName.contains(query)) {
-          _filteredAttendeeList.add(item);
-        }
-      });
-      return List.unmodifiable(_filteredAttendeeList);
-    } else {
-      return _sortAttendeeList();
-    }
-  }
-
-  ///
   /// Sort the list by last name and then first name.
   /// Tie breaker is ticketID.
   ///

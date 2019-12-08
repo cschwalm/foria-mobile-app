@@ -158,21 +158,17 @@ class AttendeeListScaffold extends StatefulWidget {
 class _AttendeeListScaffoldState extends State<AttendeeListScaffold> {
 
   TextEditingController editingController = TextEditingController();
-  AttendeeProvider _attendeeProvider;
   List<Attendee> _filteredAttendeeList;
-
-  @override
-  void initState() {
-    _attendeeProvider = GetIt.instance<AttendeeProvider>();
-    _filteredAttendeeList = _attendeeProvider.attendeeList;
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
 
     final attendeeData = Provider.of<AttendeeProvider>(context, listen: true);
     final List<Attendee> allAttendees = attendeeData.attendeeList;
+
+    if (_filteredAttendeeList == null) {
+      _filteredAttendeeList = _filterAttendees(allAttendees, null);
+    }
 
     return Scaffold(
         appBar: AppBar(
@@ -200,61 +196,68 @@ class _AttendeeListScaffoldState extends State<AttendeeListScaffold> {
                 ticketsSold + allAttendees.length.toString(),
                 style: Theme.of(context).textTheme.headline,
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 5),
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: TextField(
-                  onChanged: (value) {
-                    setState(() {
-                      _filteredAttendeeList = _attendeeProvider.filterAttendeeList(value);
-                    });
-                  },
-                  controller: editingController,
-                  decoration: InputDecoration(
-                      labelText: "Search",
-                      hintText: "Search",
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(25.0)))),
+                child: Container(
+                  height: 40,
+                  child: TextField(
+                    onChanged: (query) {
+                      setState(() {
+                        _filteredAttendeeList = _filterAttendees(allAttendees, query);
+                      });
+                    },
+                    textInputAction: TextInputAction.search,
+                    controller: editingController,
+                    decoration: InputDecoration(
+                        labelText: "Search",
+                        prefixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10.0)))),
+                  ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 5),
               MajorSettingItemDivider(),
               Expanded(
-                child: Provider<List<Attendee>>.value(
-                  value: _filteredAttendeeList,
-                  child: new AttendeeListView(),
-                ),
+                child: ListView.separated(
+                    itemCount: _filteredAttendeeList.length,
+                    separatorBuilder: (BuildContext context, int index) => Divider(height: 0),
+                    itemBuilder: (context, index) {
+                      if (_filteredAttendeeList.length == index + 1) {
+                        return Column(
+                          children: <Widget>[
+                            AttendeeItem(List.unmodifiable(_filteredAttendeeList), index),
+                            Divider(height: 0),
+                            SizedBox(height: 70)
+                          ],
+                        );
+                      }
+                      return AttendeeItem(List.unmodifiable(_filteredAttendeeList), index);
+                    }),
               ),
             ],
           ),
         )
     );
   }
-}
 
-class AttendeeListView extends StatelessWidget {
-  const AttendeeListView({
-    Key key,
-  }) : super(key: key);
+  List<Attendee> _filterAttendees (List<Attendee> allAttendees, String query) {
 
-  @override
-  Widget build(BuildContext context) {
-    return ListView.separated(
-        itemCount: Provider.of<List<Attendee>>(context).length,
-        separatorBuilder: (BuildContext context, int index) => Divider(height: 0),
-        itemBuilder: (context, index) {
-          if (Provider.of<List<Attendee>>(context).length == index + 1) {
-            return Column(
-              children: <Widget>[
-                AttendeeItem(index),
-                Divider(height: 0),
-                SizedBox(height: 70)
-              ],
-            );
-          }
-          return AttendeeItem(index);
-        });
+    List<Attendee> result = [];
+
+    if(allAttendees !=null && query != null && query.isNotEmpty) {
+      allAttendees.forEach((item) {
+        if(item.firstName.toLowerCase().contains(query)) {
+          result.add(item);
+        } else if(item.lastName.toLowerCase().contains(query)) {
+          result.add(item);
+        }
+      });
+      return result;
+    } else {
+      return allAttendees;
+    }
   }
 }
 
@@ -264,9 +267,10 @@ class AttendeeListView extends StatelessWidget {
 ///
 class AttendeeItem extends StatefulWidget {
 
+  final List<Attendee> _filteredAttendeeList;
   final int index;
 
-  AttendeeItem(this.index);
+  AttendeeItem(this._filteredAttendeeList, this.index);
 
   @override
   _AttendeeItemState createState() => _AttendeeItemState();
@@ -277,14 +281,12 @@ class _AttendeeItemState extends State<AttendeeItem> {
   static const double _rowHeight = 70.0;
   bool _isLoading = false;
   TicketProvider _ticketProvider;
-  AttendeeProvider _attendeeProvider;
   Widget child;
   String status;
 
   @override
   void initState() {
     _ticketProvider = GetIt.instance<TicketProvider>();
-    _attendeeProvider = GetIt.instance<AttendeeProvider>();
     super.initState();
   }
 
@@ -306,7 +308,7 @@ class _AttendeeItemState extends State<AttendeeItem> {
 
   @override
   Widget build(BuildContext context) {
-    Attendee attendee = Provider.of<List<Attendee>>(context)[widget.index];
+    Attendee attendee = widget._filteredAttendeeList[widget.index];
     String formattedName = attendee.lastName.trim() + ', ' + attendee.firstName.trim();
     status = attendee.ticket.status;
     final MessageStream messageStream = GetIt.instance<MessageStream>();
