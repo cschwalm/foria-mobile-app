@@ -115,6 +115,12 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
 
     Widget child;
 
+    final MessageStream messageStream = GetIt.instance<MessageStream>();
+
+    messageStream.addListener((errorMessage) {
+      showErrorAlert(context, offlineError);
+    });
+
     // Receives eventId from navigation route. eventId can also be set as an AttendeeListScreen parameter for testing
     final Map<String, dynamic> args = ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
     if (widget._eventId == null) {
@@ -227,13 +233,13 @@ class _AttendeeListScaffoldState extends State<AttendeeListScaffold> {
                       if (_filteredAttendeeList.length == index + 1) {
                         return Column(
                           children: <Widget>[
-                            AttendeeItem(List.unmodifiable(_filteredAttendeeList), index),
+                            AttendeeItem(_filteredAttendeeList[index]),
                             Divider(height: 0),
                             SizedBox(height: 70)
                           ],
                         );
                       }
-                      return AttendeeItem(List.unmodifiable(_filteredAttendeeList), index);
+                      return AttendeeItem(_filteredAttendeeList[index]);
                     }),
               ),
             ],
@@ -242,21 +248,25 @@ class _AttendeeListScaffoldState extends State<AttendeeListScaffold> {
     );
   }
 
+  ///
+  /// Filters the attendees based on the user submitted query
+  /// For example, user enters "Billy" into the search bar and should only return tickets for "Billy"
+  ///
   List<Attendee> _filterAttendees (List<Attendee> allAttendees, String query) {
 
     List<Attendee> result = [];
 
     if(allAttendees !=null && query != null && query.isNotEmpty) {
       allAttendees.forEach((item) {
-        if(item.firstName.toLowerCase().contains(query)) {
+        if(item.firstName.toLowerCase().contains(query.toLowerCase())) {
           result.add(item);
-        } else if(item.lastName.toLowerCase().contains(query)) {
+        } else if(item.lastName.toLowerCase().contains(query.toLowerCase())) {
           result.add(item);
         }
       });
-      return result;
+      return List.unmodifiable(result);
     } else {
-      return allAttendees;
+      return List.unmodifiable(allAttendees);
     }
   }
 }
@@ -267,10 +277,9 @@ class _AttendeeListScaffoldState extends State<AttendeeListScaffold> {
 ///
 class AttendeeItem extends StatefulWidget {
 
-  final List<Attendee> _filteredAttendeeList;
-  final int index;
+  final Attendee _attendee;
 
-  AttendeeItem(this._filteredAttendeeList, this.index);
+  AttendeeItem(this._attendee);
 
   @override
   _AttendeeItemState createState() => _AttendeeItemState();
@@ -308,14 +317,8 @@ class _AttendeeItemState extends State<AttendeeItem> {
 
   @override
   Widget build(BuildContext context) {
-    Attendee attendee = widget._filteredAttendeeList[widget.index];
-    String formattedName = attendee.lastName.trim() + ', ' + attendee.firstName.trim();
-    status = attendee.ticket.status;
-    final MessageStream messageStream = GetIt.instance<MessageStream>();
-
-    messageStream.addListener((errorMessage) {
-      showErrorAlert(context, offlineError);
-    });
+    String formattedName = widget._attendee.lastName.trim() + ', ' + widget._attendee.firstName.trim();
+    status = widget._attendee.ticket.status;
 
     if (_isLoading) {
       child = Container(
@@ -335,7 +338,7 @@ class _AttendeeItemState extends State<AttendeeItem> {
             width: 10,
           ),
           SizedBox(width: 6),
-          _attendeeText(formattedName, attendee.ticket.ticketTypeConfig.name),
+          _attendeeText(formattedName, widget._attendee.ticket.ticketTypeConfig.name),
         ],
       );
     } else {
@@ -346,7 +349,7 @@ class _AttendeeItemState extends State<AttendeeItem> {
             height: _rowHeight,
             width: 16,
           ),
-          Expanded(child: _attendeeText(formattedName, attendee.ticket.ticketTypeConfig.name)),
+          Expanded(child: _attendeeText(formattedName, widget._attendee.ticket.ticketTypeConfig.name)),
           OutlineButton(
               child: Text(checkInText),
               borderSide: BorderSide(
@@ -355,7 +358,7 @@ class _AttendeeItemState extends State<AttendeeItem> {
               highlightedBorderColor: constPrimaryColor,
               textColor: constPrimaryColor,
               onPressed: () {
-                showPopUpConfirm(context, confirmCheckIn, thisNonReversible, () => _manualRedeemTicket(attendee));
+                showPopUpConfirm(context, confirmCheckIn, thisNonReversible, () => _manualRedeemTicket(widget._attendee));
               }
           ),
           SizedBox(width: 16),
