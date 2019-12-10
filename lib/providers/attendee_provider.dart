@@ -56,4 +56,26 @@ class AttendeeProvider extends ChangeNotifier {
 
     return List.unmodifiable(_attendeeList);
   }
+
+  ///
+  /// Filters the attendees based on the user submitted query
+  /// For example, user enters "Billy" into the search bar and should only return tickets for "Billy"
+  ///
+  List<Attendee> filterAttendees (List<Attendee> allAttendees, String query) {
+
+    List<Attendee> result = [];
+
+    if(allAttendees !=null && query != null && query.isNotEmpty) {
+      allAttendees.forEach((item) {
+        if(item.firstName.toLowerCase().contains(query.toLowerCase())) {
+          result.add(item);
+        } else if(item.lastName.toLowerCase().contains(query.toLowerCase())) {
+          result.add(item);
+        }
+      });
+      return List.unmodifiable(result);
+    } else {
+      return List.unmodifiable(allAttendees);
+    }
+  }
 }

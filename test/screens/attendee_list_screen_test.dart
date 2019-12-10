@@ -41,6 +41,7 @@ void main() {
 
     when(eventProviderMock.getAttendeesForEvent(argThat(anything))).thenAnswer((_) async => attendees);
     when(attendeeProviderMock.attendeeList).thenReturn(UnmodifiableListView(attendees));
+    when(attendeeProviderMock.filterAttendees(any, any)).thenReturn(UnmodifiableListView(attendees));
 
     await tester.pumpWidget(MaterialApp(
       home: AttendeeListScreen('sample event id'),
@@ -73,6 +74,7 @@ void main() {
 
     when(eventProviderMock.getAttendeesForEvent(argThat(anything))).thenAnswer((_) async => attendees);
     when(attendeeProviderMock.attendeeList).thenReturn(UnmodifiableListView(attendees));
+    when(attendeeProviderMock.filterAttendees(any, any)).thenReturn(UnmodifiableListView(attendees));
     when(ticketProviderMock.manualRedeemTicket(argThat(anything))).thenAnswer((_) async {
 
       final Ticket testTicket = attendees[0].ticket;

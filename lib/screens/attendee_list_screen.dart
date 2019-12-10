@@ -173,7 +173,7 @@ class _AttendeeListScaffoldState extends State<AttendeeListScaffold> {
     final List<Attendee> allAttendees = attendeeData.attendeeList;
 
     if (_filteredAttendeeList == null) {
-      _filteredAttendeeList = _filterAttendees(allAttendees, null);
+      _filteredAttendeeList = attendeeData.filterAttendees(allAttendees, null);
     }
 
     return Scaffold(
@@ -210,7 +210,7 @@ class _AttendeeListScaffoldState extends State<AttendeeListScaffold> {
                   child: TextField(
                     onChanged: (query) {
                       setState(() {
-                        _filteredAttendeeList = _filterAttendees(allAttendees, query);
+                        _filteredAttendeeList = attendeeData.filterAttendees(allAttendees, query);
                       });
                     },
                     textInputAction: TextInputAction.search,
@@ -246,28 +246,6 @@ class _AttendeeListScaffoldState extends State<AttendeeListScaffold> {
           ),
         )
     );
-  }
-
-  ///
-  /// Filters the attendees based on the user submitted query
-  /// For example, user enters "Billy" into the search bar and should only return tickets for "Billy"
-  ///
-  List<Attendee> _filterAttendees (List<Attendee> allAttendees, String query) {
-
-    List<Attendee> result = [];
-
-    if(allAttendees !=null && query != null && query.isNotEmpty) {
-      allAttendees.forEach((item) {
-        if(item.firstName.toLowerCase().contains(query.toLowerCase())) {
-          result.add(item);
-        } else if(item.lastName.toLowerCase().contains(query.toLowerCase())) {
-          result.add(item);
-        }
-      });
-      return List.unmodifiable(result);
-    } else {
-      return List.unmodifiable(allAttendees);
-    }
   }
 }
 
