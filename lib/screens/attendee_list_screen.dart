@@ -118,6 +118,12 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
 
     Widget child;
 
+    final MessageStream messageStream = GetIt.instance<MessageStream>();
+
+    messageStream.addListener((errorMessage) {
+      showErrorAlert(context, offlineError);
+    });
+
     // Receives eventId from navigation route. eventId can also be set as an AttendeeListScreen parameter for testing
     final Map<String, dynamic> args = ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
     if (widget._eventId == null) {
@@ -152,12 +158,26 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
 ///
 /// Scaffold to display ticket sales and scan button. Attendee list items are children
 ///
-class AttendeeListScaffold extends StatelessWidget {
+class AttendeeListScaffold extends StatefulWidget {
+
+  @override
+  _AttendeeListScaffoldState createState() => _AttendeeListScaffoldState();
+}
+
+class _AttendeeListScaffoldState extends State<AttendeeListScaffold> {
+
+  TextEditingController editingController = TextEditingController();
+  List<Attendee> _filteredAttendeeList;
 
   @override
   Widget build(BuildContext context) {
+
     final attendeeData = Provider.of<AttendeeProvider>(context, listen: true);
-    final List<Attendee> attendeeList = attendeeData.attendeeList;
+    final List<Attendee> allAttendees = attendeeData.attendeeList;
+
+    if (_filteredAttendeeList == null) {
+      _filteredAttendeeList = attendeeData.filterAttendees(allAttendees, null);
+    }
 
     return Scaffold(
         appBar: AppBar(
@@ -182,26 +202,47 @@ class AttendeeListScaffold extends StatelessWidget {
             children: <Widget>[
               SizedBox(height: 20),
               Text(
-                ticketsSold + attendeeList.length.toString(),
+                ticketsSold + allAttendees.length.toString(),
                 style: Theme.of(context).textTheme.headline,
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 5),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Container(
+                  height: 40,
+                  child: TextField(
+                    onChanged: (query) {
+                      setState(() {
+                        _filteredAttendeeList = attendeeData.filterAttendees(allAttendees, query);
+                      });
+                    },
+                    textInputAction: TextInputAction.search,
+                    controller: editingController,
+                    decoration: InputDecoration(
+                        labelText: "Search",
+                        prefixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10.0)))),
+                  ),
+                ),
+              ),
+              SizedBox(height: 5),
               MajorSettingItemDivider(),
               Expanded(
                 child: ListView.separated(
-                    itemCount: attendeeList.length,
+                    itemCount: _filteredAttendeeList.length,
                     separatorBuilder: (BuildContext context, int index) => Divider(height: 0),
                     itemBuilder: (context, index) {
-                      if (attendeeList.length == index + 1) {
+                      if (_filteredAttendeeList.length == index + 1) {
                         return Column(
                           children: <Widget>[
-                            AttendeeItem(index),
+                            AttendeeItem(_filteredAttendeeList[index]),
                             Divider(height: 0),
                             SizedBox(height: 70)
                           ],
                         );
                       }
-                      return AttendeeItem(index);
+                      return AttendeeItem(_filteredAttendeeList[index]);
                     }),
               ),
             ],
@@ -217,9 +258,9 @@ class AttendeeListScaffold extends StatelessWidget {
 ///
 class AttendeeItem extends StatefulWidget {
 
-  final int index;
+  final Attendee _attendee;
 
-  AttendeeItem(this.index);
+  AttendeeItem(this._attendee);
 
   @override
   _AttendeeItemState createState() => _AttendeeItemState();
@@ -257,15 +298,8 @@ class _AttendeeItemState extends State<AttendeeItem> {
 
   @override
   Widget build(BuildContext context) {
-    final attendeeData = Provider.of<AttendeeProvider>(context, listen: true);
-    Attendee attendee = attendeeData.attendeeList[widget.index];
-    String formattedName = attendee.lastName.trim() + ', ' + attendee.firstName.trim();
-    status = attendee.ticket.status;
-    final MessageStream messageStream = GetIt.instance<MessageStream>();
-
-    messageStream.addListener((errorMessage) {
-      showErrorAlert(context, offlineError);
-    });
+    String formattedName = widget._attendee.lastName.trim() + ', ' + widget._attendee.firstName.trim();
+    status = widget._attendee.ticket.status;
 
     if (_isLoading) {
       child = Container(
@@ -285,7 +319,7 @@ class _AttendeeItemState extends State<AttendeeItem> {
             width: 10,
           ),
           SizedBox(width: 6),
-          _attendeeText(formattedName, attendee.ticket.ticketTypeConfig.name),
+          _attendeeText(formattedName, widget._attendee.ticket.ticketTypeConfig.name),
         ],
       );
     } else {
@@ -296,7 +330,7 @@ class _AttendeeItemState extends State<AttendeeItem> {
             height: _rowHeight,
             width: 16,
           ),
-          Expanded(child: _attendeeText(formattedName, attendee.ticket.ticketTypeConfig.name)),
+          Expanded(child: _attendeeText(formattedName, widget._attendee.ticket.ticketTypeConfig.name)),
           OutlineButton(
               child: Text(checkInText),
               borderSide: BorderSide(
@@ -305,7 +339,7 @@ class _AttendeeItemState extends State<AttendeeItem> {
               highlightedBorderColor: constPrimaryColor,
               textColor: constPrimaryColor,
               onPressed: () {
-                showPopUpConfirm(context, confirmCheckIn, thisNonReversible, () => _manualRedeemTicket(attendee));
+                showPopUpConfirm(context, confirmCheckIn, thisNonReversible, () => _manualRedeemTicket(widget._attendee));
               }
           ),
           SizedBox(width: 16),
