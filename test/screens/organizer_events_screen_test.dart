@@ -18,6 +18,8 @@ class MockMessageStream extends Mock implements MessageStream {}
 
 void main() {
 
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   final MessageStream messageStream = new MockMessageStream();
   final AuthUtils authUtils = new MockAuthUtils();
   final MockVenueProvider venueProviderMock = new MockVenueProvider();

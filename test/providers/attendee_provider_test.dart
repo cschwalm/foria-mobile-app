@@ -5,6 +5,8 @@ import 'package:foria_flutter_client/api.dart';
 
 void main() {
 
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   AttendeeProvider _attendeeProvider = new AttendeeProvider();
 
   test("test markAttendeeRedeemed", () async {
@@ -27,7 +29,7 @@ void main() {
     expect(list[0].ticket.status, equals('REDEEMED'));
   });
 
-  testWidgets('Attendee search for Joe finds one item', (WidgetTester tester) async {
+  test('Attendee search for Joe finds one item', () async {
     final List<Attendee> attendees = _fakeAttendeeList();
     List<Attendee> result;
 
@@ -36,7 +38,7 @@ void main() {
     expect(result.length,1);
   });
 
-  testWidgets('Attendee search for joe finds one item', (WidgetTester tester) async {
+  test('Attendee search for joe finds one item', () async {
     final List<Attendee> attendees = _fakeAttendeeList();
     List<Attendee> result;
 
@@ -45,7 +47,7 @@ void main() {
     expect(result.length,1);
   });
 
-  testWidgets('Attendee search for billy finds one item', (WidgetTester tester) async {
+  test('Attendee search for billy finds one item', () async {
     final List<Attendee> attendees = _fakeAttendeeList();
     List<Attendee> result;
 
@@ -54,7 +56,7 @@ void main() {
     expect(result.length,1);
   });
 
-  testWidgets('Attendee search for Corbin finds 8 item', (WidgetTester tester) async {
+  test('Attendee search for Corbin finds 8 item', () async {
     final List<Attendee> attendees = _fakeAttendeeList();
     List<Attendee> result;
 

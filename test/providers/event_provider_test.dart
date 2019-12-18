@@ -19,6 +19,8 @@ class MockAuthUtils extends Mock implements AuthUtils {}
 
 void main() {
 
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   final _channel = MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
   final MessageStream messageStream = new MockMessageStream();
   final DatabaseUtils databaseUtils = new MockDatabaseUtils();

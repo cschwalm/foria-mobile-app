@@ -10,7 +10,6 @@ import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 
-
 class MockBarcode extends Mock implements Barcode {}
 class MockTicketProvider extends Mock implements TicketProvider {}
 class MockRedemptionResult extends Mock implements RedemptionResult {}

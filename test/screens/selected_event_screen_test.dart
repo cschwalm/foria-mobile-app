@@ -18,6 +18,8 @@ final MockStream mockStream = new MockStream();
 
 void main() {
 
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   final MessageStream messageStream = new MockMessageStream();
   GetIt.instance.registerSingleton<MessageStream>(messageStream);
 
