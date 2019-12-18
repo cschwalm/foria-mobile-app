@@ -13,7 +13,6 @@ Future<void> contactSupport() async {
 
   try {
     await FlutterEmailSender.send(email);
-    messageStream.announceMessage(ForiaNotification.message(MessageType.MESSAGE, supportEmailSent, null));
   } catch (error) {
     messageStream.announceMessage(ForiaNotification.message(MessageType.MESSAGE, supportEmailFailed, null));
   }

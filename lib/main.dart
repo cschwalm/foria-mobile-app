@@ -46,6 +46,7 @@ void mainDelegate() {
     DeviceOrientation.portraitDown,
   ]);
 
+  WidgetsFlutterBinding.ensureInitialized();
   setupDependencies();
 
   runZoned<Future<void>>(() async {
