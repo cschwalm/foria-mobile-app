@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:foria/main.dart';
 import 'package:foria/screens/home.dart';
 import 'package:foria/screens/login.dart';
-import 'package:foria/screens/splash_screen.dart';
 import 'package:foria/screens/organizer_home_screen.dart';
+import 'package:foria/screens/splash_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/message_stream.dart';
 import 'package:get_it/get_it.dart';
@@ -14,6 +14,8 @@ class MockAuthUtils extends Mock implements AuthUtils {}
 class MockMessageStream extends Mock implements MessageStream {}
 
 void main() {
+
+  TestWidgetsFlutterBinding.ensureInitialized();
 
   final MessageStream messageStream = new MockMessageStream();
   GetIt.instance.registerSingleton<MessageStream>(messageStream);

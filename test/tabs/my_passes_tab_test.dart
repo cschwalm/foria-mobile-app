@@ -18,6 +18,8 @@ final String _eventName = 'TestEvent';
 
 void main() {
 
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   final MessageStream messageStream = new MockMessageStream();
   final AuthUtils authUtils = new MockAuthUtils();
   final TicketProvider ticketProviderMock = new MockTicketProvider();
