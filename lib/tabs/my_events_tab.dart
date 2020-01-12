@@ -493,9 +493,31 @@ class EmailVerificationConflict extends StatefulWidget {
 class _EmailVerificationConflictState extends State<EmailVerificationConflict> {
 
   bool _isCheckingVerification = false;
+  bool _showEmailVerifyButton = true;
+  Widget child;
 
   @override
   Widget build(BuildContext context) {
+
+    if (_showEmailVerifyButton){
+      child = Column(
+        children: <Widget>[
+          SizedBox(
+            height: 20,
+          ),
+          GestureDetector(
+            child: Text(resendConfirmEmail,
+              style: TextStyle(fontSize: 18.0, color: constPrimaryColor),
+              textAlign: TextAlign.center,
+            ),
+            onTap: (){},
+          )
+        ],
+      );
+    } else {
+      child = Container();
+    }
+
     return PopUpCard(
       content: Column(
         children: <Widget>[
@@ -516,7 +538,7 @@ class _EmailVerificationConflictState extends State<EmailVerificationConflict> {
             height: 25,
           ),
           PrimaryButton(
-            text: iveConfirmedEmail,
+            text: checkAgain,
             isLoading: _isCheckingVerification,
             onPress: _isCheckingVerification ? null :
                 () async {
@@ -534,6 +556,7 @@ class _EmailVerificationConflictState extends State<EmailVerificationConflict> {
 
             },
           ),
+          child
         ],
       ),
     );
