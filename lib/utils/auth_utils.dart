@@ -10,7 +10,6 @@ import 'package:foria/main.dart';
 import 'package:foria/screens/home.dart';
 import 'package:foria/screens/intro_screen_one.dart';
 import 'package:foria/screens/login.dart';
-import 'package:foria/screens/organizer_home_screen.dart';
 import 'package:foria/utils/database_utils.dart';
 import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
@@ -198,9 +197,9 @@ class AuthUtils {
       }
 
       if (await doesUserHaveVenueAccess()) {
-        Navigator.pushReplacementNamed(context, OrganizerHomeScreen.routeName);
+        Navigator.of(context).pushReplacementNamed(Home.routeName);
       } else if (pref.getBool('viewedForiaIntro')) {
-        Navigator.pushReplacementNamed(context, Home.routeName);
+        Navigator.of(context).pushReplacementNamed(Home.routeName);
       } else {
         Navigator.pushReplacementNamed(context, IntroScreenOne.routeName);
       }

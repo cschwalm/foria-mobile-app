@@ -1,15 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/main.dart';
-import 'package:foria/screens/organizer_home_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:get_it/get_it.dart';
 
-import 'home.dart';
 import 'login.dart';
 
 ///
 /// First screen shown to user. Transitions away automatically.
+import 'home.dart';
 ///
 class SplashScreen extends StatefulWidget {
 
@@ -45,8 +44,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
     if (!await authUtils.isUserLoggedIn(true)) {
       navigatorKey.currentState.pushReplacementNamed(Login.routeName);
-    } else if (await authUtils.doesUserHaveVenueAccess()) {
-      navigatorKey.currentState.pushReplacementNamed(OrganizerHomeScreen.routeName);
     } else {
       navigatorKey.currentState.pushReplacementNamed(Home.routeName);
     }

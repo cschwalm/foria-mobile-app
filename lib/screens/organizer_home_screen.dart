@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:foria/screens/organizer_events_screen.dart';
+import 'package:foria/tabs/organizer_events_tab.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/widgets/contact_support.dart';
@@ -75,7 +75,7 @@ class OrganizerHomeScreen extends StatelessWidget {
             labelTextStyle: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold,color: Theme.of(context).primaryColor),
             content: SettingsNavigationIndicator(),
             onPress: () {
-              Navigator.of(context).pushNamed(OrganizerEventsScreen.routeName);
+              Navigator.of(context).pushNamed(OrganizerEventsTab.routeName);
             },
           ),
           SettingItemDivider(),

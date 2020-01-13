@@ -70,6 +70,8 @@ const String checkAgain = 'Check again';
 
 const String resendConfirmEmail = 'Resend confirmation email';
 
+const String emailSent = 'Email sent!';
+
 // Contact Us Strings. //
 
 const String contactUs = 'Contact Us';

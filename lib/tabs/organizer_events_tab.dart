@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:foria/providers/venue_provider.dart';
 import 'package:foria/screens/attendee_list_screen.dart';
 import 'package:foria/utils/constants.dart';
-import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/discover_event_image.dart';
 import 'package:foria/widgets/errors/error_try_again_column.dart';
 import 'package:foria/widgets/no_events_column.dart';
@@ -17,12 +16,12 @@ import 'package:provider/provider.dart';
 ///
 /// Displays all the events an organizer has access to
 ///
-class OrganizerEventsScreen extends StatefulWidget {
+class OrganizerEventsTab extends StatefulWidget {
 
   static const routeName = '/organizer-events-screen';
 
   @override
-  _OrganizerEventsScreenState createState() => _OrganizerEventsScreenState();
+  _OrganizerEventsTabState createState() => _OrganizerEventsTabState();
 }
 enum _LoadingState {
 
@@ -32,7 +31,7 @@ enum _LoadingState {
   NO_EVENTS_AVAILABLE
 }
 
-class _OrganizerEventsScreenState extends State<OrganizerEventsScreen> with AutomaticKeepAliveClientMixin<OrganizerEventsScreen> {
+class _OrganizerEventsTabState extends State<OrganizerEventsTab> with AutomaticKeepAliveClientMixin<OrganizerEventsTab> {
 
   VenueProvider _venueProvider;
   _LoadingState _currentState;
@@ -88,14 +87,7 @@ class _OrganizerEventsScreenState extends State<OrganizerEventsScreen> with Auto
 
     return ChangeNotifierProvider<VenueProvider>.value(
         value: _venueProvider,
-        child: Scaffold(
-          backgroundColor: settingsBackgroundColor,
-          appBar: AppBar(
-            title: Text(selectEvent),
-            backgroundColor: Theme.of(context).primaryColorDark,
-          ),
-          body: child
-        )
+        child: child
     );
   }
 }

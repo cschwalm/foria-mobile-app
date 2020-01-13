@@ -15,11 +15,10 @@ import 'package:foria/providers/venue_provider.dart';
 import 'package:foria/screens/attendee_list_screen.dart';
 import 'package:foria/screens/intro_screen_one.dart';
 import 'package:foria/screens/intro_screen_two.dart';
-import 'package:foria/screens/organizer_events_screen.dart';
-import 'package:foria/screens/organizer_home_screen.dart';
 import 'package:foria/screens/splash_screen.dart';
 import 'package:foria/screens/ticket_scan_screen.dart';
 import 'package:foria/screens/transfer_screen.dart';
+import 'package:foria/tabs/organizer_events_tab.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/database_utils.dart';
@@ -108,12 +107,8 @@ void mainDelegate() {
                   return MaterialPageRoute(builder: (context) => TicketScanScreen(), settings: settings);
                   break;
 
-                case OrganizerHomeScreen.routeName:
-                  return MaterialPageRoute(builder: (context) => OrganizerHomeScreen(), settings: settings);
-                  break;
-
-                case OrganizerEventsScreen.routeName:
-                  return MaterialPageRoute(builder: (context) => OrganizerEventsScreen(), settings: settings);
+                case OrganizerEventsTab.routeName:
+                  return MaterialPageRoute(builder: (context) => OrganizerEventsTab(), settings: settings);
                   break;
 
                 case AttendeeListScreen.routeName:

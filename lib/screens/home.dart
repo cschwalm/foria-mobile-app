@@ -2,7 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:foria/tabs/explore_events_tab.dart';
+import 'package:foria/tabs/organizer_events_tab.dart';
+import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/size_config.dart';
+import 'package:get_it/get_it.dart';
 
 import '../tabs/account_tab.dart';
 import '../tabs/my_events_tab.dart';
@@ -64,6 +67,8 @@ class TabsState extends State<Tabs> {
   MyEventsTab _myPassesTab;
   AccountTab _accountTab;
   ExploreEventsTab _discoverEventsTab;
+  OrganizerEventsTab _venueTab;
+  List<TabItem> _allTabs;
 
   String _titleApp;
   int _tab = 1;
@@ -75,8 +80,11 @@ class TabsState extends State<Tabs> {
     _myPassesTab = new MyEventsTab();
     _accountTab = new AccountTab();
     _discoverEventsTab = new ExploreEventsTab();
+    _venueTab = new OrganizerEventsTab();
+    _allTabs = new List<TabItem>();
+    venueAccessCheck();
 
-    this._titleApp = TabItems[1].title;
+    this._titleApp = _allTabs[1].title;
 
     super.initState();
   }
@@ -85,6 +93,28 @@ class TabsState extends State<Tabs> {
   void dispose() {
     super.dispose();
     _tabController.dispose();
+  }
+
+  void venueAccessCheck() {
+
+
+    //Builds base set of tabs for all users.
+    for (TabItem currentTab in baseTabItems) {
+      _allTabs.add(currentTab);
+    }
+
+    final AuthUtils authUtils = GetIt.instance<AuthUtils>();
+    authUtils.doesUserHaveVenueAccess().then((isVenue) {
+      if (isVenue) {
+        setState(() {
+          _allTabs.add(TabItem(
+            title: 'Manage Events',
+            icon: FontAwesomeIcons.qrcode,
+            activeIcon: FontAwesomeIcons.qrcode,
+          ));
+        });
+      }
+    });
   }
 
   @override
@@ -117,6 +147,7 @@ class TabsState extends State<Tabs> {
                 _discoverEventsTab,
                 _myPassesTab,
                 _accountTab,
+                _venueTab
               ]),
       bottomNavigationBar: Theme
           .of(context)
@@ -129,7 +160,7 @@ class TabsState extends State<Tabs> {
         currentIndex: _tab,
         onTap: onTap,
         backgroundColor: Colors.white,
-        items: TabItems.map((tabItem) {
+        items: _allTabs.map((tabItem) {
           return new BottomNavigationBarItem(
             title: new Text(tabItem.title),
             icon: new Icon(tabItem.icon),
@@ -141,7 +172,7 @@ class TabsState extends State<Tabs> {
         currentIndex: _tab,
         onTap: onTap,
         backgroundColor: Colors.white,
-        items: TabItems.map((tabItem) {
+        items: _allTabs.map((tabItem) {
           return new BottomNavigationBarItem(
             title: new Text(tabItem.title),
             icon: new Icon(tabItem.icon),
@@ -163,20 +194,7 @@ class TabsState extends State<Tabs> {
 
     setState(() {
       this._tab = tab;
-
-      switch (tab) {
-        case 0:
-          this._titleApp = TabItems[0].title;
-          break;
-
-        case 1:
-          this._titleApp = TabItems[1].title;
-          break;
-
-        case 2:
-          this._titleApp = TabItems[2].title;
-          break;
-      }
+      this._titleApp = _allTabs[tab].title;
     });
   }
 }
@@ -190,7 +208,7 @@ class TabItem {
   final IconData activeIcon;
 }
 
-const List<TabItem> TabItems = const <TabItem>[
+const List<TabItem> baseTabItems = const <TabItem>[
   const TabItem(
     title: 'Explore',
     icon: IconData(
