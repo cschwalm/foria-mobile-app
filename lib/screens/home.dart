@@ -68,10 +68,12 @@ class TabsState extends State<Tabs> {
   AccountTab _accountTab;
   ExploreEventsTab _discoverEventsTab;
   OrganizerEventsTab _venueTab;
-  List<TabItem> _allTabs;
+  List<TabItem> _allTabs = new List<TabItem>();
 
   String _titleApp;
   int _tab = 1;
+
+  List<TabItem> get allTabs => List.unmodifiable(_allTabs);
 
   @override
   void initState() {
@@ -81,7 +83,7 @@ class TabsState extends State<Tabs> {
     _accountTab = new AccountTab();
     _discoverEventsTab = new ExploreEventsTab();
     _venueTab = new OrganizerEventsTab();
-    _allTabs = new List<TabItem>();
+
     venueAccessCheck();
 
     this._titleApp = _allTabs[1].title;
@@ -95,8 +97,10 @@ class TabsState extends State<Tabs> {
     _tabController.dispose();
   }
 
+  ///
+  /// Adds venue tab is if user is logged in as a venue.
+  ///
   void venueAccessCheck() {
-
 
     //Builds base set of tabs for all users.
     for (TabItem currentTab in baseTabItems) {
@@ -105,15 +109,15 @@ class TabsState extends State<Tabs> {
 
     final AuthUtils authUtils = GetIt.instance<AuthUtils>();
     authUtils.doesUserHaveVenueAccess().then((isVenue) {
+
       if (isVenue) {
-        setState(() {
-          _allTabs.add(TabItem(
-            title: 'Manage Events',
-            icon: FontAwesomeIcons.qrcode,
-            activeIcon: FontAwesomeIcons.qrcode,
-          ));
-        });
+        _allTabs.add(TabItem(
+          title: 'Manage Events',
+          icon: FontAwesomeIcons.qrcode,
+          activeIcon: FontAwesomeIcons.qrcode,
+        ));
       }
+
     });
   }
 
