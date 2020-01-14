@@ -64,7 +64,7 @@ class Tabs extends StatefulWidget {
 class TabsState extends State<Tabs> {
 
   PageController _tabController;
-  MyEventsTab _myPassesTab;
+  MyEventsTab _myEventsTab;
   AccountTab _accountTab;
   ExploreEventsTab _discoverEventsTab;
   OrganizerEventsTab _venueTab;
@@ -77,7 +77,7 @@ class TabsState extends State<Tabs> {
   void initState() {
 
     _tabController = new PageController(initialPage: 1);
-    _myPassesTab = new MyEventsTab();
+    _myEventsTab = new MyEventsTab();
     _accountTab = new AccountTab();
     _discoverEventsTab = new ExploreEventsTab();
     _venueTab = new OrganizerEventsTab();
@@ -145,7 +145,7 @@ class TabsState extends State<Tabs> {
               onPageChanged: onTabChanged,
               children: <Widget>[
                 _discoverEventsTab,
-                _myPassesTab,
+                _myEventsTab,
                 _accountTab,
                 _venueTab
               ]),
