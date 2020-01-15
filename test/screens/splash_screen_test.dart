@@ -55,7 +55,7 @@ void main() {
     final List<Event> events = _fakeEventSoldOut();
 
     when(authUtils.isUserLoggedIn(true)).thenAnswer((_) => Future.value(true));
-    when(authUtils.doesUserHaveVenueAccess()).thenAnswer((_) => Future.value(true));
+    when(authUtils.isVenue).thenReturn(true);
     when(eventProviderMock.events).thenReturn(UnmodifiableListView(events));
     when(eventProviderMock.getAllEvents()).thenAnswer((_) async => events);
 
@@ -77,7 +77,7 @@ void main() {
   testWidgets('navigates to home if user logged in as a fan, not venue', (WidgetTester tester) async {
 
     when(authUtils.isUserLoggedIn(true)).thenAnswer((_) => Future.value(true));
-    when(authUtils.doesUserHaveVenueAccess()).thenAnswer((_) => Future.value(false));
+    when(authUtils.isVenue).thenReturn(false);
 
     await tester.pumpWidget(MaterialApp(
       home: SplashScreen(),

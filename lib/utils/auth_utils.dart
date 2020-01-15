@@ -39,7 +39,7 @@ class AuthUtils {
 
   /// Data from logged in user
   User _user;
-  bool _isVenue;
+  bool _isVenue = false;
 
   ///
   /// May be null if user has not logged in.
@@ -196,7 +196,7 @@ class AuthUtils {
         pref.setBool('viewedForiaIntro', false);
       }
 
-      if (await doesUserHaveVenueAccess()) {
+      if (isVenue) {
         Navigator.of(context).pushReplacementNamed(Home.routeName);
       } else if (pref.getBool('viewedForiaIntro')) {
         Navigator.of(context).pushReplacementNamed(Home.routeName);
@@ -215,12 +215,10 @@ class AuthUtils {
   ///
   /// Checks Auth0 permission scope "write:venue_redeem"
   ///
-  Future<bool> doesUserHaveVenueAccess() async {
-    JsonWebToken jwt = await _loadToken(accessTokenKey);
+  bool _doesUserHaveVenueAccess(JsonWebToken jwt) {
 
     if (jwt == null) {
       log("ERROR: No token found in storage. Not able to check venue.", level: Level.WARNING.value);
-      _isVenue = false;
       return false;
     }
 
@@ -232,13 +230,11 @@ class AuthUtils {
       for (String scope in scopeArr) {
         if (scope == "write:venue_redeem") {
           log("User is acessing a venue account.");
-          _isVenue = true;
           return true;
         }
       }
     }
 
-    _isVenue = false;
     return false;
   }
 
@@ -268,6 +264,7 @@ class AuthUtils {
   ///
   Future<bool> isUserLoggedIn(bool doExpirationCheck) async {
     JsonWebToken jwt = await _loadToken(idTokenKey);
+    JsonWebToken accessToken = await _loadToken(accessTokenKey);
 
     if (jwt == null) {
       log("No token found in storage. User is not logged in.");
@@ -280,16 +277,16 @@ class AuthUtils {
         jwt = await forceTokenRefresh();
       } catch (ex) {
         log("Exception caught refreshing token. Device might be offline. Msg: ${ex.toString()}", level: Level.WARNING.value);
-        return true;
       }
     }
 
-    // Setup user data.
     _user = new User();
     _user.id = jwt.claims.subject;
     _user.email = jwt.claims["email"];
     _user.firstName = jwt.claims["given_name"];
     _user.lastName = jwt.claims["family_name"];
+
+    _isVenue = _doesUserHaveVenueAccess(accessToken);
 
     _analytics.setUserId(_user.id);
     return true;

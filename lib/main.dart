@@ -166,21 +166,11 @@ void setupDependencies() {
   quickActions.initialize((shortcutType) async {
     if (shortcutType == 'ACTION_SCAN') {
       log('User opened app via quick action: $shortcutType');
-      if (await authUtils.isUserLoggedIn(true) && await authUtils.doesUserHaveVenueAccess()) {
+      if (await authUtils.isUserLoggedIn(true) && authUtils.isVenue) {
         navigatorKey.currentState.pushNamed(TicketScanScreen.routeName);
       } else {
         log('ERROR: User does not have venue access and attempted to open scan screen.', level: Level.WARNING.value);
       }
-    }
-  });
-
-  //Only add the shortcut item after venue access has been verified.
-  authUtils.doesUserHaveVenueAccess().then( (isVenue) {
-
-    if (isVenue) {
-      final List<ShortcutItem> list = new List<ShortcutItem>();
-      list.add(const ShortcutItem(type: 'ACTION_SCAN', localizedTitle: 'Scan Tickets', icon: 'ic_action_scan'));
-      quickActions.setShortcutItems(list);
     }
   });
 }

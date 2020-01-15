@@ -27,7 +27,7 @@ void main() {
   test('Venue tab doesnt get built when user does not have venue access', () async {
 
     TabsState tabsState = new TabsState();
-    when(authUtils.doesUserHaveVenueAccess()).thenAnswer((_) => Future.value(false));
+    when(authUtils.isVenue).thenReturn(false);
     tabsState.venueAccessCheck();
 
     // do something to wait for 2 seconds
@@ -39,7 +39,7 @@ void main() {
   test('Venue tab gets built when user does have venue access', () async {
 
     TabsState tabsState = new TabsState();
-    when(authUtils.doesUserHaveVenueAccess()).thenAnswer((_) => Future.value(true));
+    when(authUtils.isVenue).thenReturn(true);
     tabsState.venueAccessCheck();
 
     // do something to wait for 2 seconds

@@ -64,11 +64,9 @@ class Tabs extends StatefulWidget {
 class TabsState extends State<Tabs> {
 
   PageController _tabController;
-  MyEventsTab _myEventsTab;
-  AccountTab _accountTab;
-  ExploreEventsTab _discoverEventsTab;
-  OrganizerEventsTab _venueTab;
   List<TabItem> _allTabs = new List<TabItem>();
+
+  bool _venueTabEnabled = false;
 
   String _titleApp;
   int _tab = 1;
@@ -79,13 +77,7 @@ class TabsState extends State<Tabs> {
   void initState() {
 
     _tabController = new PageController(initialPage: 1);
-    _myEventsTab = new MyEventsTab();
-    _accountTab = new AccountTab();
-    _discoverEventsTab = new ExploreEventsTab();
-    _venueTab = new OrganizerEventsTab();
-
     venueAccessCheck();
-
     this._titleApp = _allTabs[1].title;
 
     super.initState();
@@ -108,21 +100,29 @@ class TabsState extends State<Tabs> {
     }
 
     final AuthUtils authUtils = GetIt.instance<AuthUtils>();
-    authUtils.doesUserHaveVenueAccess().then((isVenue) {
 
-      if (isVenue) {
-        _allTabs.add(TabItem(
-          title: 'Manage Events',
-          icon: FontAwesomeIcons.qrcode,
-          activeIcon: FontAwesomeIcons.qrcode,
-        ));
-      }
-
-    });
+    if (authUtils.isVenue) {
+      _venueTabEnabled = true;
+      _allTabs.add(TabItem(
+        title: 'Manage Events',
+        icon: FontAwesomeIcons.qrcode,
+        activeIcon: FontAwesomeIcons.qrcode,
+      ));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+
+    final List<Widget> tabContent = [
+      new ExploreEventsTab(),
+      new MyEventsTab(),
+      new AccountTab()
+    ];
+
+    if (_venueTabEnabled) {
+      tabContent.add(new OrganizerEventsTab());
+    }
 
     return new Scaffold(
       //App Bar
@@ -147,12 +147,8 @@ class TabsState extends State<Tabs> {
       body: PageView(
               controller: _tabController,
               onPageChanged: onTabChanged,
-              children: <Widget>[
-                _discoverEventsTab,
-                _myEventsTab,
-                _accountTab,
-                _venueTab
-              ]),
+              children: tabContent
+      ),
       bottomNavigationBar: Theme
           .of(context)
           .platform == TargetPlatform.iOS
