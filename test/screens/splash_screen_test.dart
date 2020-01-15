@@ -35,19 +35,18 @@ void main() {
   testWidgets('navigates to login screen if user not logged in', (WidgetTester tester) async {
 
     when(authUtils.isUserLoggedIn(true)).thenAnswer((_) => Future.value(false));
+    when(authUtils.isVenue).thenReturn(false);
 
     await tester.pumpWidget(MaterialApp(
         home: SplashScreen(),
       navigatorKey: navigatorKey,
       routes: {
-        Login.routeName: (context) => Container(),
-
+        Login.routeName: (context) => Login(),
       },
     ));
 
     await tester.pumpAndSettle();
-    expect(find.byType(Container), findsOneWidget);
-
+    expect(find.byType(Login), findsOneWidget);
   });
 
   testWidgets('navigates to venue screen if user logged in as a venue', (WidgetTester tester) async {
@@ -84,14 +83,12 @@ void main() {
       navigatorKey: navigatorKey,
       routes: {
         Home.routeName: (context) => Container(),
-        //the test executes the build via the Home.routename, but times out on Home(). Login() used as a proxy to prove test works
+        //the test executes the build via the Home. routename, but times out on Home(). Login() used as a proxy to prove test works
       },
     ));
 
     await tester.pumpAndSettle();
-
     expect(find.byType(Container), findsOneWidget);
-
   });
 }
 
