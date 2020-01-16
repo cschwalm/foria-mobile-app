@@ -66,7 +66,11 @@ const String emailConfirmationRequired = 'Email Confirmation Required';
 
 const String pleaseConfirmEmail = 'Please check your email for an email confirmation request. Once completed you\'ll be able to log in.';
 
-const String iveConfirmedEmail = 'I\'ve confirmed my email';
+const String checkAgain = 'Check again';
+
+const String resendConfirmEmail = 'Resend confirmation email';
+
+const String emailSent = 'Email sent!';
 
 // Contact Us Strings. //
 

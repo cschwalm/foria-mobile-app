@@ -10,7 +10,7 @@ import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 
-import '../screens/selected_event_screen_test.dart';
+import '../screens/my_tickets_screen_test.dart';
 
 class MockDatabaseUtils extends Mock implements DatabaseUtils {}
 class MockEventApi extends Mock implements EventApi {}

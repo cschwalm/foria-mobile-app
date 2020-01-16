@@ -15,11 +15,10 @@ import 'package:foria/providers/venue_provider.dart';
 import 'package:foria/screens/attendee_list_screen.dart';
 import 'package:foria/screens/intro_screen_one.dart';
 import 'package:foria/screens/intro_screen_two.dart';
-import 'package:foria/screens/organizer_events_screen.dart';
-import 'package:foria/screens/organizer_home_screen.dart';
 import 'package:foria/screens/splash_screen.dart';
 import 'package:foria/screens/ticket_scan_screen.dart';
 import 'package:foria/screens/transfer_screen.dart';
+import 'package:foria/tabs/organizer_events_tab.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/constants.dart';
 import 'package:foria/utils/database_utils.dart';
@@ -108,12 +107,8 @@ void mainDelegate() {
                   return MaterialPageRoute(builder: (context) => TicketScanScreen(), settings: settings);
                   break;
 
-                case OrganizerHomeScreen.routeName:
-                  return MaterialPageRoute(builder: (context) => OrganizerHomeScreen(), settings: settings);
-                  break;
-
-                case OrganizerEventsScreen.routeName:
-                  return MaterialPageRoute(builder: (context) => OrganizerEventsScreen(), settings: settings);
+                case OrganizerEventsTab.routeName:
+                  return MaterialPageRoute(builder: (context) => OrganizerEventsTab(), settings: settings);
                   break;
 
                 case AttendeeListScreen.routeName:
@@ -171,21 +166,11 @@ void setupDependencies() {
   quickActions.initialize((shortcutType) async {
     if (shortcutType == 'ACTION_SCAN') {
       log('User opened app via quick action: $shortcutType');
-      if (await authUtils.isUserLoggedIn(true) && await authUtils.doesUserHaveVenueAccess()) {
+      if (await authUtils.isUserLoggedIn(true) && authUtils.isVenue) {
         navigatorKey.currentState.pushNamed(TicketScanScreen.routeName);
       } else {
         log('ERROR: User does not have venue access and attempted to open scan screen.', level: Level.WARNING.value);
       }
-    }
-  });
-
-  //Only add the shortcut item after venue access has been verified.
-  authUtils.doesUserHaveVenueAccess().then( (isVenue) {
-
-    if (isVenue) {
-      final List<ShortcutItem> list = new List<ShortcutItem>();
-      list.add(const ShortcutItem(type: 'ACTION_SCAN', localizedTitle: 'Scan Tickets', icon: 'ic_action_scan'));
-      quickActions.setShortcutItems(list);
     }
   });
 }

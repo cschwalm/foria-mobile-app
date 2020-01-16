@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:foria/utils/auth_utils.dart';
@@ -116,18 +117,21 @@ class MessageStream {
     if (error != null) {
 
       final String envLabel = Environment.STAGING == Configuration.getEnvironment() ? 'staging' : 'prodution';
+      final String osLabel = Platform.operatingSystem.toUpperCase();
+      final String envFullText = osLabel + ' ' + envLabel;
       final PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
-      if (packageInfo.buildNumber == '1'){
+      if (packageInfo.buildNumber == '1') {
         return;
       }
+
       if (_sentry == null) {
         final buildVersion = '${packageInfo.version} - Build: ${packageInfo.buildNumber}';
 
         final AuthUtils authUtils = GetIt.instance<AuthUtils>();
         final user = authUtils.user;
         final User userContext = new User(id: user.id, email: user.email);
-        final Event env = new Event(release: buildVersion, environment: envLabel, userContext: userContext);
+        final Event env = new Event(release: buildVersion, environment: envFullText, userContext: userContext);
 
         _sentry = new SentryClient(dsn: sentryDsn, environmentAttributes: env);
 

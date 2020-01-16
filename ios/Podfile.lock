@@ -281,7 +281,7 @@ SPEC CHECKSUMS:
   device_info: cbf09d2ec12aa7110e0b09fabe54b5bd6c8efe74
   Firebase: 0219bb4782eb1406f1b9b0628a2e625484ce910d
   firebase_analytics: d83001d25b9a58ca5eda8db0ef566c02d7af5258
-  firebase_core: 87e4c7cef68de46c0326ce2ee907fc7e365ead7e
+  firebase_core: 9bd2e66a276153e219a87ff39dfecb6b671f524a
   firebase_core_web: d501d8b946b60c8af265428ce483b0fff5ad52d1
   firebase_messaging: b8543d17dd9825f4f24a585477f77db103e5228e
   firebase_ml_vision: a40524ef47717f380239e19567c9dc050d8cc1de
@@ -295,7 +295,7 @@ SPEC CHECKSUMS:
   FirebaseMLCommon: 074a67e05122b1c9f6401a4e33b2cea3b4efd224
   FirebaseMLVision: 7a456009787690e3b53436092ae9b635563de8f3
   FirebaseMLVisionBarcodeModel: 96ef18a75ecdf867244ef2e75c8c1f01517667dc
-  Flutter: c07ea686ea8940dc75f09e821939d5673da0f1b8
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   flutter_auth0: 1d379ce1faf80f27b1058ef2502b6d0181561bdb
   flutter_email_sender: f787522d0e82f50e5766c1213dbffff22fdcf009
   flutter_secure_storage: 7953c38a04c3fdbb00571bcd87d8e3b5ceb9daec

@@ -1,15 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foria/main.dart';
-import 'package:foria/screens/organizer_home_screen.dart';
 import 'package:foria/utils/auth_utils.dart';
 import 'package:get_it/get_it.dart';
+import 'package:quick_actions/quick_actions.dart';
 
+///
+/// First screen shown to user. Transitions away automatically.
 import 'home.dart';
 import 'login.dart';
 
 ///
-/// First screen shown to user. Transitions away automatically.
+/// First screen user is shown. Loads token from disk and parses before advancing.
 ///
 class SplashScreen extends StatefulWidget {
 
@@ -30,23 +32,37 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     super.initState();
     controller = AnimationController(duration: const Duration(seconds: 2), vsync: this);
     animation = CurvedAnimation(parent: controller, curve: Curves.easeIn);
-    controller.forward();
-    controller.addStatusListener((AnimationStatus status) {
 
-      if (status == AnimationStatus.completed) {
-        _determineNavigationRoute();
+    //Wait until the token is parsed before advancing. This ensures future tabs can depend on AuthUtils data.
+    final AuthUtils authUtils = GetIt.instance<AuthUtils>();
+    authUtils.isUserLoggedIn(true).then((isLoggedIn) {
+
+      if (authUtils.isVenue) {
+
+        final List<ShortcutItem> list = new List<ShortcutItem>();
+        final QuickActions quickActions = new QuickActions();
+        list.add(const ShortcutItem(type: 'ACTION_SCAN', localizedTitle: 'Scan Tickets', icon: 'ic_action_scan'));
+        quickActions.setShortcutItems(list);
       }
+
+      controller.addStatusListener((AnimationStatus status) {
+
+        if (status == AnimationStatus.completed) {
+          _determineNavigationRoute(isLoggedIn);
+        }
+      });
     });
+
+    controller.forward();
   }
 
-  Future<void> _determineNavigationRoute() async {
+  ///
+  /// Sends user to login screen if not logged in.
+  ///
+  Future<void> _determineNavigationRoute(bool isLoggedIn) async {
 
-    final AuthUtils authUtils = GetIt.instance<AuthUtils>();
-
-    if (!await authUtils.isUserLoggedIn(true)) {
+    if (!isLoggedIn) {
       navigatorKey.currentState.pushReplacementNamed(Login.routeName);
-    } else if (await authUtils.doesUserHaveVenueAccess()) {
-      navigatorKey.currentState.pushReplacementNamed(OrganizerHomeScreen.routeName);
     } else {
       navigatorKey.currentState.pushReplacementNamed(Home.routeName);
     }

@@ -2,7 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:foria/tabs/explore_events_tab.dart';
+import 'package:foria/tabs/organizer_events_tab.dart';
+import 'package:foria/utils/auth_utils.dart';
 import 'package:foria/utils/size_config.dart';
+import 'package:get_it/get_it.dart';
 
 import '../tabs/account_tab.dart';
 import '../tabs/my_events_tab.dart';
@@ -61,22 +64,21 @@ class Tabs extends StatefulWidget {
 class TabsState extends State<Tabs> {
 
   PageController _tabController;
-  MyEventsTab _myPassesTab;
-  AccountTab _accountTab;
-  ExploreEventsTab _discoverEventsTab;
+  List<TabItem> _allTabs = new List<TabItem>();
+
+  bool _venueTabEnabled = false;
 
   String _titleApp;
   int _tab = 1;
+
+  List<TabItem> get allTabs => List.unmodifiable(_allTabs);
 
   @override
   void initState() {
 
     _tabController = new PageController(initialPage: 1);
-    _myPassesTab = new MyEventsTab();
-    _accountTab = new AccountTab();
-    _discoverEventsTab = new ExploreEventsTab();
-
-    this._titleApp = TabItems[1].title;
+    venueAccessCheck();
+    this._titleApp = _allTabs[1].title;
 
     super.initState();
   }
@@ -87,8 +89,40 @@ class TabsState extends State<Tabs> {
     _tabController.dispose();
   }
 
+  ///
+  /// Adds venue tab is if user is logged in as a venue.
+  ///
+  void venueAccessCheck() {
+
+    //Builds base set of tabs for all users.
+    for (TabItem currentTab in baseTabItems) {
+      _allTabs.add(currentTab);
+    }
+
+    final AuthUtils authUtils = GetIt.instance<AuthUtils>();
+
+    if (authUtils.isVenue) {
+      _venueTabEnabled = true;
+      _allTabs.add(TabItem(
+        title: 'Manage Events',
+        icon: FontAwesomeIcons.qrcode,
+        activeIcon: FontAwesomeIcons.qrcode,
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    final List<Widget> tabContent = [
+      new ExploreEventsTab(),
+      new MyEventsTab(),
+      new AccountTab()
+    ];
+
+    if (_venueTabEnabled) {
+      tabContent.add(new OrganizerEventsTab());
+    }
 
     return new Scaffold(
       //App Bar
@@ -113,11 +147,8 @@ class TabsState extends State<Tabs> {
       body: PageView(
               controller: _tabController,
               onPageChanged: onTabChanged,
-              children: <Widget>[
-                _discoverEventsTab,
-                _myPassesTab,
-                _accountTab,
-              ]),
+              children: tabContent
+      ),
       bottomNavigationBar: Theme
           .of(context)
           .platform == TargetPlatform.iOS
@@ -129,7 +160,7 @@ class TabsState extends State<Tabs> {
         currentIndex: _tab,
         onTap: onTap,
         backgroundColor: Colors.white,
-        items: TabItems.map((tabItem) {
+        items: _allTabs.map((tabItem) {
           return new BottomNavigationBarItem(
             title: new Text(tabItem.title),
             icon: new Icon(tabItem.icon),
@@ -139,9 +170,10 @@ class TabsState extends State<Tabs> {
       )
           : new BottomNavigationBar(
         currentIndex: _tab,
+        type: BottomNavigationBarType.fixed,
         onTap: onTap,
         backgroundColor: Colors.white,
-        items: TabItems.map((tabItem) {
+        items: _allTabs.map((tabItem) {
           return new BottomNavigationBarItem(
             title: new Text(tabItem.title),
             icon: new Icon(tabItem.icon),
@@ -163,20 +195,7 @@ class TabsState extends State<Tabs> {
 
     setState(() {
       this._tab = tab;
-
-      switch (tab) {
-        case 0:
-          this._titleApp = TabItems[0].title;
-          break;
-
-        case 1:
-          this._titleApp = TabItems[1].title;
-          break;
-
-        case 2:
-          this._titleApp = TabItems[2].title;
-          break;
-      }
+      this._titleApp = _allTabs[tab].title;
     });
   }
 }
@@ -190,7 +209,7 @@ class TabItem {
   final IconData activeIcon;
 }
 
-const List<TabItem> TabItems = const <TabItem>[
+const List<TabItem> baseTabItems = const <TabItem>[
   const TabItem(
     title: 'Explore',
     icon: IconData(

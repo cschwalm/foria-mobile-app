@@ -14,6 +14,7 @@ import 'package:foria/utils/strings.dart';
 import 'package:foria/widgets/errors/image_unavailable.dart';
 import 'package:foria/widgets/errors/simple_error.dart';
 import 'package:foria/widgets/primary_button.dart';
+import 'package:foria_flutter_client/api.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logging/logging.dart';
 import 'package:ntp/ntp.dart';
@@ -493,9 +494,32 @@ class EmailVerificationConflict extends StatefulWidget {
 class _EmailVerificationConflictState extends State<EmailVerificationConflict> {
 
   bool _isCheckingVerification = false;
+  bool _showEmailVerifyButton = true;
+  bool _isVerificationEmailButtonActive = true;
+  Widget _child;
 
   @override
   Widget build(BuildContext context) {
+
+    if (_showEmailVerifyButton) {
+      _child = GestureDetector(
+        child: Text(resendConfirmEmail,
+          style: TextStyle(fontSize: 18.0, color: constPrimaryColor),
+          textAlign: TextAlign.center,
+        ),
+        onTap: (){
+          if (_isVerificationEmailButtonActive) {
+            _triggerVerificationEmail();
+          }
+        },
+      );
+    } else {
+      _child = Text(emailSent,
+        style: Theme.of(context).textTheme.body1,
+        textAlign: TextAlign.center,
+      );
+    }
+
     return PopUpCard(
       content: Column(
         children: <Widget>[
@@ -516,7 +540,7 @@ class _EmailVerificationConflictState extends State<EmailVerificationConflict> {
             height: 25,
           ),
           PrimaryButton(
-            text: iveConfirmedEmail,
+            text: checkAgain,
             isLoading: _isCheckingVerification,
             onPress: _isCheckingVerification ? null :
                 () async {
@@ -534,9 +558,49 @@ class _EmailVerificationConflictState extends State<EmailVerificationConflict> {
 
             },
           ),
+          SizedBox(
+            height: 20,
+          ),
+          _child
         ],
       ),
     );
+  }
+
+  ///
+  /// Calls API to trigger an verification email resend
+  ///
+  void _triggerVerificationEmail () async {
+
+    final AuthUtils authUtils = GetIt.instance<AuthUtils>();
+    final MessageStream errorStream = GetIt.instance<MessageStream>();
+
+    ApiClient foriaApiClient = await authUtils.obtainForiaApiClient();
+    UserApi userApi = new UserApi(foriaApiClient);
+
+    setState(() {
+      _isVerificationEmailButtonActive = false;
+    });
+
+    try {
+      await userApi.sendVerificationEmail();
+    } on ApiException catch (ex, stackTrace) {
+      log("### FORIA SERVER ERROR: sendVerificationEmail ###", level: Level.WARNING.value);
+      log("HTTP Status Code: ${ex.code} - Error: ${ex.message}", level: Level.WARNING.value);
+      errorStream.announceError(ForiaNotification.error(MessageType.ERROR, textGenericError, null, ex, stackTrace));
+      return;
+    } catch (e, stackTrace) {
+      log("### NETWORK ERROR: sendVerificationEmail Msg: ${e.toString()} ###", level: Level.WARNING.value);
+      errorStream.announceError(ForiaNotification.error(MessageType.NETWORK_ERROR, textGenericError, null, null, stackTrace));
+      return;
+    } finally {
+      setState(() {
+        _isVerificationEmailButtonActive = true;
+      });
+    }
+    setState(() {
+      _showEmailVerifyButton = false;
+    });
   }
 }
 
