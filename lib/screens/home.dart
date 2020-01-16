@@ -170,6 +170,7 @@ class TabsState extends State<Tabs> {
       )
           : new BottomNavigationBar(
         currentIndex: _tab,
+        type: BottomNavigationBarType.fixed,
         onTap: onTap,
         backgroundColor: Colors.white,
         items: _allTabs.map((tabItem) {
