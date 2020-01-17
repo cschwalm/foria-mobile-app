@@ -20,6 +20,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'configuration.dart';
 
+///
+/// Status enum to set if class has loaded token from disk.
+///
+enum Status {
+  NOT_READY, LOGGED_IN
+}
+
 class AuthUtils {
 
   /// Key name for the access token used in secure storage plugin.
@@ -37,15 +44,38 @@ class AuthUtils {
 
   static final FirebaseAnalytics _analytics = new FirebaseAnalytics();
 
+  Status _status = Status.NOT_READY;
+
   /// Data from logged in user
   User _user;
   bool _isVenue = false;
 
   ///
-  /// May be null if user has not logged in.
+  /// Blocks and waits until token has been parsed from disk.
   ///
-  User get user => _user;
-  bool get isVenue => _isVenue;
+  Future<User> get user async {
+
+    if (_status == Status.NOT_READY) {
+      log('Attempted to access user data before identity token loaded.', level: Level.INFO.value);
+      await isUserLoggedIn(false);
+      return _user;
+    }
+
+    return _user;
+  }
+
+  ///
+  /// Blocks and waits until token has been parsed from disk.
+  ///
+  Future<bool> get isVenue async {
+
+    if (_status == Status.NOT_READY) {
+      await isUserLoggedIn(false);
+      return _isVenue;
+    }
+
+    return _isVenue;
+  }
 
   ///
   /// Returns API client for use in Foria API libs.
@@ -68,7 +98,7 @@ class AuthUtils {
     }
 
     ApiClient apiClient =
-    new ApiClient(basePath: Configuration.apiBasePath,accessToken: accessToken.toCompactSerialization());
+    new ApiClient(basePath: Configuration.apiBasePath, accessToken: accessToken.toCompactSerialization());
 
     return apiClient;
   }
@@ -196,7 +226,7 @@ class AuthUtils {
         pref.setBool('viewedForiaIntro', false);
       }
 
-      if (isVenue) {
+      if (_isVenue) {
         Navigator.of(context).pushReplacementNamed(Home.routeName);
       } else if (pref.getBool('viewedForiaIntro')) {
         Navigator.of(context).pushReplacementNamed(Home.routeName);
@@ -263,6 +293,7 @@ class AuthUtils {
   /// Expiration check should be skipped if there is no internet to allow offline access.
   ///
   Future<bool> isUserLoggedIn(bool doExpirationCheck) async {
+
     JsonWebToken jwt = await _loadToken(idTokenKey);
     JsonWebToken accessToken = await _loadToken(accessTokenKey);
 
@@ -287,6 +318,7 @@ class AuthUtils {
     _user.lastName = jwt.claims["family_name"];
 
     _isVenue = _doesUserHaveVenueAccess(accessToken);
+    _status = Status.LOGGED_IN;
 
     _analytics.setUserId(_user.id);
     return true;

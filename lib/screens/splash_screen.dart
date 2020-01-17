@@ -37,13 +37,16 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     final AuthUtils authUtils = GetIt.instance<AuthUtils>();
     authUtils.isUserLoggedIn(true).then((isLoggedIn) {
 
-      if (authUtils.isVenue) {
+      authUtils.isVenue.then((isVenue) {
 
-        final List<ShortcutItem> list = new List<ShortcutItem>();
-        final QuickActions quickActions = new QuickActions();
-        list.add(const ShortcutItem(type: 'ACTION_SCAN', localizedTitle: 'Scan Tickets', icon: 'ic_action_scan'));
-        quickActions.setShortcutItems(list);
-      }
+        if (isVenue) {
+
+          final List<ShortcutItem> list = new List<ShortcutItem>();
+          final QuickActions quickActions = new QuickActions();
+          list.add(const ShortcutItem(type: 'ACTION_SCAN', localizedTitle: 'Scan Tickets', icon: 'ic_action_scan'));
+          quickActions.setShortcutItems(list);
+        }
+      });
 
       controller.addStatusListener((AnimationStatus status) {
 

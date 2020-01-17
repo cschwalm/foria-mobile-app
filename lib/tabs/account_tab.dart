@@ -17,17 +17,43 @@ import 'package:url_launcher/url_launcher.dart';
 import '../widgets/contact_support.dart';
 import '../widgets/settings_item.dart';
 
-class AccountTab extends StatelessWidget {
+///
+/// Displays user account info and allows logout.
+///
+class AccountTab extends StatefulWidget {
 
-  final AuthUtils _authUtils = GetIt.instance<AuthUtils>();
-  final MessageStream errorStream = GetIt.instance<MessageStream>();
+  @override
+  _AccountTabState createState() => _AccountTabState();
+}
+
+enum _LoadingState {
+  NOT_READY, LOADED
+}
+
+class _AccountTabState extends State<AccountTab> with AutomaticKeepAliveClientMixin<AccountTab> {
+
+  AuthUtils _authUtils;
+  MessageStream _errorStream;
+  _LoadingState _state = _LoadingState.NOT_READY;
+  User _user;
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+
+    _authUtils = GetIt.instance<AuthUtils>();
+    _errorStream = GetIt.instance<MessageStream>();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
 
-    final User user = _authUtils.user;
-    final MessageStream messageStream = GetIt.instance<MessageStream>();
-    messageStream.addListener((errorMessage) {
+    super.build(context);
+
+    _errorStream.addListener((errorMessage) {
       Scaffold.of(context).showSnackBar(
           SnackBar(
             backgroundColor: snackbarColor,
@@ -40,12 +66,17 @@ class AccountTab extends StatelessWidget {
       );
     });
 
+    //Populate user data after token has been loaded.
+    _authUtils.user.then((user) {
+      setState(() {
+        _user = user;
+        _state = _LoadingState.LOADED;
+      });
+    });
+
     Widget accountInfo;
-    if (user == null || user.firstName == null || user.lastName == null || user.email == null) {
-      errorStream.reportError('Error: user name or email is null',null);
-      accountInfo = SizedBox(height: 20);
-    } else {
-      accountInfo = Row(children: <Widget>[
+    if (_state == _LoadingState.LOADED) {
+       accountInfo = Row(children: <Widget>[
         Expanded(
           child: Container(
             color: Colors.white,
@@ -55,12 +86,12 @@ class AccountTab extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    user.firstName + ' '+ user.lastName,
+                    _user.firstName + ' ' + _user.lastName,
                     style: Theme.of(context).textTheme.display1,
                   ),
                   SizedBox(height: 7),
                   Text(
-                    user.email,
+                    _user.email,
                     style: Theme.of(context).textTheme.body1,
                   ),
                 ],
@@ -69,6 +100,8 @@ class AccountTab extends StatelessWidget {
           ),
         )
       ],);
+    } else {
+      accountInfo = SizedBox(height: 20);
     }
 
     return Container(
