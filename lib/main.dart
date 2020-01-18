@@ -166,7 +166,7 @@ void setupDependencies() {
   quickActions.initialize((shortcutType) async {
     if (shortcutType == 'ACTION_SCAN') {
       log('User opened app via quick action: $shortcutType');
-      if (await authUtils.isUserLoggedIn(true) && authUtils.isVenue) {
+      if (await authUtils.isUserLoggedIn(true) && await authUtils.isVenue) {
         navigatorKey.currentState.pushNamed(TicketScanScreen.routeName);
       } else {
         log('ERROR: User does not have venue access and attempted to open scan screen.', level: Level.WARNING.value);

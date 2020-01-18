@@ -101,14 +101,19 @@ class TabsState extends State<Tabs> {
 
     final AuthUtils authUtils = GetIt.instance<AuthUtils>();
 
-    if (authUtils.isVenue) {
-      _venueTabEnabled = true;
-      _allTabs.add(TabItem(
-        title: 'Manage Events',
-        icon: FontAwesomeIcons.qrcode,
-        activeIcon: FontAwesomeIcons.qrcode,
-      ));
-    }
+    authUtils.isVenue.then((isVenue) {
+
+      if (isVenue) {
+        setState(() {
+          _venueTabEnabled = true;
+          _allTabs.add(TabItem(
+            title: 'Scanner',
+            icon: FontAwesomeIcons.qrcode,
+            activeIcon: FontAwesomeIcons.qrcode,
+          ));
+        });
+      }
+    });
   }
 
   @override

@@ -129,7 +129,7 @@ class MessageStream {
         final buildVersion = '${packageInfo.version} - Build: ${packageInfo.buildNumber}';
 
         final AuthUtils authUtils = GetIt.instance<AuthUtils>();
-        final user = authUtils.user;
+        final user = await authUtils.user;
         final User userContext = new User(id: user.id, email: user.email);
         final Event env = new Event(release: buildVersion, environment: envFullText, userContext: userContext);
 
