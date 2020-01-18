@@ -107,7 +107,7 @@ class TabsState extends State<Tabs> {
         setState(() {
           _venueTabEnabled = true;
           _allTabs.add(TabItem(
-            title: 'Manage Events',
+            title: 'Scanning',
             icon: FontAwesomeIcons.qrcode,
             activeIcon: FontAwesomeIcons.qrcode,
           ));
