@@ -60,6 +60,13 @@ class AuthUtils {
 
       final JsonWebToken jwt = await _loadToken(idTokenKey);
 
+      //Force logout user if we can't load token. If this is hit, there is programming error.
+      if (jwt == null) {
+        log('Forcing user logout because of failure to load ID token.', level: Level.SEVERE.value);
+        await logout();
+        return null;
+      }
+
       _user = new User();
       _user.id = jwt.claims.subject;
       _user.email = jwt.claims["email"];
