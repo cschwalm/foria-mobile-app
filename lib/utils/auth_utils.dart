@@ -55,7 +55,7 @@ class AuthUtils {
   ///
   Future<User> get user async {
 
-    if (_status == Status.NOT_READY) {
+    if (_status == Status.NOT_READY || _user == null) {
       log('Attempted to access user data before identity token loaded.', level: Level.INFO.value);
       await isUserLoggedIn(false);
       return _user;
