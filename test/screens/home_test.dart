@@ -64,6 +64,6 @@ void main() {
     ));
 
     await tester.pumpAndSettle();
-    expect(find.text('Manage Events'), findsOneWidget);
+    expect(find.text('Scanner'), findsOneWidget);
   });
 }

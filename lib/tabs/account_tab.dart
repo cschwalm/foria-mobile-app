@@ -67,7 +67,7 @@ class _AccountTabState extends State<AccountTab> with AutomaticKeepAliveClientMi
     });
 
     Widget accountInfo;
-    if (_state == _LoadingState.LOADED) {
+    if (_state == _LoadingState.LOADED && _user != null && _user.firstName != null && _user.lastName != null && _user.email != null) {
        accountInfo = Row(children: <Widget>[
         Expanded(
           child: Container(
