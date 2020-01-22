@@ -66,16 +66,8 @@ class _AccountTabState extends State<AccountTab> with AutomaticKeepAliveClientMi
       );
     });
 
-    //Populate user data after token has been loaded.
-    _authUtils.user.then((user) {
-      setState(() {
-        _user = user;
-        _state = _LoadingState.LOADED;
-      });
-    });
-
     Widget accountInfo;
-    if (_state == _LoadingState.LOADED) {
+    if (_state == _LoadingState.LOADED && _user != null && _user.firstName != null && _user.lastName != null && _user.email != null) {
        accountInfo = Row(children: <Widget>[
         Expanded(
           child: Container(
@@ -100,8 +92,31 @@ class _AccountTabState extends State<AccountTab> with AutomaticKeepAliveClientMi
           ),
         )
       ],);
+
     } else {
+
       accountInfo = SizedBox(height: 20);
+
+      //Populate user data after token has been loaded.
+      _authUtils.user.then((user) {
+
+        if (user == null || user.firstName == null || user.lastName == null || user.email == null) {
+          final ForiaNotification foriaNotification = new ForiaNotification.error(MessageType.ERROR,
+              'Failed to load user identity info.',
+              'Failed to load user info.',
+              null,
+              null);
+
+          log("Failed to load user data from stored identity token!", level: Level.SEVERE.value);
+          _errorStream.announceError(foriaNotification);
+          return;
+        }
+
+        setState(() {
+          _user = user;
+          _state = _LoadingState.LOADED;
+        });
+      });
     }
 
     return Container(

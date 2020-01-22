@@ -48,17 +48,33 @@ class AuthUtils {
 
   /// Data from logged in user
   User _user;
-  bool _isVenue = false;
 
   ///
   /// Blocks and waits until token has been parsed from disk.
   ///
   Future<User> get user async {
 
-    if (_status == Status.NOT_READY) {
-      log('Attempted to access user data before identity token loaded.', level: Level.INFO.value);
-      await isUserLoggedIn(false);
-      return _user;
+    if (_status == Status.NOT_READY || _user == null) {
+
+      log('Loading user data from stored indentity token.', level: Level.INFO.value);
+
+      final JsonWebToken jwt = await _loadToken(idTokenKey);
+
+      //Force logout user if we can't load token. If this is hit, there is programming error.
+      if (jwt == null) {
+        log('Forcing user logout because of failure to load ID token.', level: Level.SEVERE.value);
+        await logout();
+        return null;
+      }
+
+      _user = new User();
+      _user.id = jwt.claims.subject;
+      _user.email = jwt.claims["email"];
+      _user.firstName = jwt.claims["given_name"];
+      _user.lastName = jwt.claims["family_name"];
+
+      _analytics.setUserId(_user.id);
+      _status = Status.LOGGED_IN;
     }
 
     return _user;
@@ -69,12 +85,9 @@ class AuthUtils {
   ///
   Future<bool> get isVenue async {
 
-    if (_status == Status.NOT_READY) {
-      await isUserLoggedIn(false);
-      return _isVenue;
-    }
-
-    return _isVenue;
+    log('Loading isVenue data from stored access token.', level: Level.INFO.value);
+    final JsonWebToken accessToken = await _loadToken(accessTokenKey);
+    return _doesUserHaveVenueAccess(accessToken);
   }
 
   ///
@@ -226,7 +239,7 @@ class AuthUtils {
         pref.setBool('viewedForiaIntro', false);
       }
 
-      if (_isVenue) {
+      if (await isVenue) {
         Navigator.of(context).pushReplacementNamed(Home.routeName);
       } else if (pref.getBool('viewedForiaIntro')) {
         Navigator.of(context).pushReplacementNamed(Home.routeName);
@@ -295,7 +308,6 @@ class AuthUtils {
   Future<bool> isUserLoggedIn(bool doExpirationCheck) async {
 
     JsonWebToken jwt = await _loadToken(idTokenKey);
-    JsonWebToken accessToken = await _loadToken(accessTokenKey);
 
     if (jwt == null) {
       log("No token found in storage. User is not logged in.");
@@ -311,16 +323,6 @@ class AuthUtils {
       }
     }
 
-    _user = new User();
-    _user.id = jwt.claims.subject;
-    _user.email = jwt.claims["email"];
-    _user.firstName = jwt.claims["given_name"];
-    _user.lastName = jwt.claims["family_name"];
-
-    _isVenue = _doesUserHaveVenueAccess(accessToken);
-    _status = Status.LOGGED_IN;
-
-    _analytics.setUserId(_user.id);
     return true;
   }
 
